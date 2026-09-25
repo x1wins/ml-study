@@ -423,6 +423,56 @@
       </div>
     </div>
 
+    <div class="concept">
+      <h3>Example 1 &mdash; multiplication becomes addition</h3>
+      <p>Say you need <code>1000 &times; 100000</code>. With logs (base 10) you just <em>add</em> the
+      exponents:</p>
+      <div class="formula">log(1000) + log(100000) = 3 + 5 = 8  &rarr;  answer = 10<sup>8</sup> = 100,000,000</div>
+      <p class="muted">This is exactly how slide rules worked, and why the product rule
+      <code>log(a&middot;b) = log a + log b</code> is so handy: a hard multiplication turns into an easy
+      addition.</p>
+      <div class="why">
+        <strong>In ML:</strong> the probability of a whole sentence is the product of each word's
+        probability, e.g. <code>0.2 &times; 0.1 &times; 0.05 &times; &hellip;</code>. Multiplying hundreds of
+        small numbers is slow and unstable; adding their logs is fast and safe.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Example 2 &mdash; compressing a huge range (log scale)</h3>
+      <p>Imagine plotting these five values on a normal axis:</p>
+      <pre><code>value        1     100    10,000   1,000,000
+log10(value) 0      2       4          6</code></pre>
+      <p>On a linear axis, <code>1</code> and <code>100</code> would be squashed invisibly against zero
+      while <code>1,000,000</code> dominates. On a <strong>log scale</strong> they become evenly spaced
+      (0, 2, 4, 6) &mdash; every &times;100 step is the same visual distance, so you can see all of them
+      at once.</p>
+      <div class="why">
+        <strong>In ML:</strong> this is why learning-rate sweeps use log spacing
+        (<code>0.001, 0.01, 0.1, 1</code>) and why loss curves are often plotted on a log axis &mdash;
+        early training drops loss by orders of magnitude, and a log scale keeps the later fine detail visible.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Example 3 &mdash; rescuing tiny probabilities from underflow</h3>
+      <p>Multiply 400 word-probabilities of about <code>0.01</code> each. The true product is
+      <code>10<sup>&minus;800</sup></code> &mdash; far smaller than the smallest number a 64-bit float can
+      hold (&asymp; <code>10<sup>&minus;308</sup></code>), so the computer stores it as exactly
+      <code>0.0</code>. All information is lost.</p>
+      <pre><code>product of 400 probs of 0.01   &rarr; 0.0        (underflow: useless)
+sum of 400 &times; log(0.01)          &rarr; &minus;1842.07   (perfectly fine)</code></pre>
+      <p>Working in "log space" (adding logs instead of multiplying probabilities) keeps the number in a
+      normal, comparable range. To recover a probability you exponentiate at the very end.</p>
+      <div class="formula">log P = &Sigma; log(p&#7522;)   &rarr;   P = e<sup>(log P)</sup></div>
+      <div class="why">
+        <strong>In ML:</strong> this is the whole reason <em>log-likelihood</em> and
+        <em>cross-entropy</em> are computed with logs &mdash; see <a href="loss-functions.html">Loss
+        Functions</a>. It also connects to <a href="euler-number.html">Euler's number e</a>, since
+        <code>ln</code> is log base <code>e</code>.
+      </div>
+    </div>
+
     <!-- 5. DERIVATIVE -->
     <h2 class="section" id="derivative">5. The derivative of ln(x)</h2>
 
