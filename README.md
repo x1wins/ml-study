@@ -37,6 +37,15 @@ and (where useful) runnable Python code.
 | 14 | [Evaluation Metrics](evaluation-metrics.html) | Accuracy, precision/recall, F1, ROC/AUC, regression metrics |
 | 15 | [Ethics & Safety](ethics-safety.html) | Bias & fairness, privacy, responsible AI |
 
+## 🎯 Test Prep — get interview-ready
+
+| Page | What it is |
+|------|-----------|
+| [Math Practice](math-practice.html) | 24 computational problems with step-by-step solutions |
+| [Code Drills](code-drills.html) | Implement softmax, MSE, gradient descent, etc. from scratch (NumPy) with reference solutions |
+| [Interview Prep](interview-prep.html) | Readiness checklist + 16 common Q&A with reveal answers |
+| [Mock Test](mock-test.html) | Timed, shuffled 116-question exam across all topics; score + review |
+
 ## 🪜 The LLM ladder
 
 When prompting isn't enough, climb only as far as you need:

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mock Test — Timed AI/ML Assessment</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  
+    /* Mock test */
+    .setup, .mtq { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem 1.35rem; margin-bottom: 1rem; }
+    .mtbar { position: sticky; top: 44px; z-index: 40; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem 1rem; margin: 1rem 0; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
+    .mtbar strong { color: var(--accent); }
+    .mtbar .time { font-variant-numeric: tabular-nums; }
+    .mtq .qt { font-weight: 600; margin: 0.2rem 0 0.6rem; }
+    .mtq .topic { color: var(--accent-2); font-size: 0.78rem; font-weight: 700; }
+    .mopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .mopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem; cursor: pointer; font-family: inherit; }
+    .mopt:hover { border-color: var(--accent); }
+    .mopt.sel { border-color: var(--accent); background: rgba(56,189,248,0.12); }
+    .mopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.14); color: #d1fae5; }
+    .mopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.14); color: #fecaca; }
+    .mex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent); padding: 0.3rem 0.7rem; display: none; }
+    .mex.show { display: block; }
+    .btn { background: var(--accent); color: #0f172a; border: none; border-radius: 8px; padding: 0.55rem 1.1rem; font-weight: 700; cursor: pointer; font-family: inherit; margin: 0.3rem 0.4rem 0 0; }
+    .btn.secondary { background: var(--card); color: var(--accent); border: 1px solid var(--border); }
+    .btn:hover { opacity: 0.92; }
+    .result { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; display: none; text-align: center; }
+    .result.show { display: block; }
+    .result .score { font-size: 2.2rem; font-weight: 800; color: var(--accent); }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>⏱️ Mock Test</h1>
+    <p>A timed, mixed assessment drawn from every topic on the site. No feedback until you submit —
+       just like the real thing.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">← Back to Learning Path</a>
+
+    <div class="setup" id="setup">
+      <h2 class="section" style="margin-top:0;">Start a test</h2>
+      <p class="muted">Pick a length and time limit. Questions are shuffled from a bank of
+        <strong id="bankCount">0</strong> across 23 topics.</p>
+      <p>Questions:
+        <button class="btn secondary len" data-n="10">10</button>
+        <button class="btn secondary len" data-n="20">20</button>
+        <button class="btn secondary len" data-n="30">30</button>
+      </p>
+      <p>Time limit:
+        <button class="btn secondary tm" data-m="5">5 min</button>
+        <button class="btn secondary tm" data-m="10">10 min</button>
+        <button class="btn secondary tm" data-m="0">No limit</button>
+      </p>
+      <p class="muted">Selected: <strong id="selN">20</strong> questions,
+        <strong id="selT">10 min</strong>.</p>
+      <button class="btn" id="startBtn">Start test</button>
+    </div>
+
+    <div class="mtbar hidden" id="mtbar">
+      <span>Answered: <strong id="ansCount">0</strong> / <span id="qTotal">0</span></span>
+      <span class="time" id="timer">--:--</span>
+    </div>
+
+    <div id="quiz"></div>
+
+    <div id="controls" class="hidden">
+      <button class="btn" id="submitBtn">Submit test</button>
+      <button class="btn secondary" id="restartBtn">New test</button>
+    </div>
+
+    <div class="result" id="result">
+      <div class="score" id="finalScore">0 / 0</div>
+      <div class="muted" id="finalMsg"></div>
+      <button class="btn secondary" id="reviewBtn" style="margin-top:0.6rem;">Review answers</button>
+      <button class="btn" id="againBtn" style="margin-top:0.6rem;">Take another</button>
+    </div>
+
+    <a class="back" href="index.html">← Back to Learning Path</a>
+    <footer><p>Mock Test · Part of your AI study journey 🚀</p></footer>
+  </div>
+
+  <script>
+  var BANK = [{"q": "What is 'parameter sharing' in a CNN?", "options": ["Every pixel connects to every neuron", "The same small filter slides across the whole image", "Weights are copied between different networks", "Each layer uses a different kernel per pixel"], "correct": 1, "explain": "The same filter is reused across the whole image, cutting weights dramatically and giving translation invariance.", "topic": "CNN"}, {"q": "What does the convolution operation produce at each position?", "options": ["A softmax probability", "A single number from multiply-and-add over the kernel window", "A pooled maximum value", "A flattened vector"], "correct": 1, "explain": "At each position the kernel is multiplied element-wise with the patch and summed into one number of the feature map.", "topic": "CNN"}, {"q": "Using out = ⌊(N − K + 2P)/S⌋ + 1, what is the output size for a 5×5 input, 3×3 kernel, no padding, stride 1?", "options": ["5", "4", "3", "2"], "correct": 2, "explain": "(5 − 3 + 0)/1 + 1 = 3, so the output is a 3×3 feature map.", "topic": "CNN"}, {"q": "What does 2×2 max pooling do to a feature map?", "options": ["Adds a zero border around it", "Keeps the largest value in each 2×2 window, shrinking the map", "Averages all values into one number", "Doubles the resolution"], "correct": 1, "explain": "Max pooling slides a window and keeps the strongest (maximum) activation, downsampling the feature map.", "topic": "CNN"}, {"q": "What does a typical CNN do after the conv/ReLU/pool feature-extraction stack?", "options": ["Applies another convolution forever", "Flattens the features and feeds fully-connected layers for classification", "Returns the raw pixels", "Runs an RNN over the image"], "correct": 1, "explain": "The final feature maps are flattened and passed to fully-connected layers (ending in softmax) to make the decision.", "topic": "CNN"}, {"q": "What does a derivative measure at a point on a curve?", "options": ["The area under the curve", "The slope of the tangent line (instantaneous rate of change)", "The total distance travelled", "The height of the curve"], "correct": 1, "explain": "The derivative gives the slope of the tangent line, i.e. the instantaneous rate of change at that point.", "topic": "Derivatives"}, {"q": "Using the power rule, what is the derivative of x³?", "options": ["3x²", "x²", "3x", "x⁴/4"], "correct": 0, "explain": "The power rule brings the exponent down and subtracts one: x³ → 3x².", "topic": "Derivatives"}, {"q": "Which rule is described as 'literally backpropagation' and the most important for ML?", "options": ["The product rule", "The quotient rule", "The chain rule", "The constant rule"], "correct": 2, "explain": "The chain rule differentiates compositions g(h(x)) and is exactly what backpropagation applies layer by layer.", "topic": "Derivatives"}, {"q": "For f(x, y) = x² + y², what is the partial derivative ∂f/∂x?", "options": ["2y", "x² + 2x", "2x", "2x + 2y"], "correct": 2, "explain": "Treating y as a constant, y² drops to 0 and x² differentiates to 2x, so ∂f/∂x = 2x.", "topic": "Derivatives"}, {"q": "What does the gradient ∇f point toward, and how is it used in gradient descent?", "options": ["Toward steepest decrease; step along +∇f", "Toward steepest increase; step along −∇f to reduce loss", "Toward the origin; step along ∇f²", "It points nowhere; it is just a number"], "correct": 1, "explain": "The gradient points in the direction of steepest increase, so moving along −∇f goes downhill toward smaller loss.", "topic": "Derivatives"}, {"q": "Using the chain rule, the derivative of f(x) = (3x + 1)² is:", "options": ["2(3x + 1)", "6(3x + 1)", "3(3x + 1)²", "6x"], "correct": 1, "explain": "Outer 2(3x+1) times inner derivative 3 gives 2(3x+1)·3 = 6(3x + 1).", "topic": "Derivatives"}, {"q": "Which of these is one of the five pillars of responsible AI described on the page?", "options": ["Profitability", "Accountability", "Scalability", "Portability"], "correct": 1, "explain": "The five pillars are Fairness, Privacy, Transparency, Accountability, and Safety.", "topic": "Ethics"}, {"q": "What is a 'proxy' source of bias?", "options": ["A network setting that speeds up training", "A seemingly neutral feature that stands in for a protected attribute", "A duplicated row in the dataset", "A missing value filled with the mean"], "correct": 1, "explain": "A proxy feature (like postal code standing in for race or income) indirectly encodes a protected attribute.", "topic": "Ethics"}, {"q": "What does 'data minimization' mean as a privacy concept?", "options": ["Compressing files to save disk space", "Collecting and keeping only the data you actually need, for only as long as needed", "Removing all numeric columns", "Training on the smallest possible model"], "correct": 1, "explain": "Data minimization means collecting and retaining only the personal data you genuinely need and no longer.", "topic": "Ethics"}, {"q": "What distinguishes human-in-the-loop from human-on-the-loop oversight?", "options": ["In-the-loop reviews/approves decisions before they take effect; on-the-loop monitors and can intervene", "They are the same thing", "On-the-loop approves each decision first; in-the-loop only watches", "Both remove humans entirely"], "correct": 0, "explain": "Human-in-the-loop reviews or approves high-stakes decisions beforehand, while human-on-the-loop monitors and can override.", "topic": "Ethics"}, {"q": "What is 'model collapse'?", "options": ["A model crashing due to a memory error", "Quality degrading over generations when models are trained mostly on earlier models' output", "A model overfitting to the test set", "The server hosting a model going offline"], "correct": 1, "explain": "Model collapse is the degradation of quality across generations when models are trained largely on AI-generated data.", "topic": "Ethics"}, {"q": "What is the approximate value of Euler's number e?", "options": ["3.14159", "1.61803", "2.71828", "1.41421"], "correct": 2, "explain": "The page defines e = 2.71828..., the base of natural growth (like pi is for circles).", "topic": "Euler e"}, {"q": "Where does e come from in the compound-interest story?", "options": ["The limit of (1 + 1/n)^n as n goes to infinity", "The sum 1 + 2 + 3 + ... forever", "The ratio of a circle's circumference to diameter", "The square root of 2 times pi"], "correct": 0, "explain": "e is the value that (1 + 1/n)^n approaches as compounding becomes continuous (n → ∞).", "topic": "Euler e"}, {"q": "What is the 'magic property' of the function e^x described on the page?", "options": ["It equals zero everywhere", "It is its own derivative (slope equals height)", "It is always negative", "It repeats every 2π"], "correct": 1, "explain": "e^x is the function whose slope at every point equals its own value: d/dx e^x = e^x.", "topic": "Euler e"}, {"q": "In the worked softmax example with scores [2.0, 1.0, 0.1], what does softmax do with e?", "options": ["Adds e to each score", "Exponentiates each score with e, then divides by the total", "Takes the natural log of each score", "Multiplies each score by e"], "correct": 1, "explain": "Softmax computes e^(score) for each value and divides by the sum so the probabilities sum to 1.", "topic": "Euler e"}, {"q": "Why did machine learning standardize on e as the base for its formulas?", "options": ["Because e is a whole number", "Because e^x and ln(x) give the cleanest possible derivatives (e^x and 1/x)", "Because e is larger than pi", "Because e makes numbers grow faster"], "correct": 1, "explain": "Choosing e makes the ln constant factor equal 1, so gradients through e^x and ln collapse into clean expressions.", "topic": "Euler e"}, {"q": "Why can accuracy be misleading on imbalanced data?", "options": ["It is too hard to compute", "A model ignoring the rare class can still score very high accuracy", "It only works for regression", "It penalizes true negatives"], "correct": 1, "explain": "When one class is rare, predicting the majority for everything yields high accuracy while catching none of the important cases.", "topic": "Evaluation"}, {"q": "What does precision measure?", "options": ["Of all real positives, how many were caught", "When predicting positive, how often it is correct", "The average squared error", "The area under the ROC curve"], "correct": 1, "explain": "Precision = TP/(TP+FP): among positive predictions, how many were actually correct — it punishes false alarms.", "topic": "Evaluation"}, {"q": "What does recall measure?", "options": ["Of all real positives, how many the model caught", "How many positive predictions were correct", "The variance explained by the model", "The threshold used for classification"], "correct": 0, "explain": "Recall = TP/(TP+FN): of all the true positives, how many were found — it punishes misses.", "topic": "Evaluation"}, {"q": "Why is F1 the harmonic mean of precision and recall rather than the plain average?", "options": ["It is easier to compute", "It stays low unless both precision and recall are high", "It ignores recall", "It only works for balanced classes"], "correct": 1, "explain": "The harmonic mean stays low unless both are high, so you can't game F1 by maximizing only one metric.", "topic": "Evaluation"}, {"q": "What does an ROC-AUC of 0.5 indicate?", "options": ["A perfect classifier", "Performance no better than a coin flip", "Predictions are backwards", "Excellent ranking quality"], "correct": 1, "explain": "AUC of 0.5 means the model is no better than random guessing at ranking positives above negatives.", "topic": "Evaluation"}, {"q": "What does fine-tuning fundamentally change about a model?", "options": ["Only the prompt sent to it", "Its weights, and with them its behavior", "The retrieval index", "The tokenizer vocabulary"], "correct": 1, "explain": "Fine-tuning continues training on your examples so the model's weights shift toward the behavior you want.", "topic": "Fine-Tuning"}, {"q": "In LoRA, what is actually trained?", "options": ["Every weight in the base model", "Two small low-rank adapter matrices while the base is frozen", "The embedding layer only", "The tokenizer"], "correct": 1, "explain": "LoRA freezes the base model and trains only small low-rank adapter matrices A and B, often under 1% of parameters.", "topic": "Fine-Tuning"}, {"q": "What does the 'Q' in QLoRA add on top of LoRA?", "options": ["Quicker training via more GPUs", "Quantizing the frozen base to 4-bit to save memory", "Querying an external database", "Quality-checking the dataset"], "correct": 1, "explain": "QLoRA quantizes the frozen base model to 4-bit, shrinking memory so fine-tuning fits on one consumer GPU.", "topic": "Fine-Tuning"}, {"q": "What is the standard file format for fine-tuning datasets described on the page?", "options": ["CSV with commas between rows", "JSONL (one JSON object per line)", "XML documents", "Plain YAML"], "correct": 1, "explain": "JSONL (JSON Lines) puts one JSON object per line with no commas between lines and is the standard for fine-tuning data.", "topic": "Fine-Tuning"}, {"q": "Which failure mode occurs when a model memorizes training examples and fails on new inputs?", "options": ["Catastrophic forgetting", "Overfitting", "Quantization loss", "Distribution shift"], "correct": 1, "explain": "Overfitting is when the model memorizes examples and can't generalize; validation loss rises while training loss falls.", "topic": "Fine-Tuning"}, {"q": "The gradient ∇f points in the direction of:", "options": ["Steepest decrease", "Steepest increase", "Zero change", "The origin"], "correct": 1, "explain": "The gradient points uphill (steepest increase); to minimize loss we step the opposite way.", "topic": "Gradient Descent"}, {"q": "In the update rule new_w = old_w − lr × gradient, why the minus sign?", "options": ["To increase the loss", "To move downhill and reduce the loss", "It is a typo", "To normalize the weights"], "correct": 1, "explain": "Subtracting the gradient moves against the uphill direction — i.e., downhill toward lower loss.", "topic": "Gradient Descent"}, {"q": "If the learning rate is far too large, training will typically:", "options": ["Converge instantly", "Overshoot and may diverge", "Do nothing", "Always find the global minimum"], "correct": 1, "explain": "Too-large steps overshoot the minimum and can oscillate or blow up (diverge).", "topic": "Gradient Descent"}, {"q": "Stochastic Gradient Descent (SGD) updates weights using:", "options": ["The entire dataset each step", "One (or a few) examples per step", "No data", "Only the first example ever"], "correct": 1, "explain": "SGD/mini-batch uses a small sample per step — faster, noisier updates than full-batch.", "topic": "Gradient Descent"}, {"q": "How does a neural network compute the gradients for gradient descent?", "options": ["Random guessing", "Backpropagation (the chain rule applied layer by layer)", "Matrix inversion", "Sorting the weights"], "correct": 1, "explain": "Backprop applies the chain rule from the output back through each layer to get every weight's gradient.", "topic": "Gradient Descent"}, {"q": "What does integration fundamentally compute?", "options": ["The slope of a tangent line", "The area under a curve by adding up infinitely small pieces", "The maximum value of a function", "The number of times a curve crosses zero"], "correct": 1, "explain": "Integration adds up infinitely many thin slices to measure a whole, usually the area under a curve.", "topic": "Integration"}, {"q": "Integration is the inverse of which operation?", "options": ["Multiplication", "Differentiation", "Exponentiation", "Taking a logarithm"], "correct": 1, "explain": "The page stresses that integration is the exact inverse of differentiation; they undo each other.", "topic": "Integration"}, {"q": "Why does an indefinite integral include '+ C'?", "options": ["Because the curve is always positive", "Because the derivative of any constant is zero, so the constant is unknown", "Because C stands for the curve's peak", "Because integrals must round up"], "correct": 1, "explain": "Since differentiating a constant gives 0, many functions share the same derivative, so an unknown constant C is added.", "topic": "Integration"}, {"q": "How do you evaluate the definite integral of f(x) from a to b using antiderivative F?", "options": ["F(a) + F(b)", "F(b) − F(a)", "F(b) × F(a)", "F(a) / F(b)"], "correct": 1, "explain": "The Fundamental Theorem of Calculus gives the definite integral as F(b) − F(a).", "topic": "Integration"}, {"q": "In machine learning and statistics, what does the area under a probability density function p(x) over a range represent?", "options": ["The mean of the data", "The probability of landing in that range", "The variance of the model", "The slope of the loss"], "correct": 1, "explain": "P(a ≤ X ≤ b) equals the integral of p(x) from a to b, and the total area under a valid density is 1.", "topic": "Integration"}, {"q": "A dataset with rows as examples and columns as features is stored as a:", "options": ["Scalar", "Vector", "Matrix", "Single number"], "correct": 2, "explain": "A 2D grid of numbers is a matrix; rows = examples, columns = features.", "topic": "Linear Algebra"}, {"q": "The dot product of two vectors produces:", "options": ["Another vector", "A single number (scalar)", "A matrix", "Their lengths"], "correct": 1, "explain": "The dot product multiplies element-wise and sums, giving one scalar that measures similarity/alignment.", "topic": "Linear Algebra"}, {"q": "A single neural-network layer computes essentially:", "options": ["A sort of the inputs", "output = W·x + b (a matrix multiply plus bias)", "The average of inputs", "A random projection"], "correct": 1, "explain": "Each layer is a matrix multiplication W·x plus a bias vector b — matrix multiplication is the core operation.", "topic": "Linear Algebra"}, {"q": "The L2 norm of a vector measures its:", "options": ["Number of elements", "Length / magnitude (√Σxᵢ²)", "Largest element", "Sum of elements"], "correct": 1, "explain": "The L2 norm is the Euclidean length: the square root of the sum of squared components.", "topic": "Linear Algebra"}, {"q": "PCA (using eigenvectors) is mainly used for:", "options": ["Adding features", "Finding directions of greatest variance to reduce dimensions", "Sorting data", "Encrypting data"], "correct": 1, "explain": "PCA finds the principal directions (eigenvectors) of greatest variance, enabling dimensionality reduction.", "topic": "Linear Algebra"}, {"q": "A logarithm is the inverse of which operation?", "options": ["Addition", "Multiplication", "Exponentiation", "Differentiation"], "correct": 2, "explain": "If b^y = x then log_b(x) = y — the log undoes exponentiation.", "topic": "Logs"}, {"q": "The natural logarithm ln uses which base?", "options": ["10", "2", "e ≈ 2.71828", "1"], "correct": 2, "explain": "ln is log base e, the natural constant ≈ 2.71828.", "topic": "Logs"}, {"q": "By the product rule, log(a·b) equals:", "options": ["log a · log b", "log a + log b", "log a − log b", "(log a)^b"], "correct": 1, "explain": "Logs turn multiplication into addition: log(ab) = log a + log b.", "topic": "Logs"}, {"q": "Why do we sum log-probabilities instead of multiplying probabilities in ML?", "options": ["It looks nicer", "To avoid numeric underflow from many tiny products", "Logs are faster to type", "It changes the answer"], "correct": 1, "explain": "Multiplying many small probabilities underflows to 0; summing their logs is numerically stable.", "topic": "Logs"}, {"q": "The derivative of ln(x) is:", "options": ["ln(x)", "1/x", "x", "e^x"], "correct": 1, "explain": "d/dx ln(x) = 1/x — a clean derivative, which is why natural log is favored.", "topic": "Logs"}, {"q": "What does a loss function do?", "options": ["Speeds up matrix multiplication", "Turns 'how wrong the prediction was' into a single number, where lower is better", "Chooses the network's architecture", "Stores the model's weights"], "correct": 1, "explain": "A loss function compares prediction ŷ to target y and returns one number; a perfect prediction gives a loss of 0.", "topic": "Loss"}, {"q": "Why does MSE punish large errors more than MAE?", "options": ["Because it squares the errors", "Because it takes the logarithm of errors", "Because it divides by the number of samples twice", "Because it ignores small errors"], "correct": 0, "explain": "MSE squares each difference, so a miss of 4 contributes 16 while a miss of 2 contributes only 4, making it sensitive to outliers.", "topic": "Loss"}, {"q": "Which loss is more robust when the data contains outliers you don't want to dominate training?", "options": ["MSE", "Cross-entropy", "MAE", "Softmax"], "correct": 2, "explain": "MAE averages absolute errors and treats them proportionally, making it more robust to outliers than MSE.", "topic": "Loss"}, {"q": "Which loss function is used for classification, and what does it measure?", "options": ["MSE; the squared gap between numbers", "Cross-entropy; how confident the model was in the correct class", "MAE; the absolute error of a category", "Softmax; the sum of all outputs"], "correct": 1, "explain": "Cross-entropy is the classification loss; it penalizes low confidence in the true class (measuring 'surprise').", "topic": "Loss"}, {"q": "When softmax (or sigmoid) is paired with cross-entropy, what does the gradient ∂L/∂z simplify to?", "options": ["ŷ × y", "prediction minus target (ŷ − y)", "log(ŷ)", "ŷ + y"], "correct": 1, "explain": "The messy chain-rule terms cancel, leaving the clean gradient ∂L/∂z = ŷ − y, which is stable and fast.", "topic": "Loss"}, {"q": "A dataset with rows as examples and columns as features is best represented as a:", "options": ["Scalar", "Vector", "Matrix", "Single number"], "correct": 2, "explain": "A 2D grid of numbers is a matrix; rows = examples, columns = features.", "topic": "Math"}, {"q": "The dot product of two vectors produces:", "options": ["Another vector", "A single number", "A matrix", "Nothing"], "correct": 1, "explain": "A dot product multiplies and sums element-wise, yielding one scalar (it measures similarity).", "topic": "Math"}, {"q": "In gradient descent, we update weights in which direction relative to the gradient?", "options": ["Same direction", "Opposite direction", "Perpendicular", "Random"], "correct": 1, "explain": "The gradient points uphill (increasing error), so we step the opposite way to reduce error.", "topic": "Math"}, {"q": "Standard deviation measures:", "options": ["The average", "How spread out the data is", "The largest value", "The count of items"], "correct": 1, "explain": "Std dev (and variance) quantify spread/dispersion around the mean.", "topic": "Math"}, {"q": "Bayes' theorem is mainly used to:", "options": ["Sort data", "Update beliefs when new evidence arrives", "Multiply matrices", "Compute slopes"], "correct": 1, "explain": "Bayes updates a prior probability into a posterior given new evidence.", "topic": "Math"}, {"q": "Why is the ML workflow described as a loop rather than a straight line?", "options": ["Because training always fails the first time", "Because monitoring catches drift, which sends you back to collect data and retrain", "Because deployment must happen before training", "Because the test set is reused repeatedly"], "correct": 1, "explain": "Once live, the world changes; monitoring detects drift and triggers retraining, closing the loop back to data collection.", "topic": "Workflow"}, {"q": "What is data leakage in the collect/prepare stage?", "options": ["Losing rows during a database export", "A feature secretly containing the answer, inflating offline scores", "Storing data without encryption", "Using too small a dataset"], "correct": 1, "explain": "Leakage is when a feature secretly encodes the target, making offline scores look great while production performance collapses.", "topic": "Workflow"}, {"q": "When scaling features, why should you compute mean and standard deviation from the training set only?", "options": ["It runs faster", "Using the whole dataset leaks test-set information into training", "The test set has no numbers", "Validation data must be scaled differently"], "correct": 1, "explain": "Fitting the scaler on all data leaks information from the test set into training, so μ/σ are computed on train only.", "topic": "Workflow"}, {"q": "What is the purpose of the test set in a train/validation/test split?", "options": ["Choosing hyperparameters repeatedly", "Fitting the model's parameters", "A final, one-time estimate of real-world performance", "Cleaning the data"], "correct": 2, "explain": "The test set gives an honest, one-time estimate of performance and should be touched only once at the very end.", "topic": "Workflow"}, {"q": "In K-fold cross-validation, how is a more stable performance estimate obtained?", "options": ["By training on the test set K times", "By rotating the validation slice K times and averaging the scores", "By using a single large validation split", "By increasing the learning rate each fold"], "correct": 1, "explain": "K-fold rotates the validation slice so every example is validated once, then averages the K scores for a stabler estimate.", "topic": "Workflow"}, {"q": "What does a single neuron do to its inputs?", "options": ["Sorts them from smallest to largest", "Multiplies each by a weight, sums them, adds a bias, then applies an activation function", "Stores them in memory for later", "Averages them and returns the mean"], "correct": 1, "explain": "A neuron computes activation((w₁x₁ + ... + wₙxₙ) + b), the core operation of the page.", "topic": "Neural Nets"}, {"q": "What is the role of a weight in a neuron?", "options": ["It shifts the total regardless of input", "It scales an input, setting how important it is", "It adds random noise", "It stores the network's output"], "correct": 1, "explain": "A weight multiplies (scales) an input; a large weight means the input matters a lot.", "topic": "Neural Nets"}, {"q": "Why is a bias useful in a neuron?", "options": ["It multiplies each input by a constant", "It lets the neuron shift its output up or down independent of the inputs", "It normalizes the inputs to sum to 1", "It speeds up matrix multiplication"], "correct": 1, "explain": "The bias is added after the weighted sum, letting the neuron fire even when inputs are zero (like the intercept b in y = mx + b).", "topic": "Neural Nets"}, {"q": "Why do neural networks need activation functions?", "options": ["To store the weights", "To add non-linearity so the network can learn curves and complex patterns", "To make training slower and more accurate", "To convert inputs into integers"], "correct": 1, "explain": "Without activations, stacked layers collapse into one linear function; activations add the bends needed for complex patterns.", "topic": "Neural Nets"}, {"q": "What is backpropagation in the training loop?", "options": ["Feeding inputs forward to get a prediction", "Using the chain rule to compute how each weight contributed to the error, then updating downhill", "Randomly resetting the weights each step", "Measuring accuracy on the test set"], "correct": 1, "explain": "Backpropagation pushes the error backward with the chain rule to get gradients, then updates weights via w = w − lr × gradient.", "topic": "Neural Nets"}, {"q": "Standard deviation measures:", "options": ["The average value", "How spread out the data is around the mean", "The largest value", "The number of items"], "correct": 1, "explain": "Std dev (√variance) quantifies dispersion around the mean.", "topic": "Probability"}, {"q": "The normal (Gaussian) distribution's formula is built on which constant?", "options": ["π only", "e (via e^(−x²/2))", "The golden ratio", "1"], "correct": 1, "explain": "The bell curve uses e^(−x²/2); its total area integrates to 1.", "topic": "Probability"}, {"q": "For two independent events, P(A and B) equals:", "options": ["P(A) + P(B)", "P(A) × P(B)", "P(A) − P(B)", "P(A) / P(B)"], "correct": 1, "explain": "Independent probabilities multiply: P(A and B) = P(A)·P(B).", "topic": "Probability"}, {"q": "Bayes' theorem is used to:", "options": ["Sort data", "Update a prior belief into a posterior given new evidence", "Compute slopes", "Multiply matrices"], "correct": 1, "explain": "Bayes updates P(A) into P(A|B) using P(B|A)P(A)/P(B) when evidence arrives.", "topic": "Probability"}, {"q": "The expected value E[X] of a random variable is:", "options": ["Its maximum", "The probability-weighted average Σ x·p(x)", "Its variance", "Always 0.5"], "correct": 1, "explain": "Expected value is the long-run average: each outcome weighted by its probability.", "topic": "Probability"}, {"q": "According to the page, why is Python the practical language for ML despite not being the fastest?", "options": ["It compiles to machine code", "It is readable and nearly every ML tool has a Python interface", "It runs only on GPUs", "It has no libraries to learn"], "correct": 1, "explain": "Python reads almost like English and has a huge ecosystem, while the heavy math runs in C/Fortran under the hood.", "topic": "Programming"}, {"q": "What does 'vectorization' with NumPy mean?", "options": ["Looping element by element in Python", "Applying an operation to a whole array at once", "Converting arrays to lists", "Drawing vector graphics"], "correct": 1, "explain": "Vectorization applies an operation across an entire array at once instead of a Python loop — shorter and much faster.", "topic": "Programming"}, {"q": "What is NumPy broadcasting?", "options": ["Sending arrays over a network", "A rule for combining arrays of different shapes by stretching the smaller one", "Printing arrays to the console", "Sorting an array in place"], "correct": 1, "explain": "Broadcasting lets NumPy combine arrays of different shapes by virtually stretching the smaller to match the larger.", "topic": "Programming"}, {"q": "In Pandas, what does the groupby pattern do?", "options": ["Sorts columns alphabetically", "Splits into groups, applies an aggregation, then combines results", "Deletes duplicate rows", "Loads a CSV file"], "correct": 1, "explain": "groupby follows the split → apply → combine pattern: split into groups, aggregate each, then combine.", "topic": "Programming"}, {"q": "In the scikit-learn pipeline, what pattern trains and uses nearly every model?", "options": [".load() / .save()", ".fit() / .predict()", ".open() / .close()", ".group() / .merge()"], "correct": 1, "explain": "scikit-learn's .fit() then .predict() pattern is the same across dozens of models, so you can swap models freely.", "topic": "Programming"}, {"q": "In the ladder of techniques, what is the recommended order to try when an LLM gives a weak answer?", "options": ["Fine-tuning → RAG → Prompting", "Prompting → RAG → Fine-tuning", "RAG → Prompting → Fine-tuning", "Fine-tuning → Prompting → RAG"], "correct": 1, "explain": "The page teaches to exhaust the cheapest rung first: Prompting → RAG → Fine-tuning.", "topic": "Prompting"}, {"q": "In few-shot prompting, what does the number of 'shots' refer to?", "options": ["How many times you re-run the prompt", "How many worked examples you include before the real task", "How many tokens the model outputs", "How many models you compare"], "correct": 1, "explain": "'Shots' are the number of worked examples placed in the prompt (zero, one, or a few) before the actual task.", "topic": "Prompting"}, {"q": "Which message role should hold durable rules like tone, format, and persona that persist across the whole chat?", "options": ["user", "assistant", "system", "function"], "correct": 2, "explain": "The system role sets behavior, rules, and persona for the whole conversation, so durable instructions belong there.", "topic": "Prompting"}, {"q": "What is the main benefit of Chain-of-Thought prompting for reasoning or math tasks?", "options": ["It hides the answer from the user", "It makes the model faster", "Asking it to work through steps often improves correctness", "It reduces the token cost"], "correct": 2, "explain": "Asking the model to think step by step before answering often dramatically improves correctness on multi-step tasks.", "topic": "Prompting"}, {"q": "According to the page, which technique helps reduce made-up (hallucinated) answers?", "options": ["Always demand a single-word answer", "Let the model say 'I don't know' if the answer isn't in the text", "Increase the temperature", "Ask multiple tasks in one prompt"], "correct": 1, "explain": "Allowing the model to say 'I don't know' when the answer isn't present reduces fabricated answers.", "topic": "Prompting"}, {"q": "What does RAG change in order to answer questions using your documents?", "options": ["The model's weights via retraining", "The input/prompt by adding retrieved context", "The model's architecture", "The tokenizer"], "correct": 1, "explain": "RAG never retrains the model; it changes the input by pasting retrieved context into the prompt.", "topic": "RAG"}, {"q": "What are the two phases of a RAG pipeline?", "options": ["Training and inference", "Indexing (once) and query (each question)", "Encoding and decoding", "Chunking and scaling"], "correct": 1, "explain": "RAG has an indexing phase done once and a query phase run each time a user asks something.", "topic": "RAG"}, {"q": "What is an embedding in the context of RAG?", "options": ["A compressed image file", "A list of numbers (vector) that captures the meaning of text", "A database index key", "A prompt template"], "correct": 1, "explain": "An embedding is a vector of numbers capturing meaning, so texts with similar meaning get similar vectors.", "topic": "RAG"}, {"q": "In cosine similarity, what does a value of 1 indicate?", "options": ["The vectors are opposite", "The vectors are unrelated (perpendicular)", "The vectors point in the same direction (very similar)", "The vectors have equal length"], "correct": 2, "explain": "Cosine similarity of 1 means identical direction (very similar); 0 means unrelated and -1 means opposite.", "topic": "RAG"}, {"q": "Which evaluation metric asks whether every claim in the answer is supported by the retrieved context?", "options": ["Context recall", "Context precision", "Faithfulness / grounding", "Answer relevance"], "correct": 2, "explain": "Faithfulness/grounding checks that the answer states only what the retrieved context supports, fighting hallucination.", "topic": "RAG"}, {"q": "What role does the hidden state play in an RNN?", "options": ["It stores the fixed weights", "It is a running memory passed from one step to the next", "It is the final classification output only", "It is the learning rate"], "correct": 1, "explain": "The hidden state is the network's memory — a running summary of everything seen so far, passed step to step.", "topic": "RNN/LSTM"}, {"q": "Why can an RNN handle sequences of any length with a fixed number of parameters?", "options": ["It uses padding", "The same weights are shared and reused at every time step", "It adds new weights per step", "It ignores earlier inputs"], "correct": 1, "explain": "Weight sharing means the same Wx and Wh are reused at every step, so parameter count doesn't grow with sequence length.", "topic": "RNN/LSTM"}, {"q": "In the vanishing gradient problem, what happens when the recurrent factors are less than 1?", "options": ["Gradients explode to infinity", "Gradients shrink toward 0, so long-range dependencies aren't learned", "Training becomes instantly perfect", "The hidden state doubles each step"], "correct": 1, "explain": "Multiplying many factors below 1 shrinks the gradient toward 0, so early steps get almost no learning signal.", "topic": "RNN/LSTM"}, {"q": "Why does an LSTM's cell state help gradients survive over long spans?", "options": ["It multiplies by a large weight each step", "It is updated mainly by addition, so gradients flow back nearly unchanged", "It resets to zero every step", "It uses no gates"], "correct": 1, "explain": "The cell state is edited by gated addition rather than repeated matrix multiplication, letting gradients flow across long distances.", "topic": "RNN/LSTM"}, {"q": "How does a GRU differ from an LSTM?", "options": ["It has more gates and parameters", "It merges cell and hidden state and uses just two gates", "It removes the hidden state entirely", "It replaces gates with convolution"], "correct": 1, "explain": "A GRU is a lighter variant: it merges cell and hidden state and uses only update and reset gates.", "topic": "RNN/LSTM"}, {"q": "Which library is best for classic ML on structured/tabular data with quick, interpretable baselines?", "options": ["PyTorch", "scikit-learn", "Hugging Face Transformers", "Matplotlib"], "correct": 1, "explain": "scikit-learn is the go-to for classic ML (regression, classification, clustering) on tabular data with a simple API.", "topic": "Tools"}, {"q": "What consistent three-step pattern do almost all scikit-learn estimators follow?", "options": ["load / compile / run", "encode / decode / sample", "fit / predict / score", "train / validate / deploy"], "correct": 2, "explain": "Nearly every scikit-learn model uses fit(X, y), predict(X), and score(X, y).", "topic": "Tools"}, {"q": "What does autograd do in PyTorch and TensorFlow?", "options": ["Automatically labels training data", "Automatically computes gradients for backpropagation", "Automatically deploys the model", "Automatically cleans the dataset"], "correct": 1, "explain": "Autograd records the forward pass and walks it backward to compute every gradient, so you never write the chain rule by hand.", "topic": "Tools"}, {"q": "What is the simplest entry point in Hugging Face for using a pretrained model on a task?", "options": ["pipeline()", "fit()", "SavedModel", "DataFrame"], "correct": 0, "explain": "The pipeline() helper hides model-loading and tokenizing, letting you name a task and get a working model instantly.", "topic": "Tools"}, {"q": "According to the page's decision shortcut, which tool fits images, audio, or custom neural nets best?", "options": ["scikit-learn", "Pandas", "PyTorch", "Jupyter"], "correct": 2, "explain": "The page recommends PyTorch for images, audio, or custom neural networks and research/prototyping.", "topic": "Tools"}, {"q": "In the training loop, what is an 'epoch'?", "options": ["One weight update from a single batch", "One full pass over the entire training set", "A small group of examples processed together", "The step size of each update"], "correct": 1, "explain": "An epoch is one complete pass over the entire training set, made up of many batches/iterations.", "topic": "Training"}, {"q": "In the update rule w = w − η · ∂L/∂w, what does η (eta) represent?", "options": ["The learning rate (step size)", "The gradient", "The loss value", "The batch size"], "correct": 0, "explain": "η is the learning rate, controlling how large a step is taken downhill on each update.", "topic": "Training"}, {"q": "What advantage does mini-batch gradient descent have over both batch GD and single-example SGD?", "options": ["It always finds the global minimum", "It never needs a learning rate", "It balances speed and stability while being GPU-friendly", "It requires no gradients"], "correct": 2, "explain": "Mini-batches are the sweet spot: faster and more stable than full-batch or single-example updates, and they use parallel hardware well.", "topic": "Training"}, {"q": "How does Adam give each weight its own effective learning rate?", "options": ["By using a fixed schedule for all weights", "By using a running average of the squared gradient (2nd moment)", "By dropping random neurons", "By penalizing large weights"], "correct": 1, "explain": "Adam tracks a running average of the gradient squared (the 2nd moment) to adapt the step size per weight.", "topic": "Training"}, {"q": "Which sign most clearly indicates overfitting during training?", "options": ["Both training and validation loss stay high", "Training loss keeps falling while validation loss starts rising", "Loss jumps to NaN", "Validation loss drops faster than training loss"], "correct": 1, "explain": "Overfitting shows up when training loss keeps falling but validation loss turns upward — the model is memorizing noise.", "topic": "Training"}, {"q": "What key advantage do transformers have over RNNs?", "options": ["They read one token at a time", "They compare every token to every other directly and in parallel", "They use no weights", "They cannot handle long sequences"], "correct": 1, "explain": "Transformers process the whole sequence at once, comparing every token to every other directly and in parallel.", "topic": "Transformers"}, {"q": "In self-attention, what does the Query (Q) represent?", "options": ["The actual content of a token", "What a token is looking for", "The label each token offers", "The positional encoding"], "correct": 1, "explain": "The Query is 'what am I looking for?' — it is compared against every token's Key to find relevant matches.", "topic": "Transformers"}, {"q": "In Attention = softmax(QKᵀ / √dₖ) V, why divide by √dₖ?", "options": ["To make the output larger", "To keep dot products in a stable range so softmax doesn't saturate", "To add positional information", "To remove negative values"], "correct": 1, "explain": "Dividing by √dₖ scales down dot products that grow with dimension, keeping softmax from saturating and gradients healthy.", "topic": "Transformers"}, {"q": "What is the purpose of multi-head attention?", "options": ["To reduce the number of tokens", "To let the model attend to several kinds of relationships at once", "To remove the need for a feed-forward layer", "To encode position"], "correct": 1, "explain": "Multiple heads run attention in parallel, each learning a different type of relationship simultaneously.", "topic": "Transformers"}, {"q": "Why is positional encoding added to token embeddings?", "options": ["To normalize the values", "Because raw attention sees a set, not an ordered sequence", "To reduce the vocabulary size", "To replace the softmax"], "correct": 1, "explain": "Attention has no built-in sense of order, so positional encoding injects where each token sits in the sequence.", "topic": "Transformers"}, {"q": "In SOH-CAH-TOA, sine equals:", "options": ["adjacent / hypotenuse", "opposite / hypotenuse", "opposite / adjacent", "hypotenuse / opposite"], "correct": 1, "explain": "SOH: Sine = Opposite / Hypotenuse.", "topic": "Trig"}, {"q": "On the unit circle, a point at angle θ has coordinates:", "options": ["(sin θ, cos θ)", "(cos θ, sin θ)", "(tan θ, 1)", "(θ, θ²)"], "correct": 1, "explain": "The unit-circle point at angle θ is (cos θ, sin θ).", "topic": "Trig"}, {"q": "What is the range of sin θ and cos θ?", "options": ["0 to 1", "−1 to 1", "0 to ∞", "−∞ to ∞"], "correct": 1, "explain": "Both sine and cosine oscillate between −1 and 1.", "topic": "Trig"}, {"q": "The identity sin²θ + cos²θ equals:", "options": ["0", "1", "2", "tan θ"], "correct": 1, "explain": "The Pythagorean identity: sin²θ + cos²θ = 1 for any angle θ.", "topic": "Trig"}, {"q": "Why do Transformers use sin and cos for positional encoding?", "options": ["They are random", "They are bounded, smooth, and let the model represent order and relative positions", "They make training slower", "They convert text to images"], "correct": 1, "explain": "sin/cos are bounded (−1..1) and periodic, giving each position a smooth, unique encoding that captures relative order.", "topic": "Trig"}];
+  document.getElementById("bankCount").textContent = BANK.length;
+
+  var chosenN = 20, chosenM = 10, quiz = [], picks = [], timerId = null, remaining = 0, running = false;
+
+  function shuffle(a){ a = a.slice(); for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+  function fmt(s){ var m=Math.floor(s/60), ss=s%60; return (m<10?"0":"")+m+":"+(ss<10?"0":"")+ss; }
+
+  document.querySelectorAll(".len").forEach(function(b){ b.addEventListener("click",function(){ chosenN=+b.dataset.n; document.getElementById("selN").textContent=chosenN; }); });
+  document.querySelectorAll(".tm").forEach(function(b){ b.addEventListener("click",function(){ chosenM=+b.dataset.m; document.getElementById("selT").textContent = chosenM? (chosenM+" min") : "No limit"; }); });
+
+  function startTest(){
+    quiz = shuffle(BANK).slice(0, Math.min(chosenN, BANK.length));
+    picks = new Array(quiz.length).fill(-1);
+    running = true;
+    document.getElementById("setup").classList.add("hidden");
+    document.getElementById("result").classList.remove("show");
+    document.getElementById("mtbar").classList.remove("hidden");
+    document.getElementById("controls").classList.remove("hidden");
+    document.getElementById("qTotal").textContent = quiz.length;
+    document.getElementById("ansCount").textContent = "0";
+    render();
+    if (chosenM > 0){ remaining = chosenM*60; document.getElementById("timer").textContent = fmt(remaining);
+      timerId = setInterval(function(){ remaining--; document.getElementById("timer").textContent = fmt(remaining); if(remaining<=0){ clearInterval(timerId); submitTest(); } }, 1000);
+    } else { document.getElementById("timer").textContent = "∞"; }
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function render(){
+    var host = document.getElementById("quiz"); host.innerHTML="";
+    quiz.forEach(function(item, qi){
+      var w=document.createElement("div"); w.className="mtq";
+      w.innerHTML = '<div class="topic">'+ (item.topic||"") +'</div><div class="qt">'+(qi+1)+". "+item.q+'</div>';
+      var ul=document.createElement("div"); ul.className="mopts";
+      item.options.forEach(function(opt,oi){
+        var b=document.createElement("button"); b.type="button"; b.className="mopt"; b.textContent=opt;
+        b.addEventListener("click",function(){
+          if(!running) return;
+          picks[qi]=oi;
+          ul.querySelectorAll(".mopt").forEach(function(x){x.classList.remove("sel");});
+          b.classList.add("sel");
+          document.getElementById("ansCount").textContent = picks.filter(function(p){return p>=0;}).length;
+        });
+        ul.appendChild(b);
+      });
+      w.appendChild(ul);
+      var ex=document.createElement("div"); ex.className="mex"; ex.innerHTML="<strong>Why:</strong> "+item.explain;
+      w.appendChild(ex);
+      host.appendChild(w);
+    });
+  }
+
+  function submitTest(){
+    if(!running) return;
+    running=false;
+    if(timerId) clearInterval(timerId);
+    var score=0;
+    var cards=document.querySelectorAll(".mtq");
+    quiz.forEach(function(item,qi){
+      var btns=cards[qi].querySelectorAll(".mopt");
+      btns.forEach(function(b,i){ b.disabled=true;
+        if(i===item.correct) b.classList.add("correct");
+        if(i===picks[qi] && picks[qi]!==item.correct) b.classList.add("wrong");
+      });
+      if(picks[qi]===item.correct) score++;
+    });
+    var pct=Math.round(score/quiz.length*100);
+    document.getElementById("finalScore").textContent = score+" / "+quiz.length+"  ("+pct+"%)";
+    var msg = pct>=80? "Excellent — you're interview-ready on these. 🎉" :
+              pct>=60? "Solid. Review the ones you missed below." :
+              "Keep practicing — revisit the guides, then retake.";
+    document.getElementById("finalMsg").textContent = msg;
+    document.getElementById("result").classList.add("show");
+    document.getElementById("controls").classList.add("hidden");
+    document.getElementById("result").scrollIntoView({behavior:"smooth",block:"center"});
+  }
+
+  function reviewAnswers(){ document.querySelectorAll(".mex").forEach(function(e){e.classList.add("show");});
+    document.getElementById("quiz").scrollIntoView({behavior:"smooth"}); }
+  function reset(){ document.getElementById("quiz").innerHTML=""; document.getElementById("mtbar").classList.add("hidden");
+    document.getElementById("controls").classList.add("hidden"); document.getElementById("result").classList.remove("show");
+    document.getElementById("setup").classList.remove("hidden"); if(timerId) clearInterval(timerId);
+    window.scrollTo({top:0,behavior:"smooth"}); }
+
+  document.getElementById("startBtn").addEventListener("click", startTest);
+  document.getElementById("submitBtn").addEventListener("click", submitTest);
+  document.getElementById("restartBtn").addEventListener("click", reset);
+  document.getElementById("againBtn").addEventListener("click", reset);
+  document.getElementById("reviewBtn").addEventListener("click", reviewAnswers);
+  </script>
+</body>
+</html>

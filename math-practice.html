@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Practice Problems &mdash; Linear Algebra, Calculus, Probability &amp; ML Metrics</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+
+    /* Click-to-reveal solutions */
+    .sol { display: none; margin-top: .6rem; border-left: 3px solid var(--accent); padding: .4rem .8rem; color: var(--muted); }
+    .sol.show { display: block; }
+    .btn { background: var(--accent); color: #0f172a; border: none; border-radius: 8px; padding: .4rem .9rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#128221; Math Practice Problems</h1>
+    <p>Computational, exam-style problems across linear algebra, calculus, logs, probability,
+       evaluation metrics, and softmax &mdash; each with a click-to-reveal, step-by-step solution.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>How to use this page:</strong> try each problem on paper first, then click
+      <em>Show solution</em> to check your work and see the full reasoning. Cross-links point to the
+      relevant guide pages when you need a refresher.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#linalg">Linear Algebra</a></li>
+        <li><a href="#derivatives">Derivatives</a></li>
+        <li><a href="#integration">Integration</a></li>
+        <li><a href="#logs">Logarithms</a></li>
+        <li><a href="#probstats">Probability &amp; Statistics</a></li>
+        <li><a href="#evaluation">Evaluation Metrics</a></li>
+        <li><a href="#softmax">Softmax by Hand</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. LINEAR ALGEBRA -->
+    <h2 class="section" id="linalg">1. Linear Algebra</h2>
+    <p class="muted">Shapes, matrix products, dot products, and norms &mdash; the plumbing of every model.
+       Refresher: <a class="back" style="margin:0;" href="linear-algebra.html">Linear Algebra guide</a>.</p>
+
+    <div class="concept">
+      <h3>Problem 1 &middot; Shape of a matrix product</h3>
+      <p>A is a (3 &times; 2) matrix and B is a (2 &times; 4) matrix. What is the shape of the product
+         A &middot; B? Is the multiplication even valid?</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p><strong>Valid?</strong> Yes. For A &middot; B, the <em>inner</em> dimensions must match:
+           (3 &times; <strong>2</strong>) &middot; (<strong>2</strong> &times; 4). Both inner values are 2, so it is valid.</p>
+        <p><strong>Result shape</strong> = the <em>outer</em> dimensions = (3 &times; 4).</p>
+        <div class="formula">(3 &times; 2) &middot; (2 &times; 4) &rarr; (3 &times; 4)</div>
+        <p>Rule: (m &times; k) &middot; (k &times; n) &rarr; (m &times; n).</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 2 &middot; Compute a 2&times;2 by 2&times;1 matmul</h3>
+      <p>Compute the product below.</p>
+      <div class="formula">[ [1, 2], [3, 4] ] &middot; [ [5], [6] ] = ?</div>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Each output row is a dot product of that row of the matrix with the column vector:</p>
+        <p>Row 1: (1 &middot; 5) + (2 &middot; 6) = 5 + 12 = <strong>17</strong></p>
+        <p>Row 2: (3 &middot; 5) + (4 &middot; 6) = 15 + 24 = <strong>39</strong></p>
+        <div class="formula">result = [ [17], [39] ]&nbsp;&nbsp;(shape 2 &times; 1)</div>
+        <pre><code>import numpy as np
+
+A = np.array([[1, 2], [3, 4]])
+x = np.array([[5], [6]])
+print(A @ x)
+# [[17]
+#  [39]]</code></pre>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 3 &middot; Dot product of two 3-vectors</h3>
+      <p>Compute the dot product of u = [1, 2, 3] and v = [4, 5, 6].</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Multiply element-wise, then sum:</p>
+        <p>(1 &middot; 4) + (2 &middot; 5) + (3 &middot; 6) = 4 + 10 + 18 = <strong>32</strong></p>
+        <div class="formula">u &middot; v = &Sigma;<sub>i</sub> u<sub>i</sub> v<sub>i</sub> = 32</div>
+        <pre><code>import numpy as np
+
+u = np.array([1, 2, 3])
+v = np.array([4, 5, 6])
+print(np.dot(u, v))  # 32</code></pre>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 4 &middot; L2 norm of [3, 4]</h3>
+      <p>What is the L2 (Euclidean) norm of the vector [3, 4]?</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>The L2 norm is the square root of the sum of squared components:</p>
+        <div class="formula">&#8214;v&#8214;<sub>2</sub> = &radic;(3&sup2; + 4&sup2;) = &radic;(9 + 16) = &radic;25 = <strong>5</strong></div>
+        <p>This is the classic 3&ndash;4&ndash;5 right triangle.</p>
+        <pre><code>import numpy as np
+
+v = np.array([3, 4])
+print(np.linalg.norm(v))  # 5.0</code></pre>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 5 &middot; Is W x + b valid?</h3>
+      <p>W has shape (10 &times; 3), x has shape (3 &times; 1), and b has shape (10 &times; 1).
+         Is the expression W x + b a valid computation, and what is its output shape?</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p><strong>Step 1 &mdash; matmul:</strong> (10 &times; <strong>3</strong>) &middot; (<strong>3</strong> &times; 1).
+           Inner dims match (3 = 3), so W x is valid and has shape (10 &times; 1).</p>
+        <p><strong>Step 2 &mdash; add bias:</strong> W x is (10 &times; 1) and b is (10 &times; 1). Shapes match,
+           so the addition is valid.</p>
+        <div class="formula">W x + b &rarr; (10 &times; 1)&nbsp;&nbsp;&#10003; valid</div>
+        <p>This is exactly one linear layer of a neural network. See
+           <a class="back" style="margin:0;" href="neural-networks.html">Neural Networks</a>.</p>
+      </div>
+    </div>
+
+    <!-- 2. DERIVATIVES -->
+    <h2 class="section" id="derivatives">2. Derivatives</h2>
+    <p class="muted">Slopes and the chain rule &mdash; the machinery behind gradient descent.
+       Refresher: <a class="back" style="margin:0;" href="calculus.html">Calculus guide</a>.</p>
+
+    <div class="concept">
+      <h3>Problem 6 &middot; d/dx of x<sup>3</sup></h3>
+      <p>Differentiate f(x) = x<sup>3</sup>.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Use the power rule: d/dx of x<sup>n</sup> = n &middot; x<sup>n&minus;1</sup>.</p>
+        <div class="formula">d/dx (x<sup>3</sup>) = 3x<sup>2</sup></div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 7 &middot; d/dx of (3x + 1)<sup>2</sup> (chain rule)</h3>
+      <p>Differentiate f(x) = (3x + 1)<sup>2</sup>.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Let u = 3x + 1, so f = u<sup>2</sup>. Chain rule: df/dx = (df/du) &middot; (du/dx).</p>
+        <p>df/du = 2u = 2(3x + 1)&nbsp;&nbsp;and&nbsp;&nbsp;du/dx = 3.</p>
+        <div class="formula">df/dx = 2(3x + 1) &middot; 3 = 6(3x + 1) = <strong>18x + 6</strong></div>
+        <p>Check by expanding first: (3x + 1)<sup>2</sup> = 9x<sup>2</sup> + 6x + 1 &rarr;
+           derivative = 18x + 6. &#10003;</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 8 &middot; d/dx of e<sup>&minus;x<sup>2</sup></sup> (chain rule)</h3>
+      <p>Differentiate f(x) = e<sup>&minus;x<sup>2</sup></sup>.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Let u = &minus;x<sup>2</sup>, so f = e<sup>u</sup>. Chain rule: df/dx = e<sup>u</sup> &middot; (du/dx).</p>
+        <p>du/dx = &minus;2x, and e<sup>u</sup> = e<sup>&minus;x<sup>2</sup></sup>.</p>
+        <div class="formula">df/dx = &minus;2x &middot; e<sup>&minus;x<sup>2</sup></sup></div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 9 &middot; d/dx of ln(x)</h3>
+      <p>Differentiate f(x) = ln(x).</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>The derivative of the natural log is a standard result:</p>
+        <div class="formula">d/dx (ln x) = 1 / x&nbsp;&nbsp;(for x &gt; 0)</div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 10 &middot; Partial &part;f/&part;x of x<sup>2</sup> + y<sup>2</sup></h3>
+      <p>Find the partial derivative of f(x, y) = x<sup>2</sup> + y<sup>2</sup> with respect to x.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Treat y as a constant. Then y<sup>2</sup> is a constant (derivative 0), and
+           d/dx of x<sup>2</sup> = 2x.</p>
+        <div class="formula">&part;f/&part;x = 2x&nbsp;&nbsp;&nbsp;(similarly &part;f/&part;y = 2y)</div>
+        <p>The full gradient is &nabla;f = [2x, 2y].</p>
+      </div>
+    </div>
+
+    <!-- 3. INTEGRATION -->
+    <h2 class="section" id="integration">3. Integration</h2>
+    <p class="muted">The reverse of differentiation, and the "area under the curve".
+       Refresher: <a class="back" style="margin:0;" href="calculus.html">Calculus guide</a>.</p>
+
+    <div class="concept">
+      <h3>Problem 11 &middot; Indefinite integral of 2x</h3>
+      <p>Evaluate &#8747; 2x dx.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Reverse the power rule: &#8747; x<sup>n</sup> dx = x<sup>n+1</sup> / (n + 1) + C.</p>
+        <div class="formula">&#8747; 2x dx = 2 &middot; (x<sup>2</sup> / 2) + C = x<sup>2</sup> + C</div>
+        <p>Check: d/dx (x<sup>2</sup> + C) = 2x. &#10003;</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 12 &middot; Indefinite integral of x<sup>2</sup></h3>
+      <p>Evaluate &#8747; x<sup>2</sup> dx.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Add 1 to the exponent and divide by the new exponent:</p>
+        <div class="formula">&#8747; x<sup>2</sup> dx = x<sup>3</sup> / 3 + C</div>
+        <p>Check: d/dx (x<sup>3</sup>/3) = 3x<sup>2</sup>/3 = x<sup>2</sup>. &#10003;</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 13 &middot; Definite integral of x from 0 to 2</h3>
+      <p>Evaluate &#8747;<sub>0</sub><sup>2</sup> x dx.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Antiderivative of x is x<sup>2</sup> / 2. Evaluate at the bounds and subtract:</p>
+        <div class="formula">[ x<sup>2</sup>/2 ]<sub>0</sub><sup>2</sup> = (2<sup>2</sup>/2) &minus; (0<sup>2</sup>/2) = 4/2 &minus; 0 = <strong>2</strong></div>
+        <p>Geometric check: the region under y = x from 0 to 2 is a triangle with base 2 and height 2,
+           area = &frac12; &middot; 2 &middot; 2 = 2. &#10003;</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 14 &middot; What does the definite integral mean?</h3>
+      <p>In one sentence, what does &#8747;<sub>a</sub><sup>b</sup> f(x) dx represent geometrically?</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>It is the <strong>signed area</strong> between the curve y = f(x) and the x-axis, from x = a
+           to x = b. Area above the axis counts as positive, area below counts as negative.</p>
+        <div class="why" style="margin:.5rem 0 0;">
+          <strong>Why it matters in ML:</strong> probabilities are areas under density curves, and
+          expected values are integrals (or sums) weighted by probability.
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. LOGARITHMS -->
+    <h2 class="section" id="logs">4. Logarithms</h2>
+    <p class="muted">Turning products into sums and taming tiny probabilities.
+       Refresher: <a class="back" style="margin:0;" href="logarithms.html">Logarithms guide</a>.</p>
+
+    <div class="concept">
+      <h3>Problem 15 &middot; Evaluate log<sub>2</sub>(8)</h3>
+      <p>What is log<sub>2</sub>(8)?</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Ask: "2 raised to what power gives 8?" Since 2<sup>3</sup> = 8:</p>
+        <div class="formula">log<sub>2</sub>(8) = 3</div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 16 &middot; Evaluate ln(e<sup>3</sup>)</h3>
+      <p>What is ln(e<sup>3</sup>)?</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>ln is log base e, and log<sub>b</sub>(b<sup>k</sup>) = k. Here b = e and k = 3:</p>
+        <div class="formula">ln(e<sup>3</sup>) = 3</div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 17 &middot; Simplify log(a) + log(b)</h3>
+      <p>Rewrite log(a) + log(b) as a single logarithm.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>The product rule of logs: adding logs multiplies their arguments.</p>
+        <div class="formula">log(a) + log(b) = log(a &middot; b)</div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 18 &middot; Why sum log-probabilities?</h3>
+      <p>In ML we often maximize a sum of log-probabilities &Sigma; log(p<sub>i</sub>) instead of the
+         product &prod; p<sub>i</sub>. Give the main numerical reason.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p><strong>Underflow.</strong> Multiplying many probabilities (each between 0 and 1) produces a
+           number so tiny it rounds to 0 in floating point, destroying the value.</p>
+        <p>Taking logs turns the product into a sum: log(&prod; p<sub>i</sub>) = &Sigma; log(p<sub>i</sub>).
+           The sum stays in a safe numeric range, and log is monotonic so the maximizer is unchanged.</p>
+        <pre><code>import numpy as np
+
+p = np.full(1000, 0.1)      # 1000 probabilities of 0.1
+print(np.prod(p))           # 0.0            (underflowed to zero!)
+print(np.sum(np.log(p)))    # -2302.585...   (safe, usable)</code></pre>
+      </div>
+    </div>
+
+    <!-- 5. PROBABILITY & STATISTICS -->
+    <h2 class="section" id="probstats">5. Probability &amp; Statistics</h2>
+    <p class="muted">Means, spread, independence, Bayes, and expected value.
+       Refresher: <a class="back" style="margin:0;" href="statistics.html">Statistics guide</a>.</p>
+
+    <div class="concept">
+      <h3>Problem 19 &middot; Mean and standard deviation</h3>
+      <p>For the list [2, 4, 4, 4, 5, 5, 7, 9], compute the mean and the (population) standard
+         deviation.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p><strong>Mean</strong> = sum / count = (2+4+4+4+5+5+7+9) / 8 = 40 / 8 = <strong>5</strong>.</p>
+        <p><strong>Deviations from the mean:</strong> &minus;3, &minus;1, &minus;1, &minus;1, 0, 0, 2, 4.</p>
+        <p><strong>Squared deviations:</strong> 9, 1, 1, 1, 0, 0, 4, 16. Sum = 32.</p>
+        <p><strong>Variance</strong> (population) = 32 / 8 = 4. &nbsp;
+           <strong>Std</strong> = &radic;4 = <strong>2</strong>.</p>
+        <pre><code>import numpy as np
+
+data = np.array([2, 4, 4, 4, 5, 5, 7, 9])
+print(data.mean())  # 5.0
+print(data.std())   # 2.0   (population std, ddof=0)</code></pre>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 20 &middot; P(A and B) for independent events</h3>
+      <p>Two independent events have P(A) = 0.5 and P(B) = 0.2. What is P(A and B)?</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>For <em>independent</em> events, the joint probability is the product:</p>
+        <div class="formula">P(A &and; B) = P(A) &middot; P(B) = 0.5 &middot; 0.2 = <strong>0.1</strong></div>
+        <p>(This multiplication rule holds <em>only</em> when the events are independent.)</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 21 &middot; Bayes: the surprising test result</h3>
+      <p>A disease affects 1% of people. A test is 99% accurate: it correctly flags 99% of sick people
+         (sensitivity) and correctly clears 99% of healthy people (specificity). You test positive.
+         What is the probability you actually have the disease?</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Bayes' theorem: P(D | +) = P(+ | D) &middot; P(D) / P(+).</p>
+        <p><strong>Numerator</strong> (true positives): P(+ | D) &middot; P(D) = 0.99 &middot; 0.01 = 0.0099.</p>
+        <p><strong>False positives:</strong> P(+ | not D) &middot; P(not D) = 0.01 &middot; 0.99 = 0.0099.</p>
+        <p><strong>Total P(+)</strong> = 0.0099 + 0.0099 = 0.0198.</p>
+        <div class="formula">P(D | +) = 0.0099 / 0.0198 = 0.5&nbsp;&nbsp;(<strong>~50%</strong>)</div>
+        <p>Even with a 99% accurate test, a positive result means only about a 50% chance of disease,
+           because the disease is rare and false positives are as numerous as true positives.</p>
+        <pre><code>prevalence  = 0.01
+sensitivity = 0.99   # P(+ | disease)
+specificity = 0.99   # P(- | healthy)  ->  P(+ | healthy) = 0.01
+
+tp = sensitivity * prevalence            # 0.0099
+fp = (1 - specificity) * (1 - prevalence) # 0.0099
+posterior = tp / (tp + fp)
+print(round(posterior, 4))  # 0.5</code></pre>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Problem 22 &middot; Expected value of a fair die</h3>
+      <p>What is the expected value of a single roll of a fair six-sided die?</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p>Each face 1&ndash;6 has probability 1/6. Expected value = &Sigma; (value &middot; probability):</p>
+        <div class="formula">E[X] = (1 + 2 + 3 + 4 + 5 + 6) / 6 = 21 / 6 = <strong>3.5</strong></div>
+        <p>The expected value need not be an achievable outcome &mdash; you can never roll a 3.5, yet
+           that is the long-run average.</p>
+      </div>
+    </div>
+
+    <!-- 6. EVALUATION METRICS -->
+    <h2 class="section" id="evaluation">6. Evaluation Metrics</h2>
+    <p class="muted">Turning a confusion matrix into precision, recall, and F1.
+       Refresher: <a class="back" style="margin:0;" href="evaluation-metrics.html">Evaluation Metrics guide</a>.</p>
+
+    <div class="concept">
+      <h3>Problem 23 &middot; Precision, recall, and F1</h3>
+      <p>A classifier has TP = 40, FP = 10, FN = 20. Compute precision, recall, and the F1 score.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p><strong>Precision</strong> = TP / (TP + FP) = 40 / (40 + 10) = 40 / 50 = <strong>0.8</strong>.</p>
+        <p><strong>Recall</strong> = TP / (TP + FN) = 40 / (40 + 20) = 40 / 60 &approx; <strong>0.667</strong>.</p>
+        <p><strong>F1</strong> = 2 &middot; (precision &middot; recall) / (precision + recall):</p>
+        <div class="formula">F1 = 2 &middot; (0.8 &middot; 0.667) / (0.8 + 0.667) = 1.0672 / 1.4667 &approx; <strong>0.727</strong></div>
+        <pre><code>tp, fp, fn = 40, 10, 20
+precision = tp / (tp + fp)          # 0.8
+recall    = tp / (tp + fn)          # 0.6667
+f1 = 2 * precision * recall / (precision + recall)
+print(round(precision, 3))  # 0.8
+print(round(recall, 3))     # 0.667
+print(round(f1, 3))         # 0.727</code></pre>
+        <p>F1 is the harmonic mean of precision and recall &mdash; it stays low unless <em>both</em>
+           are high.</p>
+      </div>
+    </div>
+
+    <!-- 7. SOFTMAX BY HAND -->
+    <h2 class="section" id="softmax">7. Softmax by Hand</h2>
+    <p class="muted">Turning raw scores (logits) into a probability distribution.
+       Refresher: <a class="back" style="margin:0;" href="neural-networks.html#activation">Activation functions</a>.</p>
+
+    <div class="concept">
+      <h3>Problem 24 &middot; Softmax of [2, 1, 0]</h3>
+      <p>Compute the softmax of the logits [2, 1, 0]. Show the exponentials and the normalization.</p>
+      <button class="btn reveal" type="button">Show solution</button>
+      <div class="sol">
+        <p><strong>Step 1 &mdash; exponentiate each logit:</strong></p>
+        <p>e<sup>2</sup> &approx; 7.389,&nbsp;&nbsp; e<sup>1</sup> &approx; 2.718,&nbsp;&nbsp; e<sup>0</sup> = 1.000</p>
+        <p><strong>Step 2 &mdash; sum them:</strong> 7.389 + 2.718 + 1.000 = 11.107</p>
+        <p><strong>Step 3 &mdash; divide each by the sum:</strong></p>
+        <div class="formula">
+          7.389 / 11.107 &approx; 0.665<br />
+          2.718 / 11.107 &approx; 0.245<br />
+          1.000 / 11.107 &approx; 0.090
+        </div>
+        <p>softmax([2, 1, 0]) &approx; [<strong>0.665, 0.245, 0.090</strong>], and the three values sum
+           to 1.000 as required.</p>
+        <pre><code>import numpy as np
+
+z = np.array([2.0, 1.0, 0.0])
+e = np.exp(z - np.max(z))   # subtract max for numerical stability
+softmax = e / e.sum()
+print(np.round(softmax, 3))  # [0.665 0.245 0.09 ]</code></pre>
+        <div class="why" style="margin:.5rem 0 0;">
+          <strong>Note:</strong> subtracting the max before exponentiating (a common trick) does not
+          change the result &mdash; it only prevents overflow for large logits.
+        </div>
+      </div>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>Math Practice &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+
+  <script>
+  (function () {
+    var buttons = document.querySelectorAll(".reveal");
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var sol = btn.nextElementSibling;
+        while (sol && !sol.classList.contains("sol")) {
+          sol = sol.nextElementSibling;
+        }
+        if (!sol) return;
+        var shown = sol.classList.toggle("show");
+        btn.textContent = shown ? "Hide solution" : "Show solution";
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

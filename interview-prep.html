@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Developer Interview Prep — Checklist &amp; Q&amp;A</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+
+    /* Click-to-reveal answers */
+    .btn {
+      display: inline-block;
+      background: var(--code-bg);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.9rem;
+      font-family: inherit;
+      cursor: pointer;
+      margin: 0.5rem 0 0;
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+    .btn:hover { background: var(--accent); color: var(--bg); }
+    .sol {
+      display: none;
+      margin-top: 0.75rem;
+      background: rgba(167, 139, 250, 0.08);
+      border-left: 4px solid var(--accent-2);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+    }
+    .sol.show { display: block; }
+    .sol strong { color: var(--accent-2); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#127891; AI Developer Interview Prep</h1>
+    <p>Your one-stop hub: a topic readiness checklist plus the most common interview
+       questions with click-to-reveal model answers.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>How to use this page:</strong> Work down the checklist and open each guide you feel
+      shaky on. Then test recall with the Q&amp;A &mdash; try to answer out loud <em>before</em>
+      revealing. Finish with the practice pages linked below.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#practice">Practice &amp; Drills</a></li>
+        <li><a href="#checklist">Topic Readiness Checklist</a></li>
+        <li><a href="#qa">Common Interview Q&amp;A</a></li>
+      </ol>
+    </div>
+
+    <!-- 0. PRACTICE LINKS -->
+    <h2 class="section" id="practice">1. Practice &amp; Drills</h2>
+    <p class="muted">Once you have reviewed the theory, put it to work under exam-like conditions.</p>
+    <div class="concept">
+      <h3>Hands-on practice pages</h3>
+      <ul class="clean">
+        <li><a href="math-practice.html">Math Practice</a> &mdash; work through linear algebra, calculus, and probability problems.</li>
+        <li><a href="code-drills.html">Code Drills</a> &mdash; implement core algorithms from scratch with numpy.</li>
+        <li><a href="mock-test.html">Mock Test</a> &mdash; a timed, mixed-topic quiz to simulate the real thing.</li>
+      </ul>
+    </div>
+
+    <!-- 1. CHECKLIST -->
+    <h2 class="section" id="checklist">2. Topic Readiness Checklist</h2>
+    <p class="muted">Can you explain each of these in your own words? If not, follow the link and review.</p>
+    <div class="concept">
+      <h3>&#128290; Math</h3>
+      <ul class="clean">
+        <li><a href="math-foundations.html">Math foundations</a> &mdash; the essential notation and building blocks.</li>
+        <li><a href="linear-algebra.html">Linear algebra</a> &mdash; vectors, matrices, dot products, matrix multiplication.</li>
+        <li><a href="probability-statistics.html">Probability &amp; statistics</a> &mdash; distributions, expectation, Bayes, variance.</li>
+        <li><a href="gradient-descent.html">Gradient descent</a> &mdash; derivatives, gradients, and how models minimize loss.</li>
+      </ul>
+
+      <h3>&#129513; ML fundamentals</h3>
+      <ul class="clean">
+        <li><a href="loss-functions.html">Loss functions</a> &mdash; MSE, cross-entropy, and what they measure.</li>
+        <li><a href="training-optimization.html">Training &amp; optimization</a> &mdash; optimizers, learning rate, regularization, batching.</li>
+        <li><a href="evaluation-metrics.html">Evaluation metrics</a> &mdash; accuracy, precision, recall, F1, ROC-AUC.</li>
+      </ul>
+
+      <h3>&#129504; Deep learning</h3>
+      <ul class="clean">
+        <li><a href="neural-networks.html">Neural networks</a> &mdash; weights, bias, activation, backpropagation.</li>
+        <li><a href="cnn.html">CNNs</a> &mdash; convolutions, filters, pooling for images.</li>
+        <li><a href="rnn-lstm.html">RNNs &amp; LSTMs</a> &mdash; sequences, memory, the vanishing gradient problem.</li>
+        <li><a href="transformers.html">Transformers</a> &mdash; self-attention, Q/K/V, positional encoding.</li>
+      </ul>
+
+      <h3>&#129302; LLMs</h3>
+      <ul class="clean">
+        <li><a href="prompting.html">Prompting</a> &mdash; zero/few-shot, chain-of-thought, structured prompts.</li>
+        <li><a href="rag.html">RAG</a> &mdash; retrieval-augmented generation and vector search.</li>
+        <li><a href="fine-tuning.html">Fine-tuning</a> &mdash; adapting a base model, LoRA, when it beats RAG.</li>
+      </ul>
+
+      <h3>&#128187; Coding</h3>
+      <ul class="clean">
+        <li><a href="code-drills.html">Code drills</a> &mdash; implement softmax, gradient descent, attention in numpy.</li>
+        <li><a href="neural-networks.html">Neural networks</a> &mdash; build a forward and backward pass from scratch.</li>
+        <li><a href="linear-algebra.html">Linear algebra</a> &mdash; vectorize loops into matrix operations.</li>
+      </ul>
+
+      <h3>&#127959;&#65039; ML system design</h3>
+      <ul class="clean">
+        <li><a href="ml-workflow.html">ML workflow</a> &mdash; data &rarr; train &rarr; evaluate &rarr; deploy &rarr; monitor.</li>
+        <li><a href="ethics-safety.html">Ethics &amp; safety</a> &mdash; bias, fairness, privacy, and responsible deployment.</li>
+        <li><a href="evaluation-metrics.html">Evaluation metrics</a> &mdash; choosing the right metric for the business goal.</li>
+      </ul>
+    </div>
+
+    <!-- 2. Q&A -->
+    <h2 class="section" id="qa">3. Common Interview Q&amp;A</h2>
+    <p class="muted">Answer out loud first, then click &ldquo;Show answer&rdquo; to compare with a concise model answer.</p>
+
+    <div class="concept">
+      <h3>Q1. What is gradient descent, and why the minus sign?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p><strong>Gradient descent</strong> is an optimization algorithm that minimizes a loss function
+        by repeatedly stepping in the direction that reduces the loss fastest. The gradient
+        <code>&nabla;L</code> points in the direction of steepest <em>increase</em>, so we move in the
+        <em>opposite</em> direction &mdash; hence the minus sign in the update rule
+        <code>w = w &minus; lr &times; &nabla;L</code>. The learning rate <code>lr</code> scales the step size.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q2. What is backpropagation?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p><strong>Backpropagation</strong> is the algorithm that computes the gradient of the loss with
+        respect to every weight and bias by applying the <strong>chain rule</strong> backward through the
+        network. The error is measured at the output, then propagated backward layer by layer:
+        <code>&part;L/&part;w = (&part;L/&part;&#375;) &times; (&part;&#375;/&part;z) &times; (&part;z/&part;w)</code>.
+        Those gradients are then used by gradient descent to update the parameters.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q3. Explain the bias-variance tradeoff.</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p><strong>Bias</strong> is error from overly simple assumptions (underfitting &mdash; the model
+        misses real patterns). <strong>Variance</strong> is error from being too sensitive to the training
+        data (overfitting &mdash; the model memorizes noise). Lowering one often raises the other, so the
+        goal is a sweet spot that minimizes total error on unseen data. High bias &rarr; more capacity;
+        high variance &rarr; more data, regularization, or a simpler model.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q4. What is overfitting, and how do you prevent it?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p><strong>Overfitting</strong> is when a model fits the training data (including its noise) so
+        closely that it generalizes poorly to new data &mdash; low training error but high validation error.
+        Prevent it with: more or augmented data, <strong>regularization</strong> (L1/L2 penalties),
+        <strong>dropout</strong> (randomly zeroing activations during training), <strong>early stopping</strong>
+        (halt when validation loss stops improving), and reducing model complexity.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q5. Precision vs recall vs F1 &mdash; when do you prefer each?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p><strong>Precision</strong> = TP / (TP + FP): of the items flagged positive, how many truly are.
+        Prefer it when false positives are costly (e.g., spam filtering marking real mail as spam).
+        <strong>Recall</strong> = TP / (TP + FN): of all true positives, how many you caught. Prefer it
+        when false negatives are costly (e.g., disease screening). <strong>F1</strong> is the harmonic
+        mean <code>2 &middot; (P &middot; R) / (P + R)</code> &mdash; use it when you need a single balanced
+        score, especially with class imbalance.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q6. Why does softmax use e (the exponential)?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p>Softmax is <code>e<sup>x<sub>i</sub></sup> / &Sigma;<sub>j</sub> e<sup>x<sub>j</sub></sup></code>.
+        The exponential makes every value <strong>positive</strong> (so outputs are valid probabilities),
+        <strong>amplifies differences</strong> so larger logits dominate, and is <strong>smooth and
+        differentiable</strong> for gradient descent. It also pairs cleanly with cross-entropy loss,
+        giving a simple gradient <code>(prediction &minus; target)</code>.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q7. What is the vanishing gradient problem, and how do LSTMs / ReLU help?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p>In deep or recurrent networks, gradients are products of many small derivatives. With
+        saturating activations like sigmoid (derivative &le; 0.25), repeated multiplication drives the
+        gradient toward zero, so early layers barely learn. <strong>ReLU</strong> has a derivative of 1
+        for positive inputs, so it does not shrink the gradient. <strong>LSTMs</strong> use a gated cell
+        state with an additive path, letting gradients flow across many time steps without vanishing.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q8. How does self-attention (Q/K/V) work?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p>Each token is projected into a <strong>Query</strong>, <strong>Key</strong>, and
+        <strong>Value</strong> vector. Attention scores are the dot products of one token's Query with
+        every token's Key, scaled by <code>1/&radic;d<sub>k</sub></code> and passed through softmax to get
+        weights. The output is the weighted sum of the Values:
+        <code>Attention(Q,K,V) = softmax(QK<sup>T</sup> / &radic;d<sub>k</sub>) &middot; V</code>. This lets
+        each token gather information from every other token, capturing context regardless of distance.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q9. RAG vs fine-tuning &mdash; when do you use each?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p><strong>RAG</strong> (retrieval-augmented generation) fetches relevant documents at query time
+        and feeds them into the prompt. Use it for knowledge that changes often, large or private
+        knowledge bases, and when you need citations &mdash; no retraining needed.
+        <strong>Fine-tuning</strong> updates the model's weights on your data. Use it to teach a specific
+        style, format, or skill, or to reduce prompt length for a fixed task. They combine well: fine-tune
+        for behavior, RAG for fresh facts.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q10. What is cross-entropy loss?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p><strong>Cross-entropy</strong> measures the distance between the predicted probability
+        distribution and the true labels: <code>L = &minus;&Sigma;<sub>i</sub> y<sub>i</sub> &middot; log(p<sub>i</sub>)</code>.
+        For classification with one-hot labels it reduces to <code>&minus;log(p<sub>correct</sub>)</code>,
+        so confident-and-correct predictions incur near-zero loss while confident-and-wrong predictions are
+        heavily penalized. It pairs naturally with softmax outputs.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q11. Why split data into train / validation / test?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p>The <strong>training set</strong> fits the model's parameters. The <strong>validation set</strong>
+        tunes hyperparameters and guides choices like early stopping &mdash; it must stay separate so those
+        decisions do not leak into the parameters. The <strong>test set</strong> is touched only once at the
+        end to give an unbiased estimate of real-world performance. Without this separation you cannot tell
+        genuine generalization from memorization.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q12. What is a learning rate, and what happens if it is too high or too low?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p>The <strong>learning rate</strong> scales each gradient-descent step:
+        <code>w = w &minus; lr &times; &nabla;L</code>. <strong>Too high</strong> and the updates overshoot the
+        minimum &mdash; the loss oscillates or diverges. <strong>Too low</strong> and training is very slow and
+        may stall in a poor spot. Common fixes: learning-rate schedules (decay over time), warmup, and
+        adaptive optimizers like Adam.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q13. What are embeddings?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p><strong>Embeddings</strong> are dense, learned vectors that represent discrete items (words,
+        tokens, users, images) in a continuous space where <strong>distance encodes similarity</strong>.
+        Semantically related items sit close together, so the model can generalize and do arithmetic like
+        <code>king &minus; man + woman &asymp; queen</code>. They power search, recommendations, and the input
+        layer of language models.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q14. L1 vs L2 regularization?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p>Both add a penalty on weight size to the loss to curb overfitting. <strong>L1</strong> (Lasso)
+        adds <code>&lambda; &middot; &Sigma;|w|</code>; it drives some weights exactly to zero, producing
+        <em>sparse</em> models and doing feature selection. <strong>L2</strong> (Ridge / weight decay) adds
+        <code>&lambda; &middot; &Sigma;w<sup>2</sup></code>; it shrinks weights smoothly toward (but not to) zero,
+        spreading influence across features. Elastic Net combines both.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q15. What is batch normalization (briefly)?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p><strong>Batch normalization</strong> normalizes a layer's inputs across the mini-batch to have
+        roughly zero mean and unit variance, then applies learnable scale and shift parameters. This
+        stabilizes and speeds up training, allows higher learning rates, reduces sensitivity to
+        initialization, and provides a mild regularizing effect.</p>
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Q16. How do you handle class imbalance?</h3>
+      <button class="btn" type="button">Show answer</button>
+      <div class="sol">
+        <p>Options include: <strong>resampling</strong> (oversample the minority, e.g., SMOTE, or
+        undersample the majority), <strong>class weights</strong> in the loss so minority errors count
+        more, choosing <strong>metrics that expose imbalance</strong> (precision, recall, F1, PR-AUC rather
+        than raw accuracy), adjusting the <strong>decision threshold</strong>, and collecting more minority
+        data where possible.</p>
+      </div>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>Interview Prep &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+
+  <script>
+  (function () {
+    var buttons = document.querySelectorAll(".btn");
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var sol = btn.nextElementSibling;
+        while (sol && !sol.classList.contains("sol")) {
+          sol = sol.nextElementSibling;
+        }
+        if (!sol) return;
+        var shown = sol.classList.toggle("show");
+        btn.textContent = shown ? "Hide answer" : "Show answer";
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

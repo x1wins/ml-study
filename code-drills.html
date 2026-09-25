@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code-From-Scratch Drills — Implement It Yourself with NumPy</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+
+    /* Click-to-reveal solution drills */
+    .btn {
+      display: inline-block;
+      margin: 0.5rem 0 0;
+      background: var(--accent);
+      color: #06263a;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: background 0.12s ease, transform 0.05s ease;
+    }
+    .btn:hover { background: #7dd3fc; }
+    .btn:active { transform: translateY(1px); }
+    .sol { display: none; margin-top: 0.75rem; }
+    .sol.show { display: block; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#9000;&#65039; Code-From-Scratch Drills</h1>
+    <p>Stop reading, start typing. Eight "implement it yourself" NumPy exercises &mdash; try each one
+       first, then click to reveal a clean reference solution with its expected output.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>How to use this page:</strong> read the task, open your editor, and implement the function
+      with <code>numpy</code> before revealing anything. The math you have been studying only sticks once
+      your fingers have typed it. Every solution below is runnable and its printed output is shown as a
+      comment.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>The drills</h2>
+      <ol>
+        <li><a href="#d1">Sigmoid</a></li>
+        <li><a href="#d2">Sigmoid derivative</a></li>
+        <li><a href="#d3">Softmax (numerically stable)</a></li>
+        <li><a href="#d4">Mean squared error</a></li>
+        <li><a href="#d5">Binary cross-entropy</a></li>
+        <li><a href="#d6">Cosine similarity</a></li>
+        <li><a href="#d7">Gradient descent on f(x) = x&sup2;</a></li>
+        <li><a href="#d8">Two-layer forward pass</a></li>
+        <li><a href="#related">Related pages &amp; resources</a></li>
+      </ol>
+    </div>
+
+    <p class="muted" style="margin-top:1.5rem;">Every drill assumes <code>import numpy as np</code> at the
+    top of your file. Try to write the whole function from memory before peeking.</p>
+
+    <!-- DRILL 1 -->
+    <h2 class="section" id="d1">1. Sigmoid</h2>
+    <div class="concept">
+      <h3>Task</h3>
+      <p>Implement <code>sigmoid(x)</code> defined as <code>1 / (1 + np.exp(-x))</code>. It should squash
+      any real number into the range 0 &rarr; 1 and work element-wise on a NumPy array.</p>
+      <div class="formula">&sigma;(x) = 1 &divide; (1 + e<sup>&minus;x</sup>)</div>
+      <p><strong>Expected behavior:</strong> <code>sigmoid(0)</code> returns <code>0.5</code> (the curve's
+      midpoint), large positive inputs approach 1, and large negative inputs approach 0.</p>
+      <button class="btn" type="button">Show solution</button>
+      <div class="sol">
+        <pre><code>import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+print(sigmoid(0.0))                       # 0.5
+print(np.round(sigmoid(np.array([-2.0, 0.0, 2.0])), 4))
+# [0.1192 0.5    0.8808]</code></pre>
+      </div>
+    </div>
+
+    <!-- DRILL 2 -->
+    <h2 class="section" id="d2">2. Sigmoid derivative</h2>
+    <div class="concept">
+      <h3>Task</h3>
+      <p>Implement the derivative of the sigmoid. The neat trick: if <code>s = sigmoid(x)</code>, then the
+      derivative is simply <code>s &times; (1 &minus; s)</code>. Write <code>sigmoid_deriv(s)</code> that takes
+      the <em>already-computed</em> sigmoid value.</p>
+      <div class="formula">&sigma;&prime;(x) = s &middot; (1 &minus; s), &nbsp; where s = &sigma;(x)</div>
+      <p><strong>Expected behavior:</strong> at <code>x = 0</code>, <code>s = 0.5</code> so the derivative is
+      <code>0.5 &times; 0.5 = 0.25</code> (the steepest point of the curve).</p>
+      <button class="btn" type="button">Show solution</button>
+      <div class="sol">
+        <pre><code>import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def sigmoid_deriv(s):
+    # s is sigmoid(x) already computed
+    return s * (1 - s)
+
+s = sigmoid(0.0)
+print(sigmoid_deriv(s))                   # 0.25</code></pre>
+      </div>
+    </div>
+
+    <!-- DRILL 3 -->
+    <h2 class="section" id="d3">3. Softmax (numerically stable)</h2>
+    <div class="concept">
+      <h3>Task</h3>
+      <p>Implement <code>softmax(v)</code> that turns a vector of scores into probabilities that sum to 1.
+      For numerical stability you must <strong>subtract the max</strong> before exponentiating, otherwise large
+      inputs overflow <code>np.exp</code>.</p>
+      <div class="formula">softmax(v)<sub>i</sub> = e<sup>v<sub>i</sub> &minus; max(v)</sup> &divide; &Sigma;<sub>j</sub> e<sup>v<sub>j</sub> &minus; max(v)</sup></div>
+      <p><strong>Expected behavior:</strong> <code>softmax([2, 1, 0])</code> &rarr;
+      <code>[0.665, 0.245, 0.090]</code>, and the three values add up to 1.</p>
+      <button class="btn" type="button">Show solution</button>
+      <div class="sol">
+        <pre><code>import numpy as np
+
+def softmax(v):
+    v = np.asarray(v, dtype=float)
+    e = np.exp(v - np.max(v))     # subtract max for numerical stability
+    return e / e.sum()
+
+print(np.round(softmax([2, 1, 0]), 3))    # [0.665 0.245 0.09 ]
+print(round(softmax([2, 1, 0]).sum(), 6)) # 1.0 (sums to one)</code></pre>
+      </div>
+    </div>
+
+    <!-- DRILL 4 -->
+    <h2 class="section" id="d4">4. Mean squared error</h2>
+    <div class="concept">
+      <h3>Task</h3>
+      <p>Implement <code>mse(y_true, y_pred)</code>: the average of the squared differences between the
+      truth and the prediction. This is the classic regression loss.</p>
+      <div class="formula">MSE = (1 &divide; n) &middot; &Sigma; (y<sub>true</sub> &minus; y<sub>pred</sub>)<sup>2</sup></div>
+      <p><strong>Expected behavior:</strong> for
+      <code>y_true = [1, 2, 3]</code> and <code>y_pred = [1.1, 1.9, 3.2]</code> the errors are
+      <code>&minus;0.1, 0.1, &minus;0.2</code>, giving MSE <code>= 0.02</code>.</p>
+      <button class="btn" type="button">Show solution</button>
+      <div class="sol">
+        <pre><code>import numpy as np
+
+def mse(y_true, y_pred):
+    y_true = np.asarray(y_true, dtype=float)
+    y_pred = np.asarray(y_pred, dtype=float)
+    return np.mean((y_true - y_pred) ** 2)
+
+print(round(float(mse([1, 2, 3], [1.1, 1.9, 3.2])), 4))   # 0.02</code></pre>
+      </div>
+    </div>
+
+    <!-- DRILL 5 -->
+    <h2 class="section" id="d5">5. Binary cross-entropy</h2>
+    <div class="concept">
+      <h3>Task</h3>
+      <p>Implement <code>binary_cross_entropy(y, p)</code>, the loss for yes/no classification where
+      <code>p</code> is the predicted probability of class 1. <strong>Clip</strong> <code>p</code> away from
+      exactly 0 and 1 so <code>np.log</code> never sees zero, then average over the batch.</p>
+      <div class="formula">BCE = &minus;(1 &divide; n) &middot; &Sigma; [ y &middot; ln(p) + (1 &minus; y) &middot; ln(1 &minus; p) ]</div>
+      <p><strong>Expected behavior:</strong> for confident, mostly-correct predictions
+      <code>y = [1, 0, 1]</code>, <code>p = [0.9, 0.1, 0.8]</code> the loss is small, about
+      <code>0.1446</code>.</p>
+      <button class="btn" type="button">Show solution</button>
+      <div class="sol">
+        <pre><code>import numpy as np
+
+def binary_cross_entropy(y, p):
+    y = np.asarray(y, dtype=float)
+    p = np.asarray(p, dtype=float)
+    p = np.clip(p, 1e-12, 1 - 1e-12)      # avoid log(0)
+    return -np.mean(y * np.log(p) + (1 - y) * np.log(1 - p))
+
+print(round(float(binary_cross_entropy([1, 0, 1], [0.9, 0.1, 0.8])), 4))
+# 0.1446</code></pre>
+      </div>
+    </div>
+
+    <!-- DRILL 6 -->
+    <h2 class="section" id="d6">6. Cosine similarity</h2>
+    <div class="concept">
+      <h3>Task</h3>
+      <p>Implement <code>cosine_similarity(a, b)</code>: the dot product divided by the product of the two
+      vectors' norms. It measures the <em>angle</em> between vectors, ignoring their length &mdash; the
+      backbone of embedding search.</p>
+      <div class="formula">cos(a, b) = (a &middot; b) &divide; (&Vert;a&Vert; &times; &Vert;b&Vert;)</div>
+      <p><strong>Expected behavior:</strong> parallel vectors like <code>[1, 2, 3]</code> and
+      <code>[2, 4, 6]</code> give <code>1.0</code>; perpendicular vectors like <code>[1, 0]</code> and
+      <code>[0, 1]</code> give <code>0.0</code>.</p>
+      <button class="btn" type="button">Show solution</button>
+      <div class="sol">
+        <pre><code>import numpy as np
+
+def cosine_similarity(a, b):
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+print(round(float(cosine_similarity([1, 2, 3], [2, 4, 6])), 4))   # 1.0
+print(round(float(cosine_similarity([1, 0], [0, 1])), 4))         # 0.0</code></pre>
+      </div>
+    </div>
+
+    <!-- DRILL 7 -->
+    <h2 class="section" id="d7">7. Gradient descent on f(x) = x&sup2;</h2>
+    <div class="concept">
+      <h3>Task</h3>
+      <p>Minimize <code>f(x) = x**2</code> using gradient descent. The gradient is
+      <code>f&prime;(x) = 2x</code>. Start from <code>x0 = 10</code> and repeatedly step downhill:
+      <code>x = x &minus; lr &times; 2x</code>. After enough steps <code>x</code> should sit near the minimum
+      at 0.</p>
+      <div class="formula">x &larr; x &minus; lr &middot; (2x), &nbsp; f&prime;(x) = 2x</div>
+      <p><strong>Expected behavior:</strong> with <code>lr = 0.1</code> and 100 steps, <code>x</code> is
+      driven to roughly <code>2e-09</code> (essentially 0), where <code>f(x)</code> is minimal.</p>
+      <button class="btn" type="button">Show solution</button>
+      <div class="sol">
+        <pre><code>import numpy as np
+
+def gradient_descent(x0=10.0, lr=0.1, steps=100):
+    x = float(x0)
+    for _ in range(steps):
+        grad = 2 * x            # derivative of x**2
+        x = x - lr * grad       # step downhill
+    return x
+
+x_min = gradient_descent()
+print(x_min)                    # 2.0370359763344878e-09  (~0)
+print(round(x_min ** 2, 12))    # 0.0  (f(x) at the minimum)</code></pre>
+      </div>
+    </div>
+
+    <!-- DRILL 8 -->
+    <h2 class="section" id="d8">8. Two-layer forward pass</h2>
+    <div class="concept">
+      <h3>Task</h3>
+      <p>Implement one forward pass of a tiny network: a ReLU hidden layer followed by a sigmoid output.
+      Compute <code>h = relu(W1 &middot; x + b1)</code>, then <code>y = sigmoid(W2 &middot; h + b2)</code>.
+      Use <code>@</code> for the matrix &times; vector products.</p>
+      <div class="formula">h = relu(W<sub>1</sub>x + b<sub>1</sub>) &nbsp;&rarr;&nbsp; y = &sigma;(W<sub>2</sub>h + b<sub>2</sub>)</div>
+      <p><strong>Expected behavior:</strong> with the weights below, the hidden layer is
+      <code>[0, 0, 0.55]</code> (ReLU zeroed two neurons) and the final probability is about
+      <code>0.633</code>.</p>
+      <button class="btn" type="button">Show solution</button>
+      <div class="sol">
+        <pre><code>import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def relu(x):
+    return np.maximum(0, x)
+
+def forward(x, W1, b1, W2, b2):
+    h = relu(W1 @ x + b1)       # hidden layer
+    y = sigmoid(W2 @ h + b2)    # output layer
+    return h, y
+
+x  = np.array([0.5, -1.2])
+W1 = np.array([[ 0.1,  0.4],
+               [-0.7,  0.2],
+               [ 0.3, -0.5]])   # (3, 2): 3 hidden neurons
+b1 = np.array([0.0, 0.1, -0.2])
+W2 = np.array([0.6, -0.4, 0.9]) # (3,): 1 output neuron
+b2 = 0.05
+
+h, y = forward(x, W1, b1, W2, b2)
+print(np.round(h, 4))            # [0.   0.   0.55]
+print(round(float(y), 4))        # 0.633</code></pre>
+      </div>
+    </div>
+
+    <!-- RELATED -->
+    <h2 class="section" id="related">Related pages &amp; resources</h2>
+    <div class="concept">
+      <h3>Study the theory behind each drill</h3>
+      <ul class="clean">
+        <li><a href="neural-networks.html">Neural Networks</a> &mdash; where sigmoid, ReLU, softmax and the two-layer forward pass come from</li>
+        <li><a href="loss-functions.html">Loss Functions</a> &mdash; the theory behind MSE and binary cross-entropy</li>
+        <li><a href="gradient-descent.html">Gradient Descent</a> &mdash; why the <code>x = x &minus; lr &times; grad</code> update works</li>
+        <li><a href="linear-algebra.html">Linear Algebra</a> &mdash; dot products, norms and cosine similarity</li>
+      </ul>
+      <div class="why">
+        <strong>Practice tip:</strong> come back a week later and redo every drill from a blank file. If you
+        can rebuild all eight without peeking, the fundamentals are truly yours.
+      </div>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>Code Drills &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+
+  <script>
+  (function () {
+    // Each reveal button toggles the .sol div immediately after it.
+    var buttons = document.querySelectorAll(".btn");
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var sol = btn.nextElementSibling;
+        while (sol && !sol.classList.contains("sol")) {
+          sol = sol.nextElementSibling;
+        }
+        if (!sol) return;
+        var shown = sol.classList.toggle("show");
+        btn.textContent = shown ? "Hide solution" : "Show solution";
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
