@@ -100,12 +100,64 @@
       font-size: 0.85rem;
       color: #fbbf24;
     }
+
+    /* Sticky top navigation */
+    .topnav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 1rem;
+      align-items: center;
+      padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.2rem 0.1rem;
+      white-space: nowrap;
+    }
+    .topnav a:hover { color: var(--accent); }
+
+    /* Status badges + planned cards */
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.05rem 0.45rem;
+      border-radius: 999px;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+    .badge.ready { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid #4ade8055; }
+    .badge.soon  { background: rgba(148, 163, 184, 0.12); color: var(--muted); border: 1px solid var(--border); }
+    .card.planned { opacity: 0.7; cursor: default; }
+    .card.planned:hover { transform: none; border-color: var(--border); }
   </style>
 </head>
 <body>
+  <nav class="topnav">
+    <span class="brand">🤖 ML Study</span>
+    <a href="#learn">What to Learn</a>
+    <a href="math-foundations.html">Math</a>
+    <a href="neural-networks.html">Neural Nets</a>
+    <a href="loss-functions.html">Loss</a>
+    <a href="training-optimization.html">Training</a>
+    <a href="cnn.html">CNNs</a>
+    <a href="rnn-lstm.html">RNN/LSTM</a>
+    <a href="transformers.html">Transformers</a>
+    <a href="#order">Order</a>
+    <a href="#resources">Resources</a>
+  </nav>
   <header>
     <h1>🤖 AI / ML Learning Path</h1>
-    <p>A beginner's roadmap: everything you need to acknowledge before becoming an AI developer.</p>
+    <p>A beginner's roadmap: everything you need to know before becoming an AI developer.</p>
   </header>
 
   <div class="container">
@@ -118,75 +170,106 @@
       </p>
     </div>
 
-    <!-- WHAT TO KNOW -->
-    <h2>📌 What You Need to Acknowledge</h2>
+    <!-- WHAT TO LEARN (unified, clickable) -->
+    <h2 id="learn">📌 What You'll Learn</h2>
+    <p style="color: var(--muted); margin-bottom: 1rem;">
+      Click any <span class="badge ready">Ready</span> card for a full guide with diagrams and runnable code.
+      <span class="badge soon">Soon</span> topics are on the roadmap.
+    </p>
     <div class="grid">
-      <div class="card">
+      <a class="card" href="math-foundations.html" style="text-decoration:none; color:inherit; display:block;">
         <span class="num">1</span>
-        <h3>Math Foundations</h3>
+        <h3>📐 Math Foundations <span class="badge ready">Ready</span></h3>
         <ul>
           <li>Linear algebra (vectors, matrices)</li>
           <li>Calculus (derivatives, gradients)</li>
           <li>Probability &amp; statistics</li>
         </ul>
-      </div>
-      <div class="card">
+      </a>
+      <div class="card planned">
         <span class="num">2</span>
-        <h3>Programming</h3>
+        <h3>💻 Programming <span class="badge soon">Soon</span></h3>
         <ul>
           <li>Python basics</li>
           <li>NumPy &amp; Pandas</li>
           <li>Jupyter Notebooks</li>
         </ul>
       </div>
-      <div class="card">
+      <a class="card" href="neural-networks.html" style="text-decoration:none; color:inherit; display:block;">
         <span class="num">3</span>
-        <h3>ML Fundamentals</h3>
+        <h3>🧠 Neural Networks <span class="badge ready">Ready</span></h3>
         <ul>
-          <li>Supervised vs unsupervised</li>
-          <li>Training / validation / test</li>
-          <li>Overfitting &amp; underfitting</li>
+          <li>Weights &amp; bias</li>
+          <li>Activation functions</li>
+          <li>Backpropagation</li>
         </ul>
-      </div>
-      <div class="card">
+      </a>
+      <a class="card" href="loss-functions.html" style="text-decoration:none; color:inherit; display:block;">
         <span class="num">4</span>
-        <h3>Core Algorithms</h3>
+        <h3>🎯 Loss Functions <span class="badge ready">Ready</span></h3>
         <ul>
-          <li>Linear &amp; logistic regression</li>
-          <li>Decision trees, k-means</li>
-          <li>Neural networks (weights, bias, backprop)</li>
+          <li>MSE &amp; MAE (regression)</li>
+          <li>Cross-entropy (classification)</li>
+          <li>Why loss drives learning</li>
         </ul>
-      </div>
-      <div class="card">
+      </a>
+      <a class="card" href="training-optimization.html" style="text-decoration:none; color:inherit; display:block;">
         <span class="num">5</span>
-        <h3>Deep Learning</h3>
+        <h3>⚙️ Training &amp; Optimization <span class="badge ready">Ready</span></h3>
         <ul>
-          <li>CNNs (images)</li>
-          <li>RNNs / LSTMs (sequences)</li>
-          <li>Transformers (LLMs)</li>
+          <li>SGD, momentum, Adam</li>
+          <li>Learning rate, epochs, batches</li>
+          <li>Overfitting &amp; regularization</li>
         </ul>
-      </div>
-      <div class="card">
+      </a>
+      <a class="card" href="cnn.html" style="text-decoration:none; color:inherit; display:block;">
         <span class="num">6</span>
-        <h3>Tools &amp; Frameworks</h3>
+        <h3>🖼️ CNNs <span class="badge ready">Ready</span></h3>
+        <ul>
+          <li>Convolution &amp; filters</li>
+          <li>Pooling &amp; feature maps</li>
+          <li>Why they work for images</li>
+        </ul>
+      </a>
+      <a class="card" href="rnn-lstm.html" style="text-decoration:none; color:inherit; display:block;">
+        <span class="num">7</span>
+        <h3>🔁 RNNs &amp; LSTMs <span class="badge ready">Ready</span></h3>
+        <ul>
+          <li>Sequences &amp; hidden state</li>
+          <li>Vanishing gradients</li>
+          <li>LSTM gates</li>
+        </ul>
+      </a>
+      <a class="card" href="transformers.html" style="text-decoration:none; color:inherit; display:block;">
+        <span class="num">8</span>
+        <h3>🤖 Transformers <span class="badge ready">Ready</span></h3>
+        <ul>
+          <li>Self-attention (Q/K/V)</li>
+          <li>Multi-head &amp; positional encoding</li>
+          <li>Why they power LLMs</li>
+        </ul>
+      </a>
+      <div class="card planned">
+        <span class="num">9</span>
+        <h3>🛠️ Tools &amp; Frameworks <span class="badge soon">Soon</span></h3>
         <ul>
           <li>scikit-learn</li>
           <li>PyTorch / TensorFlow</li>
           <li>Hugging Face</li>
         </ul>
       </div>
-      <div class="card">
-        <span class="num">7</span>
-        <h3>ML Workflow</h3>
+      <div class="card planned">
+        <span class="num">10</span>
+        <h3>🔄 ML Workflow <span class="badge soon">Soon</span></h3>
         <ul>
           <li>Collect &amp; clean data</li>
           <li>Train &amp; evaluate</li>
           <li>Deploy &amp; monitor</li>
         </ul>
       </div>
-      <div class="card">
-        <span class="num">8</span>
-        <h3>Ethics &amp; Safety</h3>
+      <div class="card planned">
+        <span class="num">11</span>
+        <h3>⚖️ Ethics &amp; Safety <span class="badge soon">Soon</span></h3>
         <ul>
           <li>Bias &amp; fairness</li>
           <li>Data privacy</li>
@@ -195,69 +278,8 @@
       </div>
     </div>
 
-    <!-- DEEP DIVE TOPICS -->
-    <h2>📖 Deep Dive Topics</h2>
-    <p style="color: var(--muted); margin-bottom: 1rem;">Detailed guides — click any card to learn the concept with diagrams and runnable code.</p>
-    <div class="grid">
-      <a class="card" href="math-foundations.html" style="text-decoration:none; color:inherit; display:block;">
-        <h3>📐 Math Foundations →</h3>
-        <ul>
-          <li>Vectors, matrices, gradients</li>
-          <li>Probability &amp; statistics</li>
-        </ul>
-      </a>
-      <a class="card" href="neural-networks.html" style="text-decoration:none; color:inherit; display:block;">
-        <h3>🧠 Neural Networks →</h3>
-        <ul>
-          <li>Weights &amp; bias</li>
-          <li>Activation functions</li>
-          <li>Backpropagation</li>
-        </ul>
-      </a>
-      <a class="card" href="loss-functions.html" style="text-decoration:none; color:inherit; display:block;">
-        <h3>🎯 Loss Functions →</h3>
-        <ul>
-          <li>MSE &amp; MAE (regression)</li>
-          <li>Cross-entropy (classification)</li>
-          <li>Why loss drives learning</li>
-        </ul>
-      </a>
-      <a class="card" href="training-optimization.html" style="text-decoration:none; color:inherit; display:block;">
-        <h3>⚙️ Training &amp; Optimization →</h3>
-        <ul>
-          <li>SGD, momentum, Adam</li>
-          <li>Learning rate, epochs, batches</li>
-          <li>Overfitting &amp; regularization</li>
-        </ul>
-      </a>
-      <a class="card" href="cnn.html" style="text-decoration:none; color:inherit; display:block;">
-        <h3>🖼️ CNNs →</h3>
-        <ul>
-          <li>Convolution &amp; filters</li>
-          <li>Pooling &amp; feature maps</li>
-          <li>Why they work for images</li>
-        </ul>
-      </a>
-      <a class="card" href="rnn-lstm.html" style="text-decoration:none; color:inherit; display:block;">
-        <h3>🔁 RNNs &amp; LSTMs →</h3>
-        <ul>
-          <li>Sequences &amp; hidden state</li>
-          <li>Vanishing gradients</li>
-          <li>LSTM gates</li>
-        </ul>
-      </a>
-      <a class="card" href="transformers.html" style="text-decoration:none; color:inherit; display:block;">
-        <h3>🤖 Transformers →</h3>
-        <ul>
-          <li>Self-attention (Q/K/V)</li>
-          <li>Multi-head &amp; positional encoding</li>
-          <li>Why they power LLMs</li>
-        </ul>
-      </a>
-    </div>
-
     <!-- LEARNING PATH -->
-    <h2>🗺️ Suggested Learning Order</h2>
+    <h2 id="order">🗺️ Suggested Learning Order</h2>
     <div class="path">
       <div class="step">
         <h4>Step 1 — Learn Python</h4>
@@ -266,6 +288,7 @@
       <div class="step">
         <h4>Step 2 — Brush up on Math</h4>
         You don't need a PhD. Focus on intuition for vectors, gradients, and probability.
+        <div style="margin-top:0.4rem;"><a href="math-foundations.html" style="color:var(--accent); font-size:0.9rem;">→ Math Foundations guide</a></div>
       </div>
       <div class="step">
         <h4>Step 3 — Classic ML with scikit-learn</h4>
@@ -274,6 +297,12 @@
       <div class="step">
         <h4>Step 4 — Deep Learning</h4>
         Move to <code>PyTorch</code> or <code>TensorFlow</code>. Train a neural network on images.
+        <div style="margin-top:0.4rem;">
+          <a href="neural-networks.html" style="color:var(--accent); font-size:0.9rem;">→ Neural Networks</a> ·
+          <a href="cnn.html" style="color:var(--accent); font-size:0.9rem;">CNNs</a> ·
+          <a href="rnn-lstm.html" style="color:var(--accent); font-size:0.9rem;">RNNs/LSTMs</a> ·
+          <a href="transformers.html" style="color:var(--accent); font-size:0.9rem;">Transformers</a>
+        </div>
       </div>
       <div class="step">
         <h4>Step 5 — Build a Project</h4>
@@ -294,7 +323,7 @@ prediction = model.predict(X_new)  # make a guess</code></pre>
     </div>
 
     <!-- RESOURCES -->
-    <h2>📚 Free Resources</h2>
+    <h2 id="resources">📚 Free Resources</h2>
     <div class="card resources">
       <ul>
         <li><a href="https://www.python.org/about/gettingstarted/" target="_blank" rel="noopener">Python — Official Getting Started</a></li>
