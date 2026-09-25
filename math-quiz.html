@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Quiz — Test Yourself (e, Derivatives, Integration)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.9rem; color: var(--code-text);
+           background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    /* Quiz */
+    .quiz-bar {
+      position: sticky; top: 44px; z-index: 40;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
+      margin: 1.25rem 0;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.95rem;
+    }
+    .quiz-bar strong { color: var(--accent); }
+
+    .q {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.35rem;
+      margin-bottom: 1rem;
+    }
+    .q .qnum { color: var(--accent-2); font-weight: 700; font-size: 0.85rem; }
+    .q .qtext { margin: 0.35rem 0 0.75rem; font-size: 1.05rem; }
+    .options { list-style: none; display: grid; gap: 0.5rem; }
+    .opt {
+      display: block; width: 100%; text-align: left;
+      background: var(--code-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.98rem;
+      cursor: pointer;
+      transition: border-color 0.12s ease, background 0.12s ease;
+      font-family: inherit;
+    }
+    .opt:hover:not(:disabled) { border-color: var(--accent); }
+    .opt:disabled { cursor: default; }
+    .opt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .opt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .explain {
+      margin-top: 0.6rem;
+      font-size: 0.92rem;
+      color: var(--muted);
+      border-left: 3px solid var(--accent);
+      padding: 0.35rem 0.75rem;
+      display: none;
+    }
+    .explain.show { display: block; }
+    .explain strong { color: var(--accent); }
+
+    .btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #0f172a;
+      font-weight: 700;
+      border: none; border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin: 0.5rem 0.5rem 0 0;
+      font-family: inherit;
+    }
+    .btn.secondary { background: var(--card); color: var(--accent); border: 1px solid var(--border); }
+    .btn:hover { opacity: 0.92; }
+
+    .result {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      display: none;
+      text-align: center;
+    }
+    .result.show { display: block; }
+    .result .score { font-size: 2rem; font-weight: 800; color: var(--accent); }
+    .result .msg { color: var(--muted); }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>🧮 Math Quiz — Test Yourself</h1>
+    <p>Check your understanding of the math foundations: Euler's number <code>e</code>,
+       derivatives, and integration. Instant feedback, no sign-up.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="quiz-bar">
+      <span>Score: <strong id="score">0</strong> / <span id="total">0</span></span>
+      <span id="answered" class="muted">0 answered</span>
+    </div>
+
+    <p class="muted">Pick an answer for each question &mdash; it's marked instantly with an explanation.
+    Review the guides:
+    <a href="math-foundations.html" style="color:var(--accent);">Math Foundations</a> ·
+    <a href="euler-number.html" style="color:var(--accent);">Euler's e</a> ·
+    <a href="derivatives.html" style="color:var(--accent);">Derivatives</a> ·
+    <a href="integration.html" style="color:var(--accent);">Integration</a>.</p>
+
+    <div id="quiz"></div>
+
+    <div style="margin-top:1rem;">
+      <button class="btn" id="checkAll">Reveal my score</button>
+      <button class="btn secondary" id="reset">Reset quiz</button>
+    </div>
+
+    <div class="result" id="result">
+      <div class="score" id="finalScore">0 / 0</div>
+      <div class="msg" id="finalMsg"></div>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>Math Quiz &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+
+  <script>
+    // Quiz data. correct = index into options. Symbols kept plain for JS strings.
+    const QUESTIONS = [
+      {
+        topic: "Euler's number",
+        q: "Euler's number e is approximately equal to:",
+        options: ["1.618", "2.71828", "3.14159", "0.69315"],
+        correct: 1,
+        explain: "e \u2248 2.71828 (irrational, never ends/repeats). 1.618 is the golden ratio, 3.14159 is \u03c0."
+      },
+      {
+        topic: "Euler's number",
+        q: "e arises as the limit of which expression as n \u2192 \u221e?",
+        options: ["(1 + n)^(1/n)", "(1 + 1/n)^n", "(1 \u2212 1/n)^n", "n^(1/n)"],
+        correct: 1,
+        explain: "e = lim(n\u2192\u221e) (1 + 1/n)^n \u2014 the limit of compounding interest infinitely often."
+      },
+      {
+        topic: "Euler's number",
+        q: "What is special about the function f(x) = e^x?",
+        options: [
+          "It is its own derivative: d/dx e^x = e^x",
+          "Its derivative is 0",
+          "It equals x for all x",
+          "It has no derivative"
+        ],
+        correct: 0,
+        explain: "e^x is the unique function whose derivative equals itself \u2014 which is why it keeps AI math clean."
+      },
+      {
+        topic: "Euler's number",
+        q: "Why does softmax use e^x on each score?",
+        options: [
+          "To make values negative",
+          "To make all values positive and amplify differences, giving a valid probability distribution",
+          "To round the numbers",
+          "Because it is faster than addition"
+        ],
+        correct: 1,
+        explain: "e^x is always positive and grows fast, so softmax turns raw scores into positive probabilities that sum to 1."
+      },
+      {
+        topic: "Terminology",
+        q: "Which statement is correct?",
+        options: [
+          "Differentiation is the result; a derivative is the process",
+          "Differentiation is the process; a derivative is the result",
+          "They mean exactly the same thing",
+          "A derivative is the area under a curve"
+        ],
+        correct: 1,
+        explain: "Differentiation is the process (the action); the derivative is the result you get (the slope function)."
+      },
+      {
+        topic: "Derivatives",
+        q: "The derivative of f(x) = x\u00b2 is:",
+        options: ["x", "2x", "x\u00b2/2", "2"],
+        correct: 1,
+        explain: "Power rule: d/dx x\u207f = n\u00b7x\u207f\u207b\u00b9, so d/dx x\u00b2 = 2x."
+      },
+      {
+        topic: "Derivatives",
+        q: "A derivative measures:",
+        options: [
+          "The total area under a curve",
+          "The instantaneous rate of change (slope) at a point",
+          "The average of a dataset",
+          "The number of variables"
+        ],
+        correct: 1,
+        explain: "A derivative is the slope / instantaneous rate of change \u2014 how fast the output changes as you nudge the input."
+      },
+      {
+        topic: "Derivatives",
+        q: "For f(x, y) = x\u00b2 + y\u00b2, the gradient \u2207f is:",
+        options: ["[x, y]", "[2x, 2y]", "[2, 2]", "x\u00b2 + y\u00b2"],
+        correct: 1,
+        explain: "Partial derivatives: \u2202f/\u2202x = 2x, \u2202f/\u2202y = 2y, so \u2207f = [2x, 2y]."
+      },
+      {
+        topic: "Derivatives",
+        q: "Which calculus rule powers backpropagation?",
+        options: ["Product rule", "Chain rule", "Quotient rule", "Power rule"],
+        correct: 1,
+        explain: "Backpropagation is the chain rule applied through the layers of a network."
+      },
+      {
+        topic: "Integration",
+        q: "Integration is best described as finding:",
+        options: [
+          "The slope at a point",
+          "The accumulated total / area under a curve",
+          "The largest value",
+          "The number of data points"
+        ],
+        correct: 1,
+        explain: "Integration accumulates \u2014 the definite integral is the area under the curve between two limits."
+      },
+      {
+        topic: "Integration",
+        q: "\u222b 2x dx = ?",
+        options: ["x\u00b2 + C", "2 + C", "x + C", "2x\u00b2 + C"],
+        correct: 0,
+        explain: "Integration reverses differentiation: since d/dx x\u00b2 = 2x, \u222b 2x dx = x\u00b2 + C."
+      },
+      {
+        topic: "Integration",
+        q: "The Fundamental Theorem of Calculus says that differentiation and integration are:",
+        options: ["Unrelated", "Inverse operations", "The same operation", "Both about slopes"],
+        correct: 1,
+        explain: "They are inverses: integrating a derivative recovers the original function (up to a constant)."
+      },
+      {
+        topic: "Integration",
+        q: "In probability, the area under a probability density curve represents:",
+        options: ["The slope", "A probability", "The mean only", "Nothing meaningful"],
+        correct: 1,
+        explain: "Area under a density = probability; the total area under a valid density is 1."
+      }
+    ];
+
+    const quizEl = document.getElementById("quiz");
+    const scoreEl = document.getElementById("score");
+    const totalEl = document.getElementById("total");
+    const answeredEl = document.getElementById("answered");
+    const resultEl = document.getElementById("result");
+    const finalScoreEl = document.getElementById("finalScore");
+    const finalMsgEl = document.getElementById("finalMsg");
+
+    let score = 0;
+    let answered = 0;
+    const answeredState = new Array(QUESTIONS.length).fill(false);
+
+    totalEl.textContent = QUESTIONS.length;
+
+    function render() {
+      quizEl.innerHTML = "";
+      QUESTIONS.forEach((item, qi) => {
+        const q = document.createElement("div");
+        q.className = "q";
+        q.innerHTML =
+          '<div class="qnum">Q' + (qi + 1) + ' &middot; ' + item.topic + '</div>' +
+          '<div class="qtext">' + item.q + '</div>';
+        const ul = document.createElement("div");
+        ul.className = "options";
+        item.options.forEach((optText, oi) => {
+          const btn = document.createElement("button");
+          btn.className = "opt";
+          btn.type = "button";
+          btn.textContent = optText;
+          btn.addEventListener("click", () => choose(qi, oi, q));
+          ul.appendChild(btn);
+        });
+        q.appendChild(ul);
+        const ex = document.createElement("div");
+        ex.className = "explain";
+        ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+        q.appendChild(ex);
+        quizEl.appendChild(q);
+      });
+    }
+
+    function choose(qi, oi, qEl) {
+      if (answeredState[qi]) return;         // lock after first answer
+      answeredState[qi] = true;
+      answered++;
+      const item = QUESTIONS[qi];
+      const buttons = qEl.querySelectorAll(".opt");
+      buttons.forEach((b, i) => {
+        b.disabled = true;
+        if (i === item.correct) b.classList.add("correct");
+        if (i === oi && oi !== item.correct) b.classList.add("wrong");
+      });
+      if (oi === item.correct) score++;
+      qEl.querySelector(".explain").classList.add("show");
+      scoreEl.textContent = score;
+      answeredEl.textContent = answered + " answered";
+      if (answered === QUESTIONS.length) showResult();
+    }
+
+    function showResult() {
+      const pct = Math.round((score / QUESTIONS.length) * 100);
+      finalScoreEl.textContent = score + " / " + QUESTIONS.length + "  (" + pct + "%)";
+      let msg;
+      if (pct === 100) msg = "Perfect! You've got the math foundations down. \ud83c\udf89";
+      else if (pct >= 75) msg = "Great work \u2014 solid understanding. Review the misses above.";
+      else if (pct >= 50) msg = "Good start. Revisit the linked guides and try again.";
+      else msg = "Keep going \u2014 read the guides, then retake the quiz. You'll get there. \ud83d\ude80";
+      finalMsgEl.textContent = msg;
+      resultEl.classList.add("show");
+      resultEl.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    document.getElementById("checkAll").addEventListener("click", showResult);
+    document.getElementById("reset").addEventListener("click", () => {
+      score = 0; answered = 0;
+      answeredState.fill(false);
+      scoreEl.textContent = "0";
+      answeredEl.textContent = "0 answered";
+      resultEl.classList.remove("show");
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    render();
+  </script>
+</body>
+</html>

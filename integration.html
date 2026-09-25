@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integration &mdash; Antiderivatives, Definite Integrals &amp; Area Under a Curve</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#8747; Integration: Adding Up the Infinitely Small</h1>
+    <p>Antiderivatives, definite integrals, the Fundamental Theorem of Calculus, and area under a
+       curve &mdash; explained simply, with the "why it matters" and runnable code.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> <em>Integration</em> is the <strong>process</strong> of adding up
+      infinitely many tiny pieces to measure a whole &mdash; usually the <em>area under a curve</em>.
+      The <strong>result</strong> of that process is called an <em>integral</em>. And here is the
+      punchline: integration is the exact <strong>inverse</strong> of
+      <a href="derivatives.html" style="color:var(--accent);">differentiation</a>. One takes things
+      apart into rates of change; the other adds those rates back up.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#intuition">The Intuition (accumulation &amp; area)</a></li>
+        <li><a href="#process-result">Process vs. Result (and the inverse of the derivative)</a></li>
+        <li><a href="#indefinite">The Indefinite Integral (antiderivative + C)</a></li>
+        <li><a href="#definite">The Definite Integral (area from a to b)</a></li>
+        <li><a href="#ftc">The Fundamental Theorem of Calculus</a></li>
+        <li><a href="#rules">Common Integration Rules</a></li>
+        <li><a href="#numerical">Numerical Integration (Riemann &amp; trapezoidal)</a></li>
+        <li><a href="#ml">Where Integration Shows Up in ML &amp; Stats</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. INTUITION -->
+    <h2 class="section" id="intuition">1. The Intuition &mdash; accumulation &amp; area</h2>
+    <p class="muted">Integration answers one question: "If I add up all the little bits, how much do I have in total?"</p>
+
+    <div class="concept">
+      <h3>Adding up infinitely many slivers</h3>
+      <p>Imagine a curve <code>f(x)</code> drawn above the x-axis. The <strong>area</strong> trapped
+      between the curve and the axis is hard to measure directly &mdash; it is a weird curved shape.
+      The trick of integration is to slice that area into skinny rectangles, add up their areas, and
+      make the slices infinitely thin. The sum becomes exact.</p>
+      <div class="formula">area &asymp; &Sigma; f(x<sub>i</sub>) &middot; &Delta;x &nbsp;&rarr;&nbsp; &int;<sub>a</sub><sup>b</sup> f(x) dx</div>
+      <p>The stretched-out <strong>&int;</strong> symbol is literally an old-style "S" for
+      <em>sum</em>. The <code>dx</code> is the width of each infinitely thin slice.</p>
+
+      <svg class="diagram" viewBox="0 0 560 240" role="img"
+           aria-label="A curve rising from left to right with the shaded area underneath it between two vertical lines a and b, representing the definite integral.">
+        <!-- axes -->
+        <line x1="50" y1="200" x2="520" y2="200" stroke="#334155" stroke-width="1.5"/>
+        <line x1="50" y1="30"  x2="50"  y2="200" stroke="#334155" stroke-width="1.5"/>
+        <text x="515" y="220" fill="#94a3b8" font-size="12">x</text>
+        <text x="35"  y="40"  fill="#94a3b8" font-size="12">y</text>
+        <!-- shaded area under curve -->
+        <path d="M 130 200 L 130 150 C 250 90, 350 70, 430 55 L 430 200 Z"
+              fill="rgba(56,189,248,0.18)" stroke="none"/>
+        <!-- the curve -->
+        <path d="M 60 175 C 200 120, 320 90, 500 45" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+        <text x="470" y="40" fill="#38bdf8" font-size="13">f(x)</text>
+        <!-- boundary lines a and b -->
+        <line x1="130" y1="200" x2="130" y2="150" stroke="#a78bfa" stroke-width="2"/>
+        <line x1="430" y1="200" x2="430" y2="55"  stroke="#a78bfa" stroke-width="2"/>
+        <text x="126" y="218" fill="#a78bfa" font-size="13" text-anchor="middle">a</text>
+        <text x="430" y="218" fill="#a78bfa" font-size="13" text-anchor="middle">b</text>
+        <!-- area label -->
+        <text x="285" y="170" fill="#e2e8f0" font-size="14" text-anchor="middle">&int;<tspan dy="4" font-size="10">a</tspan><tspan dy="-4"> </tspan>f(x) dx</text>
+      </svg>
+
+      <div class="why">
+        <strong>Why it matters:</strong> "Total distance from a speed graph", "total probability under
+        a bell curve", "total charge from a current" &mdash; anytime you accumulate a changing
+        quantity over an interval, you are integrating.
+      </div>
+    </div>
+
+    <!-- 2. PROCESS VS RESULT -->
+    <h2 class="section" id="process-result">2. Process vs. Result &mdash; and the inverse of the derivative</h2>
+
+    <div class="concept">
+      <h3>Two words that are easy to mix up</h3>
+      <table>
+        <tr><th>Term</th><th>What it is</th><th>Example</th></tr>
+        <tr><td><strong>Integration</strong></td><td>The <em>process</em> (the verb) &mdash; the act of finding the area / antiderivative</td><td>"Integrate <code>2x</code>."</td></tr>
+        <tr><td><strong>Integral</strong></td><td>The <em>result</em> (the noun) &mdash; the answer you get</td><td>"The integral is <code>x&sup2; + C</code>."</td></tr>
+      </table>
+      <div class="why">
+        <strong>The key relationship:</strong> integration is the <strong>inverse</strong> of
+        differentiation. If differentiating <code>x&sup2;</code> gives <code>2x</code>, then
+        integrating <code>2x</code> gives back <code>x&sup2;</code> (plus a constant). They undo each
+        other &mdash; see <a href="derivatives.html" style="color:var(--accent);">derivatives.html</a>
+        for the forward direction.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Differentiation &harr; Integration</h3>
+      <svg class="diagram" viewBox="0 0 560 160" role="img"
+           aria-label="Two boxes: the original function x squared and its rate of change 2x. An arrow labelled differentiation points from x squared to 2x, and an arrow labelled integration points back from 2x to x squared.">
+        <rect x="60"  y="55" width="150" height="50" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="135" y="86" fill="#38bdf8" font-size="18" text-anchor="middle">x&sup2;</text>
+        <rect x="350" y="55" width="150" height="50" rx="10" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="425" y="86" fill="#a78bfa" font-size="18" text-anchor="middle">2x</text>
+        <!-- differentiate arrow (top) -->
+        <path d="M 210 68 C 280 40, 300 40, 350 68" fill="none" stroke="#4ade80" stroke-width="2" marker-end="url(#arw2)"/>
+        <text x="280" y="35" fill="#4ade80" font-size="12" text-anchor="middle">differentiate</text>
+        <!-- integrate arrow (bottom) -->
+        <path d="M 350 95 C 300 125, 280 125, 210 95" fill="none" stroke="#fbbf24" stroke-width="2" marker-end="url(#arw2)"/>
+        <text x="280" y="140" fill="#fbbf24" font-size="12" text-anchor="middle">integrate (+ C)</text>
+        <defs>
+          <marker id="arw2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- 3. INDEFINITE -->
+    <h2 class="section" id="indefinite">3. The Indefinite Integral (antiderivative + C)</h2>
+    <p class="muted">"What function, when differentiated, gives me this?" &mdash; the answer is the antiderivative.</p>
+
+    <div class="concept">
+      <h3>Finding the antiderivative</h3>
+      <p>An <strong>indefinite integral</strong> has no start/end points. It asks for the whole
+      <em>family</em> of functions whose derivative is <code>f(x)</code>. It is written with the
+      <strong>&int;</strong> sign and no limits:</p>
+      <div class="formula">&int; 2x dx = x&sup2; + C</div>
+      <p>Why the <strong>+ C</strong>? Because the derivative of a constant is zero. So
+      <code>x&sup2;</code>, <code>x&sup2; + 5</code>, and <code>x&sup2; &minus; 100</code> all have the
+      same derivative <code>2x</code>. We cannot know which constant it was, so we tack on an unknown
+      constant <code>C</code>.</p>
+      <div class="why">
+        <strong>Why it matters:</strong> The indefinite integral gives a <em>formula</em> you can
+        reuse. The definite integral (next section) plugs numbers into that formula to get an actual
+        area.
+      </div>
+    </div>
+
+    <!-- 4. DEFINITE -->
+    <h2 class="section" id="definite">4. The Definite Integral (area from a to b)</h2>
+    <p class="muted">Add the two limits <code>a</code> and <code>b</code>, and the integral becomes a single number: the area.</p>
+
+    <div class="concept">
+      <h3>A number, not a function</h3>
+      <p>A <strong>definite integral</strong> has a lower limit <code>a</code> and an upper limit
+      <code>b</code>. It equals the signed area under <code>f(x)</code> between those points:</p>
+      <div class="formula">&int;<sub>a</sub><sup>b</sup> f(x) dx = area from a to b</div>
+      <p>You compute it by finding the antiderivative <code>F(x)</code>, then subtracting its value at
+      the two endpoints (the constant <code>C</code> cancels out, which is why definite integrals give
+      a clean number):</p>
+      <div class="formula">&int;<sub>a</sub><sup>b</sup> f(x) dx = F(b) &minus; F(a)</div>
+      <p>Example &mdash; area under <code>2x</code> from 0 to 3, using <code>F(x) = x&sup2;</code>:</p>
+      <div class="formula">&int;<sub>0</sub><sup>3</sup> 2x dx = F(3) &minus; F(0) = 3&sup2; &minus; 0&sup2; = 9</div>
+      <div class="why">
+        <strong>Signed area:</strong> area below the x-axis counts as <em>negative</em>. So an integral
+        can come out to zero even when the curve is far from flat &mdash; the parts above and below can
+        cancel.
+      </div>
+    </div>
+
+    <!-- 5. FTC -->
+    <h2 class="section" id="ftc">5. The Fundamental Theorem of Calculus</h2>
+    <p class="muted">The bridge that connects the two great ideas of calculus &mdash; and proves they are inverses.</p>
+
+    <div class="concept">
+      <h3>Integrating a derivative recovers the original</h3>
+      <p>The Fundamental Theorem of Calculus (FTC) says the two operations are two sides of one coin.
+      In plain words: <strong>if you integrate the rate of change of something, you get back the total
+      change of that something.</strong></p>
+      <div class="formula">&int;<sub>a</sub><sup>b</sup> F&prime;(x) dx = F(b) &minus; F(a)</div>
+      <p>Here <code>F&prime;(x)</code> is the derivative of <code>F</code>. Integrating it from
+      <code>a</code> to <code>b</code> hands back the net change in <code>F</code>. Differentiation and
+      integration cancel:</p>
+      <div class="formula">d/dx &int;<sub>a</sub><sup>x</sup> f(t) dt = f(x)</div>
+      <div class="why">
+        <strong>Why it matters:</strong> This is what lets us compute areas <em>without</em> summing
+        infinitely many rectangles by hand. Find an antiderivative, plug in the endpoints, subtract.
+        It also explains why "the integral of a speed graph is the total distance travelled" &mdash;
+        speed is the derivative of position.
+      </div>
+    </div>
+
+    <!-- 6. RULES -->
+    <h2 class="section" id="rules">6. Common Integration Rules</h2>
+    <p class="muted">A small toolbox handles most integrals you will meet early on.</p>
+
+    <div class="concept">
+      <h3>The rules you use most</h3>
+      <table>
+        <tr><th>Rule</th><th>Formula</th><th>Example</th></tr>
+        <tr>
+          <td>Power rule</td>
+          <td><code>&int; x<sup>n</sup> dx = x<sup>n+1</sup> / (n+1) + C</code> &nbsp;(n &ne; &minus;1)</td>
+          <td><code>&int; x&sup2; dx = x&sup3;/3 + C</code></td>
+        </tr>
+        <tr>
+          <td>Constant multiple</td>
+          <td><code>&int; k&middot;f(x) dx = k &int; f(x) dx</code></td>
+          <td><code>&int; 5x dx = 5x&sup2;/2 + C</code></td>
+        </tr>
+        <tr>
+          <td>Sum rule</td>
+          <td><code>&int; [f + g] dx = &int; f dx + &int; g dx</code></td>
+          <td><code>&int; (x + 1) dx = x&sup2;/2 + x + C</code></td>
+        </tr>
+        <tr>
+          <td>Constant</td>
+          <td><code>&int; k dx = kx + C</code></td>
+          <td><code>&int; 7 dx = 7x + C</code></td>
+        </tr>
+        <tr>
+          <td>Reciprocal (special!)</td>
+          <td><code>&int; 1/x dx = ln|x| + C</code></td>
+          <td>the power rule breaks at n = &minus;1</td>
+        </tr>
+        <tr>
+          <td>Exponential</td>
+          <td><code>&int; e<sup>x</sup> dx = e<sup>x</sup> + C</code></td>
+          <td>its own antiderivative!</td>
+        </tr>
+      </table>
+      <div class="why">
+        <strong>Note the special case:</strong> the power rule needs to divide by <code>n+1</code>. If
+        <code>n = &minus;1</code> that is division by zero &mdash; so <code>&int; 1/x dx</code> is
+        <em>not</em> a power; it is <code>ln|x| + C</code>. And <code>e<sup>x</sup></code> is famously
+        its own derivative <em>and</em> its own integral &mdash; see
+        <a href="euler-number.html" style="color:var(--accent);">euler-number.html</a> for why
+        <code>e</code> is so special.
+      </div>
+    </div>
+
+    <!-- 7. NUMERICAL -->
+    <h2 class="section" id="numerical">7. Numerical Integration (when there is no neat formula)</h2>
+    <p class="muted">Most real-world functions have no tidy antiderivative &mdash; so we approximate the area numerically.</p>
+
+    <div class="concept">
+      <h3>Riemann sums &amp; the trapezoidal rule</h3>
+      <p>A <strong>Riemann sum</strong> is the original idea made literal: chop the interval into
+      rectangles and add their areas. A <strong>trapezoidal rule</strong> is smarter &mdash; it uses
+      trapezoids (slanted tops) that hug the curve better, so it needs fewer slices for the same
+      accuracy.</p>
+
+      <svg class="diagram" viewBox="0 0 560 240" role="img"
+           aria-label="A curve with rectangles beneath it on the left half showing a Riemann sum, and trapezoids beneath it on the right half showing the trapezoidal rule.">
+        <!-- axes -->
+        <line x1="40" y1="200" x2="530" y2="200" stroke="#334155" stroke-width="1.5"/>
+        <line x1="40" y1="30"  x2="40"  y2="200" stroke="#334155" stroke-width="1.5"/>
+        <!-- Riemann rectangles (left) -->
+        <rect x="60"  y="150" width="45" height="50"  fill="rgba(56,189,248,0.15)" stroke="#38bdf8" stroke-width="1.5"/>
+        <rect x="105" y="130" width="45" height="70"  fill="rgba(56,189,248,0.15)" stroke="#38bdf8" stroke-width="1.5"/>
+        <rect x="150" y="105" width="45" height="95"  fill="rgba(56,189,248,0.15)" stroke="#38bdf8" stroke-width="1.5"/>
+        <rect x="195" y="85"  width="45" height="115" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" stroke-width="1.5"/>
+        <text x="150" y="225" fill="#38bdf8" font-size="12" text-anchor="middle">rectangles (Riemann)</text>
+        <!-- Trapezoids (right) -->
+        <polygon points="300,200 300,80 345,68 345,200" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="1.5"/>
+        <polygon points="345,200 345,68 390,58 390,200" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="1.5"/>
+        <polygon points="390,200 390,58 435,50 435,200" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="1.5"/>
+        <polygon points="435,200 435,50 480,44 480,200" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="390" y="225" fill="#a78bfa" font-size="12" text-anchor="middle">trapezoids</text>
+        <!-- the curve over both -->
+        <path d="M 60 150 C 200 90, 320 70, 500 40" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+        <text x="500" y="35" fill="#fbbf24" font-size="12">f(x)</text>
+      </svg>
+
+      <div class="why">
+        <strong>Why it matters:</strong> Computers cannot do symbolic calculus by default &mdash; they
+        add up numbers. Numerical integration is how libraries evaluate probabilities, expected
+        values, and losses over data. NumPy ships <code>np.trapz</code> for exactly this.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Approximate &int;<sub>0</sub><sup>1</sup> x&sup2; dx (true value = 1/3)</h3>
+      <p>We know analytically that <code>&int;<sub>0</sub><sup>1</sup> x&sup2; dx = x&sup3;/3</code>
+      evaluated from 0 to 1 = <code>1/3 &asymp; 0.3333</code>. Let us confirm that numerically with the
+      trapezoidal rule:</p>
+      <pre><code>import numpy as np
+
+# The function we want the area under
+def f(x):
+    return x ** 2          # ** is Python's exponent operator
+
+# 1) Slice [0, 1] into many points
+x = np.linspace(0, 1, 1001)   # 1001 points => 1000 trapezoids
+y = f(x)
+
+# 2a) Built-in trapezoidal rule
+#     NumPy 2.0 renamed np.trapz -> np.trapezoid; support both:
+trapezoid = getattr(np, "trapezoid", getattr(np, "trapz", None))
+area_builtin = trapezoid(y, x)
+
+# 2b) Trapezoidal rule written out by hand (same idea)
+dx = x[1] - x[0]
+area_manual = dx * (y[0] / 2 + y[1:-1].sum() + y[-1] / 2)
+
+print(f"built-in trapz: {area_builtin:.6f}")   # 0.333333...
+print(f"manual trapz  : {area_manual:.6f}")    # 0.333333...
+print(f"exact (1/3)   : {1/3:.6f}")            # 0.333333
+
+# A crude left Riemann sum for comparison (less accurate)
+riemann = (f(x[:-1]) * dx).sum()
+print(f"left Riemann  : {riemann:.6f}")        # ~0.3328</code></pre>
+      <p class="muted">Both trapezoid estimates land on <code>0.333333</code> &mdash; matching the exact
+      answer <code>1/3</code> to six decimals. The cruder Riemann sum is close but slightly off, which
+      is why the trapezoidal rule is preferred.</p>
+    </div>
+
+    <!-- 8. ML -->
+    <h2 class="section" id="ml">8. Where Integration Shows Up in ML &amp; Stats</h2>
+    <p class="muted">Integration is the quiet engine behind probability, expectation, and model evaluation.</p>
+
+    <div class="concept">
+      <h3>Area under a probability density = probability</h3>
+      <p>A continuous random variable is described by a <strong>probability density function</strong>
+      <code>p(x)</code>. You cannot read a probability off it directly &mdash; you must integrate over
+      a range. The area under the curve between two values <em>is</em> the probability of landing in
+      that range:</p>
+      <div class="formula">P(a &le; X &le; b) = &int;<sub>a</sub><sup>b</sup> p(x) dx</div>
+      <p>And because <em>some</em> value must occur, the total area under any valid density is exactly
+      1:</p>
+      <div class="formula">&int;<sub>&minus;&infin;</sub><sup>&infin;</sup> p(x) dx = 1</div>
+      <div class="why">
+        <strong>The normal (bell) curve:</strong> the famous Gaussian is normalized precisely so its
+        total area equals 1. That normalizing constant <code>1/&radic;(2&pi;&sigma;&sup2;)</code> is
+        chosen to make the integral come out to one.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Expected value = integral of x weighted by its probability</h3>
+      <p>The <strong>expected value</strong> (mean) of a continuous variable is the balance point of
+      its distribution &mdash; each value <code>x</code> weighted by how likely it is:</p>
+      <div class="formula">E[x] = &int; x &middot; p(x) dx</div>
+      <p>More generally, the expectation of any function <code>g(x)</code> is
+      <code>E[g(x)] = &int; g(x) &middot; p(x) dx</code>. Expectations sit at the heart of loss
+      functions, variance, and information theory. See
+      <a href="math-foundations.html" style="color:var(--accent);">math-foundations.html</a> for the
+      broader math toolkit.</p>
+    </div>
+
+    <div class="concept">
+      <h3>AUC &mdash; the area under the ROC curve</h3>
+      <p>When you evaluate a classifier, the <strong>ROC curve</strong> plots the true-positive rate
+      against the false-positive rate. The single-number summary <strong>AUC</strong> (Area Under the
+      Curve) is &mdash; as the name says &mdash; the integral of that curve:</p>
+      <div class="formula">AUC = &int;<sub>0</sub><sup>1</sup> TPR(FPR) d(FPR)</div>
+      <p>An AUC of 1.0 is a perfect classifier; 0.5 is random guessing. In practice it is computed with
+      the trapezoidal rule over the ROC points &mdash; exactly the numerical integration from section
+      7. Full detail lives in
+      <a href="evaluation-metrics.html" style="color:var(--accent);">evaluation-metrics.html</a>.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Diffusion &amp; continuous-time models (briefly)</h3>
+      <p>Modern generative <strong>diffusion models</strong> (and neural ODEs) are described by
+      continuous processes. Sampling from them means <em>integrating</em> a differential equation over
+      time &mdash; numerically stepping from noise to a finished image by accumulating many tiny
+      updates. The same "add up infinitely small pieces" idea, now driving state-of-the-art image and
+      audio generation.</p>
+      <div class="why">
+        <strong>Takeaway:</strong> from a single probability to a generated image, integration is how
+        we turn a <em>rate</em> or a <em>density</em> into a <em>total</em>.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>Integration</strong> &mdash; the process of adding up infinitely small pieces (area under a curve)</li>
+        <li><strong>Integral</strong> &mdash; the result of that process (a function, or a number)</li>
+        <li><strong>Indefinite integral</strong> &mdash; the antiderivative, always with <code>+ C</code></li>
+        <li><strong>Definite integral</strong> &mdash; a number, computed as <code>F(b) &minus; F(a)</code></li>
+        <li><strong>FTC</strong> &mdash; differentiation and integration are inverses</li>
+        <li><strong>In ML</strong> &mdash; probabilities, expected values, AUC, and diffusion models all rely on it</li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">9. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://www.3blue1brown.com/topics/calculus" target="_blank" rel="noopener">3Blue1Brown &mdash; Essence of Calculus (video series)</a></li>
+        <li><a href="https://www.khanacademy.org/math/integral-calculus" target="_blank" rel="noopener">Khan Academy &mdash; Integral Calculus</a></li>
+        <li><a href="https://numpy.org/doc/stable/reference/generated/numpy.trapz.html" target="_blank" rel="noopener">NumPy docs &mdash; numpy.trapz</a></li>
+        <li><a href="https://ocw.mit.edu/courses/18-01-single-variable-calculus-fall-2006/" target="_blank" rel="noopener">MIT OCW &mdash; Single Variable Calculus</a></li>
+        <li><a href="derivatives.html">&rarr; Derivatives (the inverse operation)</a></li>
+        <li><a href="euler-number.html">&rarr; Euler's Number e (why &int; e<sup>x</sup> dx = e<sup>x</sup>)</a></li>
+        <li><a href="evaluation-metrics.html">&rarr; Evaluation Metrics (AUC in depth)</a></li>
+        <li><a href="math-foundations.html">&rarr; Math Foundations</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>Integration &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

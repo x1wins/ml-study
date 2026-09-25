@@ -13,6 +13,10 @@ and (where useful) runnable Python code.
 | # | Topic | What it covers |
 |---|-------|----------------|
 | 1 | [Math Foundations](math-foundations.html) | Linear algebra, calculus, gradients, probability |
+| 1a | [Euler's Number e](euler-number.html) | What e is, compounding, why AI uses it (softmax/sigmoid) |
+| 1b | [Derivatives](derivatives.html) | Differentiation: slope, rules, partials, gradient, chain rule |
+| 1c | [Integration](integration.html) | Area under a curve, fundamental theorem, probability/AUC |
+| — | [Math Quiz](math-quiz.html) | Interactive self-check on e, derivatives, integration |
 | 2 | [Programming](programming.html) | Python, NumPy, Pandas, Jupyter |
 | 3 | [Neural Networks](neural-networks.html) | Weights, bias, activation, backpropagation |
 | 4 | [Loss Functions](loss-functions.html) | MSE/MAE, cross-entropy, why loss drives learning |
