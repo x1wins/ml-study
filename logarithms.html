@@ -473,6 +473,40 @@ sum of 400 &times; log(0.01)          &rarr; &minus;1842.07   (perfectly fine)</
       </div>
     </div>
 
+    <div class="concept">
+      <h3>Example 4 &mdash; log scales you already use in real life</h3>
+      <p>Many everyday scales are logarithmic precisely because they cover enormous ranges. Each unit is a
+      fixed <em>multiplier</em>, not a fixed amount:</p>
+      <table>
+        <tr><th>Scale</th><th>Each step means</th><th>So &hellip;</th></tr>
+        <tr><td>Decibels (sound)</td><td>+10 dB = &times;10 power</td><td>70 dB is 100&times; the power of 50 dB</td></tr>
+        <tr><td>Richter (earthquakes)</td><td>+1 = &times;10 amplitude</td><td>a magnitude 6 is 100&times; a magnitude 4</td></tr>
+        <tr><td>pH (acidity)</td><td>&minus;1 pH = &times;10 more acidic</td><td>pH 3 is 1000&times; more acidic than pH 6</td></tr>
+      </table>
+      <p class="muted">The takeaway: on a log scale, <strong>equal spacing = equal ratios</strong>. That's
+      the same reason a loss curve dropping from 10 &rarr; 1 &rarr; 0.1 looks like even steps on a log axis.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Example 5 &mdash; log-odds (logits): logs power classification</h3>
+      <p>A probability <code>p</code> lives in a cramped range (0 to 1). Its <strong>log-odds</strong>
+      (the "logit") stretches it to the full number line, which is far easier for a model to work with:</p>
+      <div class="formula">logit(p) = ln( p / (1 &minus; p) )</div>
+      <p>Worked values:</p>
+      <pre><code>p = 0.5   &rarr; ln(0.5/0.5)   = ln(1)  =  0      (50/50, neutral)
+p = 0.9   &rarr; ln(0.9/0.1)   = ln(9)  = +2.197  (confident yes)
+p = 0.1   &rarr; ln(0.1/0.9)   = ln(1/9)= &minus;2.197  (confident no)</code></pre>
+      <p>Notice the symmetry: <code>p</code> and <code>1&minus;p</code> give opposite-sign logits. The
+      <strong>sigmoid</strong> function is exactly the inverse &mdash; it maps a logit back to a probability:</p>
+      <div class="formula">&sigma;(x) = 1 / (1 + e<sup>&minus;x</sup>)   (undoes the logit)</div>
+      <div class="why">
+        <strong>In ML:</strong> neural-network classifiers output raw <em>logits</em>; sigmoid or softmax
+        turn them into probabilities, and cross-entropy (built on <code>ln</code>) scores them. Logs and
+        the exponential <code>e<sup>x</sup></code> are two sides of the same coin &mdash; see
+        <a href="neural-networks.html">Neural Networks</a> and <a href="euler-number.html">Euler's number e</a>.
+      </div>
+    </div>
+
     <!-- 5. DERIVATIVE -->
     <h2 class="section" id="derivative">5. The derivative of ln(x)</h2>
 
