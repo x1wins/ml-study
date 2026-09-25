@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neural Networks — Weights, Bias, Activation &amp; Backpropagation</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>&#129504; Neural Networks: The Four Building Blocks</h1>
+    <p>Weights, Bias, Activation Functions, and Backpropagation &mdash; explained simply,
+       with the "why it matters" and runnable code.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> A neural network is just numbers (<em>weights</em> and
+      <em>biases</em>) passed through simple math and a squashing function (<em>activation</em>).
+      <em>Backpropagation</em> is how the network adjusts those numbers to get better. That's the
+      whole game.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#neuron">The Neuron (the whole idea in one picture)</a></li>
+        <li><a href="#weights">Weights</a></li>
+        <li><a href="#bias">Bias</a></li>
+        <li><a href="#activation">Activation Functions</a></li>
+        <li><a href="#backprop">Backpropagation</a></li>
+        <li><a href="#full">Putting It Together (full code)</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 0. THE NEURON -->
+    <h2 class="section" id="neuron">1. The Neuron &mdash; the whole idea in one picture</h2>
+    <p class="muted">Every neural network is built from one tiny unit repeated thousands of times: the neuron.</p>
+
+    <div class="concept">
+      <h3>What a single neuron does</h3>
+      <p>A neuron takes inputs, multiplies each by a <strong>weight</strong>, adds them up, adds a
+      <strong>bias</strong>, then passes the result through an <strong>activation function</strong>.</p>
+      <div class="formula">output = activation( (w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + &hellip; + w<sub>n</sub>x<sub>n</sub>) + b )</div>
+
+      <svg class="diagram" viewBox="0 0 560 240" role="img"
+           aria-label="A neuron: three inputs multiplied by weights, summed with a bias, passed through an activation to produce an output.">
+        <!-- inputs -->
+        <circle cx="60" cy="60"  r="18" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <circle cx="60" cy="120" r="18" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <circle cx="60" cy="180" r="18" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="60" y="65"  fill="#e2e8f0" font-size="13" text-anchor="middle">x&#8321;</text>
+        <text x="60" y="125" fill="#e2e8f0" font-size="13" text-anchor="middle">x&#8322;</text>
+        <text x="60" y="185" fill="#e2e8f0" font-size="13" text-anchor="middle">x&#8323;</text>
+        <!-- weight lines -->
+        <line x1="78" y1="60"  x2="250" y2="120" stroke="#a78bfa" stroke-width="2"/>
+        <line x1="78" y1="120" x2="250" y2="120" stroke="#a78bfa" stroke-width="2"/>
+        <line x1="78" y1="180" x2="250" y2="120" stroke="#a78bfa" stroke-width="2"/>
+        <text x="150" y="80"  fill="#a78bfa" font-size="12">w&#8321;</text>
+        <text x="150" y="115" fill="#a78bfa" font-size="12">w&#8322;</text>
+        <text x="150" y="160" fill="#a78bfa" font-size="12">w&#8323;</text>
+        <!-- sum node -->
+        <circle cx="280" cy="120" r="30" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="280" y="118" fill="#fbbf24" font-size="18" text-anchor="middle">&Sigma;</text>
+        <text x="280" y="135" fill="#94a3b8" font-size="10" text-anchor="middle">+ b</text>
+        <!-- activation box -->
+        <rect x="360" y="95" width="90" height="50" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="405" y="125" fill="#38bdf8" font-size="13" text-anchor="middle">activation</text>
+        <line x1="310" y1="120" x2="360" y2="120" stroke="#e2e8f0" stroke-width="2"/>
+        <!-- output -->
+        <line x1="450" y1="120" x2="510" y2="120" stroke="#e2e8f0" stroke-width="2"/>
+        <circle cx="528" cy="120" r="18" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="528" y="125" fill="#4ade80" font-size="12" text-anchor="middle">&#375;</text>
+      </svg>
+      <div class="why">
+        <strong>Why it matters:</strong> "Deep learning" is just millions of these neurons stacked in
+        layers. Understand one neuron and you understand the whole network.
+      </div>
+    </div>
+
+    <!-- 2. WEIGHTS -->
+    <h2 class="section" id="weights">2. Weights</h2>
+    <p class="muted">The knobs the network turns to learn. Weights decide how <em>important</em> each input is.</p>
+
+    <div class="concept">
+      <h3>What is a weight?</h3>
+      <p>A <strong>weight</strong> is a number multiplied by an input. A big weight means "this input
+      matters a lot"; a weight near zero means "mostly ignore this input"; a negative weight means
+      "this input pushes the answer the other way".</p>
+      <div class="formula">contribution of an input = weight &times; input</div>
+      <div class="why">
+        <strong>Why it matters:</strong> Learning = finding the right weights. Everything the model
+        "knows" is stored in its weights.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Weights in code</h3>
+      <pre><code>import numpy as np
+
+inputs  = np.array([1.0, 2.0, 3.0])     # x
+weights = np.array([0.2, 0.8, -0.5])    # w  (learned during training)
+
+# weighted sum = dot product
+weighted_sum = np.dot(weights, inputs)  # 0.2 + 1.6 - 1.5 = 0.3
+print(weighted_sum)  # 0.3</code></pre>
+      <p class="muted">A whole layer stores its weights as a <strong>matrix</strong>, so all neurons
+      compute at once with one matrix multiply.</p>
+    </div>
+
+    <!-- 3. BIAS -->
+    <h2 class="section" id="bias">3. Bias</h2>
+    <p class="muted">A shift value that lets a neuron fire even when inputs are zero.</p>
+
+    <div class="concept">
+      <h3>What is a bias?</h3>
+      <p>The <strong>bias</strong> is an extra number added <em>after</em> the weighted sum. It shifts
+      the result up or down, independent of the inputs. Think of it like the intercept
+      <code>b</code> in the line equation <code>y = mx + b</code>.</p>
+      <div class="formula">z = (w<sub>1</sub>x<sub>1</sub> + &hellip; + w<sub>n</sub>x<sub>n</sub>) + b</div>
+      <div class="why">
+        <strong>Why it matters:</strong> Without a bias, every neuron is forced through the origin
+        (output 0 when all inputs are 0). The bias gives the network freedom to fit data that
+        doesn't pass through zero &mdash; greatly increasing what it can learn.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Weights vs. Bias at a glance</h3>
+      <table>
+        <tr><th>&nbsp;</th><th>Weight</th><th>Bias</th></tr>
+        <tr><td>Role</td><td>Scales an input</td><td>Shifts the total</td></tr>
+        <tr><td>Depends on input?</td><td>Yes (multiplied by x)</td><td>No (added regardless)</td></tr>
+        <tr><td>Line analogy</td><td>slope <code>m</code></td><td>intercept <code>b</code></td></tr>
+        <tr><td>How many?</td><td>one per input</td><td>one per neuron</td></tr>
+      </table>
+      <pre><code>z = np.dot(weights, inputs) + bias   # bias is a single number added on
+</code></pre>
+    </div>
+
+    <!-- 4. ACTIVATION -->
+    <h2 class="section" id="activation">4. Activation Functions</h2>
+    <p class="muted">The "should this neuron fire, and how strongly?" step. It adds <em>non-linearity</em>.</p>
+
+    <div class="concept">
+      <h3>Why do we need them?</h3>
+      <p>Without an activation function, stacking layers is pointless: a chain of weighted sums is
+      still just one big weighted sum (a straight line). Activation functions bend the output so the
+      network can learn <strong>curves and complex patterns</strong>.</p>
+      <div class="why">
+        <strong>Key idea:</strong> weights + bias = a straight line. Activation = the bend that lets
+        many lines combine into any shape.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>The common activation functions</h3>
+      <table>
+        <tr><th>Name</th><th>Formula</th><th>Output range</th><th>Used for</th></tr>
+        <tr>
+          <td>Sigmoid</td>
+          <td><code>&sigma;(x) = 1 / (1 + e<sup>&minus;x</sup>)</code></td>
+          <td>0 &rarr; 1</td>
+          <td>Probabilities, binary output</td>
+        </tr>
+        <tr>
+          <td>Tanh</td>
+          <td><code>tanh(x)</code></td>
+          <td>&minus;1 &rarr; 1</td>
+          <td>Zero-centered hidden layers</td>
+        </tr>
+        <tr>
+          <td>ReLU</td>
+          <td><code>max(0, x)</code></td>
+          <td>0 &rarr; &infin;</td>
+          <td>Default for hidden layers (fast)</td>
+        </tr>
+        <tr>
+          <td>Softmax</td>
+          <td><code>e<sup>x<sub>i</sub></sup> / &Sigma;<sub>j</sub> e<sup>x<sub>j</sub></sup></code></td>
+          <td>sums to 1</td>
+          <td>Multi-class output probabilities</td>
+        </tr>
+      </table>
+
+      <svg class="diagram" viewBox="0 0 560 200" role="img"
+           aria-label="Shapes of three activation functions: sigmoid S-curve, tanh S-curve, and ReLU hinge.">
+        <!-- axes helper -->
+        <line x1="40"  y1="100" x2="180" y2="100" stroke="#334155" stroke-width="1"/>
+        <line x1="110" y1="30"  x2="110" y2="170" stroke="#334155" stroke-width="1"/>
+        <path d="M 45 155 C 95 155, 95 45, 175 45" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+        <text x="110" y="190" fill="#38bdf8" font-size="12" text-anchor="middle">Sigmoid</text>
+
+        <line x1="210" y1="100" x2="350" y2="100" stroke="#334155" stroke-width="1"/>
+        <line x1="280" y1="30"  x2="280" y2="170" stroke="#334155" stroke-width="1"/>
+        <path d="M 215 160 C 265 160, 265 40, 345 40" fill="none" stroke="#a78bfa" stroke-width="2.5"/>
+        <text x="280" y="190" fill="#a78bfa" font-size="12" text-anchor="middle">Tanh</text>
+
+        <line x1="380" y1="100" x2="520" y2="100" stroke="#334155" stroke-width="1"/>
+        <line x1="450" y1="30"  x2="450" y2="170" stroke="#334155" stroke-width="1"/>
+        <path d="M 385 100 L 450 100 L 515 45" fill="none" stroke="#4ade80" stroke-width="2.5"/>
+        <text x="450" y="190" fill="#4ade80" font-size="12" text-anchor="middle">ReLU</text>
+      </svg>
+
+      <div class="why">
+        <strong>Rule of thumb:</strong> use <strong>ReLU</strong> for hidden layers (simple and fast),
+        <strong>sigmoid</strong> for a single yes/no output, and <strong>softmax</strong> for choosing
+        one of many classes.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Activation functions in code</h3>
+      <pre><code>import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def relu(x):
+    return np.maximum(0, x)
+
+def softmax(x):
+    e = np.exp(x - np.max(x))     # subtract max for numerical stability
+    return e / e.sum()
+
+print(sigmoid(0.3))            # 0.574
+print(relu(np.array([-2, 5]))) # [0 5]
+print(softmax(np.array([2.0, 1.0, 0.1])))  # [0.659 0.242 0.099]</code></pre>
+    </div>
+
+    <!-- 5. BACKPROPAGATION -->
+    <h2 class="section" id="backprop">5. Backpropagation</h2>
+    <p class="muted">How the network learns: measure the error, then adjust every weight and bias to reduce it.</p>
+
+    <div class="concept">
+      <h3>The learning loop</h3>
+      <ol style="padding-left:1.25rem; color:var(--muted);">
+        <li><strong>Forward pass:</strong> feed inputs through the network to get a prediction.</li>
+        <li><strong>Loss:</strong> measure how wrong the prediction is (e.g., <code>(prediction &minus; target)&sup2;</code>).</li>
+        <li><strong>Backward pass:</strong> use the <strong>chain rule</strong> to compute how much each
+            weight/bias contributed to the error (the gradient).</li>
+        <li><strong>Update:</strong> nudge every weight/bias downhill: <code>w = w &minus; lr &times; gradient</code>.</li>
+        <li>Repeat thousands of times until the loss is small.</li>
+      </ol>
+
+      <svg class="diagram" viewBox="0 0 560 150" role="img"
+           aria-label="The training loop: forward pass produces a prediction, loss is measured, backward pass sends error signals back, weights update.">
+        <rect x="20"  y="55" width="90" height="40" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="65"  y="80" fill="#38bdf8" font-size="12" text-anchor="middle">Forward</text>
+        <rect x="150" y="55" width="90" height="40" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="195" y="80" fill="#fbbf24" font-size="12" text-anchor="middle">Loss</text>
+        <rect x="280" y="55" width="110" height="40" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+        <text x="335" y="80" fill="#f87171" font-size="12" text-anchor="middle">Backprop</text>
+        <rect x="430" y="55" width="100" height="40" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="480" y="80" fill="#4ade80" font-size="12" text-anchor="middle">Update w,b</text>
+        <!-- forward arrows -->
+        <line x1="110" y1="75" x2="150" y2="75" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="240" y1="75" x2="280" y2="75" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="390" y1="75" x2="430" y2="75" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <!-- loop-back arrow -->
+        <path d="M 480 95 C 480 135, 65 135, 65 95" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+        <text x="270" y="132" fill="#94a3b8" font-size="10" text-anchor="middle">repeat</text>
+        <defs>
+          <marker id="arw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+
+      <div class="why">
+        <strong>Why "back"-propagation?</strong> The error is measured at the <em>output</em>, then
+        pushed <em>backward</em> through the layers. The chain rule lets us split the blame: how much
+        did each weight contribute to the final error?
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>The chain rule (the engine of backprop)</h3>
+      <p>If error <code>L</code> depends on output <code>&#375;</code>, which depends on the sum
+      <code>z</code>, which depends on weight <code>w</code>, the chain rule multiplies the local
+      slopes together:</p>
+      <div class="formula">&part;L/&part;w = (&part;L/&part;&#375;) &times; (&part;&#375;/&part;z) &times; (&part;z/&part;w)</div>
+      <p class="muted">Each factor is easy on its own; multiplying them gives "how much this one weight
+      affects the total error." Do this for every weight = the full gradient.</p>
+    </div>
+
+    <div class="concept">
+      <h3>One neuron learning, from scratch</h3>
+      <pre><code>import numpy as np
+
+def sigmoid(x):        return 1 / (1 + np.exp(-x))
+def sigmoid_deriv(y):  return y * (1 - y)   # y is sigmoid(x) already
+
+# Toy problem: learn to output ~0.9 from a fixed input
+x, target = 1.5, 0.9
+w, b = 0.0, 0.0        # start untrained
+lr = 0.5
+
+for step in range(200):
+    # 1) forward pass
+    z = w * x + b
+    y = sigmoid(z)
+
+    # 2) loss = (y - target)^2
+    loss = (y - target) ** 2
+
+    # 3) backward pass (chain rule)
+    dL_dy = 2 * (y - target)       # dLoss/dy
+    dy_dz = sigmoid_deriv(y)       # dy/dz
+    dz_dw = x                      # dz/dw
+    dz_db = 1                      # dz/db
+
+    grad_w = dL_dy * dy_dz * dz_dw
+    grad_b = dL_dy * dy_dz * dz_db
+
+    # 4) update
+    w -= lr * grad_w
+    b -= lr * grad_b
+
+    if step % 40 == 0:
+        print(f"step {step:3d}: y={y:.4f}  loss={loss:.5f}")
+
+print(f"final prediction: {sigmoid(w*x+b):.4f} (target 0.9)")</code></pre>
+      <p class="muted">Run it: the prediction climbs from 0.5 toward 0.9 as the weight and bias learn.
+      A real network does exactly this for millions of weights at once.</p>
+    </div>
+
+    <!-- 6. FULL EXAMPLE -->
+    <h2 class="section" id="full">6. Putting It Together</h2>
+    <div class="concept">
+      <h3>A tiny 2-layer network (forward pass)</h3>
+      <p>Combining all four blocks: weights, bias, activation, chained across two layers.</p>
+      <pre><code>import numpy as np
+
+def sigmoid(x): return 1 / (1 + np.exp(-x))
+def relu(x):    return np.maximum(0, x)
+
+# Input (2 features)
+x = np.array([0.5, -1.2])
+
+# Layer 1: 2 inputs -> 3 neurons
+W1 = np.array([[ 0.1,  0.4],
+               [-0.7,  0.2],
+               [ 0.3, -0.5]])   # shape (3, 2): 3 neurons, each with 2 weights
+b1 = np.array([0.0, 0.1, -0.2]) # one bias per neuron
+
+# Layer 2: 3 inputs -> 1 output neuron
+W2 = np.array([0.6, -0.4, 0.9]) # 3 weights
+b2 = 0.05
+
+# Forward pass
+z1 = W1 @ x + b1        # weighted sums + bias  (layer 1)
+a1 = relu(z1)           # activation            (layer 1)
+
+z2 = W2 @ a1 + b2       # weighted sum + bias   (layer 2)
+y  = sigmoid(z2)        # activation            (final probability)
+
+print("hidden layer:", a1)
+print("prediction  :", round(float(y), 4))</code></pre>
+      <div class="why">
+        <strong>That's a neural network.</strong> Training would wrap this in the backprop loop from
+        section 5, adjusting <code>W1, b1, W2, b2</code> until predictions match the targets.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>Weight</strong> &mdash; how important each input is (multiplied)</li>
+        <li><strong>Bias</strong> &mdash; a shift that lets neurons fire without input (added)</li>
+        <li><strong>Activation</strong> &mdash; the bend that adds non-linearity (ReLU / sigmoid / softmax)</li>
+        <li><strong>Backpropagation</strong> &mdash; chain rule + gradient descent to learn the weights &amp; biases</li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">7. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://www.3blue1brown.com/topics/neural-networks" target="_blank" rel="noopener">3Blue1Brown &mdash; Neural Networks (video series)</a></li>
+        <li><a href="http://neuralnetworksanddeeplearning.com/" target="_blank" rel="noopener">Neural Networks and Deep Learning (free book, Michael Nielsen)</a></li>
+        <li><a href="https://cs231n.github.io/optimization-2/" target="_blank" rel="noopener">Stanford CS231n &mdash; Backpropagation notes</a></li>
+        <li><a href="https://playground.tensorflow.org/" target="_blank" rel="noopener">TensorFlow Playground &mdash; play with a network in your browser</a></li>
+        <li><a href="https://pytorch.org/tutorials/beginner/basics/intro.html" target="_blank" rel="noopener">PyTorch &mdash; Learn the Basics</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>Neural Networks &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

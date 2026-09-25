@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Foundations for AI/ML — Beginner Guide</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    /* Table of contents */
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "▸ "; color: var(--accent); }
+
+    .resources a { color: var(--accent); text-decoration: none; }
+    .resources a:hover { text-decoration: underline; }
+
+    .descent {
+      display: block;
+      width: 100%;
+      max-width: 460px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📐 Math Foundations for AI/ML</h1>
+    <p>The core math you need to acknowledge — explained simply, with the "why it matters" for machine learning.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">← Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Don't panic!</strong> You do <em>not</em> need to be a mathematician. You need
+      <em>intuition</em> for four areas. Modern libraries (NumPy, PyTorch) do the heavy calculation for you —
+      your job is to understand <em>what</em> is happening and <em>why</em>.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#linear-algebra">Linear Algebra</a></li>
+        <li><a href="#calculus">Calculus</a></li>
+        <li><a href="#probability">Probability &amp; Statistics</a></li>
+        <li><a href="#optimization">Optimization (bonus)</a></li>
+        <li><a href="#plan">How Much Do You Actually Need?</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. LINEAR ALGEBRA -->
+    <h2 class="section" id="linear-algebra">1. Linear Algebra</h2>
+    <p class="muted">The language of data. Everything in ML is stored as numbers in grids.</p>
+
+    <div class="concept">
+      <h3>Scalars, Vectors, Matrices, Tensors</h3>
+      <table>
+        <tr><th>Name</th><th>What it is</th><th>Example</th></tr>
+        <tr><td>Scalar</td><td>A single number</td><td><code>5</code></td></tr>
+        <tr><td>Vector</td><td>A list of numbers (1D)</td><td><code>[1, 2, 3]</code></td></tr>
+        <tr><td>Matrix</td><td>A grid of numbers (2D)</td><td><code>[[1, 2], [3, 4]]</code></td></tr>
+        <tr><td>Tensor</td><td>Numbers in 3+ dimensions</td><td>An RGB image (height × width × 3)</td></tr>
+      </table>
+      <div class="why">
+        <strong>Why it matters:</strong> A dataset is a matrix (rows = examples, columns = features).
+        An image is a tensor. Neural networks are chains of matrix operations.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Key Operations</h3>
+      <ul class="clean">
+        <li><strong>Addition / scaling:</strong> combine or resize vectors</li>
+        <li><strong>Dot product:</strong> multiply two vectors → a single number (measures similarity)</li>
+        <li><strong>Matrix multiplication:</strong> the core operation inside every neural network layer</li>
+        <li><strong>Transpose:</strong> flip rows and columns</li>
+      </ul>
+      <p class="muted">Dot product example — the heart of a neuron:</p>
+      <div class="formula">output = (w₁·x₁) + (w₂·x₂) + (w₃·x₃) + bias</div>
+      <pre><code>import numpy as np
+
+weights = np.array([0.2, 0.8, -0.5])
+inputs  = np.array([1.0, 2.0, 3.0])
+
+output = np.dot(weights, inputs)   # 0.2 + 1.6 - 1.5 = 0.3
+print(output)  # 0.3</code></pre>
+    </div>
+
+    <!-- 2. CALCULUS -->
+    <h2 class="section" id="calculus">2. Calculus</h2>
+    <p class="muted">How models <em>learn</em>. Calculus tells us which direction to adjust to improve.</p>
+
+    <div class="concept">
+      <h3>Derivatives &amp; Gradients</h3>
+      <p>A <strong>derivative</strong> measures how much the output changes when you nudge the input.
+      A <strong>gradient</strong> is just a collection of derivatives (one per input variable).</p>
+      <div class="why">
+        <strong>Why it matters:</strong> Training a model = reducing "error". The gradient points in the
+        direction where error increases — so we step in the <em>opposite</em> direction to reduce it.
+        This is <strong>gradient descent</strong>.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Gradient Descent (the learning loop)</h3>
+      <div class="formula">new_weight = old_weight − (learning_rate × gradient)</div>
+      <pre><code># Minimize f(x) = x^2 by walking downhill
+x = 10.0            # starting point
+learning_rate = 0.1
+
+for step in range(20):
+    gradient = 2 * x        # derivative of x^2
+    x = x - learning_rate * gradient
+    print(f"step {step}: x = {x:.4f}")
+
+# x slides toward 0, the minimum</code></pre>
+      <p class="muted">This tiny loop is the same idea used to train massive neural networks.</p>
+    </div>
+
+    <div class="concept">
+      <h3>The Chain Rule</h3>
+      <p>Lets us compute gradients through many stacked functions. This is what powers
+      <strong>backpropagation</strong> — the algorithm that trains deep networks.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Derivatives → Gradient (the key link)</h3>
+      <p>A <strong>derivative</strong> works on a function of <em>one</em> variable: "if I nudge
+      <code>x</code>, how much does <code>f(x)</code> change?"</p>
+      <div class="formula">f(x) = x²  →  df/dx = 2x</div>
+      <p>At <code>x = 3</code>, the derivative is <code>6</code>: a steep, positive slope — increasing
+      <code>x</code> increases <code>f(x)</code> quickly.</p>
+
+      <p>A <strong>gradient</strong> is the same idea for a function of <em>many</em> variables. You take
+      one <strong>partial derivative</strong> per variable and collect them into a vector:</p>
+      <div class="formula">f(x, y) = x² + y²  →  ∇f = [ ∂f/∂x , ∂f/∂y ] = [ 2x , 2y ]</div>
+
+      <table>
+        <tr><th>Concept</th><th>Variables</th><th>Result</th><th>Symbol</th></tr>
+        <tr><td>Derivative</td><td>one</td><td>a single number (slope)</td><td><code>df/dx</code></td></tr>
+        <tr><td>Partial derivative</td><td>one of many</td><td>slope in one direction</td><td><code>∂f/∂x</code></td></tr>
+        <tr><td>Gradient</td><td>all</td><td>a vector of partials</td><td><code>∇f</code></td></tr>
+      </table>
+
+      <div class="why">
+        <strong>Partial derivative trick:</strong> treat every <em>other</em> variable as a constant.
+        For <code>f(x, y) = x² + y²</code> → <code>∂f/∂x = 2x</code> (the <code>y²</code> term becomes 0)
+        and <code>∂f/∂y = 2y</code> (the <code>x²</code> term becomes 0).
+      </div>
+
+      <p>The gradient vector <strong>points toward the steepest increase</strong>. To <em>minimize</em>
+      error we step in the <em>opposite</em> direction — that's the minus sign in gradient descent:</p>
+      <div class="formula">new_weight = old_weight − learning_rate × gradient</div>
+
+      <h3 style="margin-top:1.25rem;">Two-variable descent in code</h3>
+      <pre><code># Minimize f(x, y) = x^2 + y^2  (minimum is at 0, 0)
+x, y = 5.0, -3.0
+lr = 0.1
+
+for step in range(15):
+    grad_x = 2 * x          # partial derivative wrt x
+    grad_y = 2 * y          # partial derivative wrt y
+    x = x - lr * grad_x     # step downhill in x
+    y = y - lr * grad_y     # step downhill in y
+    print(f"step {step}: x={x:.3f}, y={y:.3f}")
+
+# both x and y slide toward 0 together</code></pre>
+
+      <h3 style="margin-top:1.25rem;">The downhill picture</h3>
+      <p class="muted">The gradient at each point (arrow) shows the uphill direction; we move the
+      opposite way, sliding down into the valley (the minimum):</p>
+      <svg class="descent" viewBox="0 0 460 220" role="img"
+           aria-label="A parabola-shaped valley with a ball rolling down toward the minimum, guided by gradient arrows.">
+        <!-- valley curve: y = 0.006*(x-230)^2 + 30 sampled -->
+        <path d="M 40 190 Q 230 -60 420 190" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+        <!-- points stepping downhill -->
+        <circle cx="90"  cy="150" r="7" fill="#a78bfa"/>
+        <circle cx="140" cy="95"  r="7" fill="#a78bfa" opacity="0.8"/>
+        <circle cx="185" cy="55"  r="7" fill="#a78bfa" opacity="0.7"/>
+        <circle cx="230" cy="40"  r="8" fill="#fbbf24"/>
+        <!-- gradient arrows (pointing uphill, away from minimum) -->
+        <line x1="90"  y1="150" x2="70"  y2="172" stroke="#f87171" stroke-width="2"/>
+        <line x1="140" y1="95"  x2="122" y2="120" stroke="#f87171" stroke-width="2"/>
+        <line x1="185" y1="55"  x2="172" y2="82"  stroke="#f87171" stroke-width="2"/>
+        <!-- labels -->
+        <text x="235" y="35" fill="#fbbf24" font-size="12">minimum</text>
+        <text x="45"  y="205" fill="#94a3b8" font-size="11">start (high error)</text>
+        <text x="330" y="120" fill="#f87171" font-size="11">red = gradient (uphill)</text>
+      </svg>
+      <div class="why">
+        <strong>In real ML:</strong> a network has millions of weights, so the loss <code>L</code> has
+        millions of partial derivatives: <code>∇L = [∂L/∂w₁, ∂L/∂w₂, …, ∂L/∂wₙ]</code>. Each partial says
+        "how much does error change if I nudge this one weight?" We nudge every weight downhill at once.
+        The <strong>chain rule</strong> makes computing all these partials efficient — that's
+        <strong>backpropagation</strong>.
+      </div>
+    </div>
+
+    <!-- 3. PROBABILITY -->
+    <h2 class="section" id="probability">3. Probability &amp; Statistics</h2>
+    <p class="muted">How models handle <em>uncertainty</em> and how we measure them.</p>
+
+    <div class="concept">
+      <h3>Core Statistics</h3>
+      <ul class="clean">
+        <li><strong>Mean:</strong> the average value</li>
+        <li><strong>Median:</strong> the middle value (robust to outliers)</li>
+        <li><strong>Variance / Std Dev:</strong> how spread out the data is</li>
+        <li><strong>Distribution:</strong> the shape of your data (e.g., the bell curve / normal distribution)</li>
+      </ul>
+      <pre><code>import numpy as np
+
+data = np.array([2, 4, 4, 4, 5, 5, 7, 9])
+print("mean:", data.mean())    # 5.0
+print("std :", data.std())     # 2.0</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>Probability Basics</h3>
+      <ul class="clean">
+        <li><strong>Probability:</strong> a number from 0 (never) to 1 (always)</li>
+        <li><strong>Conditional probability:</strong> P(A | B) — chance of A given B happened</li>
+        <li><strong>Bayes' Theorem:</strong> update beliefs when new evidence arrives</li>
+      </ul>
+      <div class="formula">P(A | B) = P(B | A) × P(A) / P(B)</div>
+      <div class="why">
+        <strong>Why it matters:</strong> Classifiers output probabilities ("90% cat, 10% dog").
+        Bayes' theorem is the foundation of spam filters and many classic ML models.
+      </div>
+    </div>
+
+    <!-- 4. OPTIMIZATION -->
+    <h2 class="section" id="optimization">4. Optimization <span class="muted" style="font-size:1rem;">(bonus)</span></h2>
+    <div class="concept">
+      <p>Optimization ties it all together: it's the process of finding the best model parameters
+      by minimizing a <strong>loss function</strong> (a number measuring how wrong the model is).</p>
+      <ul class="clean">
+        <li><strong>Loss function:</strong> measures error (e.g., Mean Squared Error)</li>
+        <li><strong>Goal:</strong> find weights that make loss as small as possible</li>
+        <li><strong>Method:</strong> gradient descent (from the calculus section)</li>
+      </ul>
+      <div class="formula">MSE = average( (prediction − actual)² )</div>
+    </div>
+
+    <!-- 5. PLAN -->
+    <h2 class="section" id="plan">5. How Much Do You Actually Need?</h2>
+    <div class="concept">
+      <table>
+        <tr><th>Topic</th><th>Priority</th><th>Depth needed</th></tr>
+        <tr><td>Vectors &amp; matrices</td><td>⭐⭐⭐ High</td><td>Comfortable using them</td></tr>
+        <tr><td>Matrix multiplication</td><td>⭐⭐⭐ High</td><td>Understand the concept</td></tr>
+        <tr><td>Derivatives / gradients</td><td>⭐⭐⭐ High</td><td>Intuition + gradient descent</td></tr>
+        <tr><td>Probability basics</td><td>⭐⭐ Medium</td><td>Mean, std, distributions</td></tr>
+        <tr><td>Bayes' theorem</td><td>⭐⭐ Medium</td><td>Nice to know</td></tr>
+        <tr><td>Advanced proofs</td><td>⭐ Low</td><td>Skip for now</td></tr>
+      </table>
+      <div class="why">
+        <strong>Tip:</strong> Learn math <em>alongside</em> coding, not before. When you hit a concept in a
+        tutorial, look it up then. It sticks better when tied to a real problem.
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">6. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://www.khanacademy.org/math/linear-algebra" target="_blank" rel="noopener">Khan Academy — Linear Algebra</a></li>
+        <li><a href="https://www.khanacademy.org/math/calculus-1" target="_blank" rel="noopener">Khan Academy — Calculus</a></li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability" target="_blank" rel="noopener">Khan Academy — Statistics &amp; Probability</a></li>
+        <li><a href="https://www.3blue1brown.com/topics/linear-algebra" target="_blank" rel="noopener">3Blue1Brown — Essence of Linear Algebra (video)</a></li>
+        <li><a href="https://www.3blue1brown.com/topics/calculus" target="_blank" rel="noopener">3Blue1Brown — Essence of Calculus (video)</a></li>
+        <li><a href="https://mml-book.github.io/" target="_blank" rel="noopener">Mathematics for Machine Learning (free book)</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">← Back to Learning Path</a>
+
+    <footer>
+      <p>Math Foundations · Part of your AI study journey 🚀</p>
+    </footer>
+  </div>
+</body>
+</html>

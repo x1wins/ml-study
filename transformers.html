@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transformers &amp; Attention — Self-Attention, Q/K/V, Multi-Head &amp; LLMs</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>&#129302; Transformers &amp; Attention</h1>
+    <p>Self-attention, Query/Key/Value, multi-head attention, and positional encoding &mdash;
+       the architecture behind every modern LLM, explained simply.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> A transformer looks at a whole sequence <em>at once</em> and lets
+      every token decide which other tokens to "pay attention to." No recurrence, no waiting for the
+      previous step &mdash; just parallel math. That single idea (<em>attention</em>) is what powers
+      ChatGPT, translation, and image models.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#motivation">Why Transformers? (vs RNNs)</a></li>
+        <li><a href="#attention">Self-Attention: Query, Key, Value</a></li>
+        <li><a href="#formula">The Attention Formula</a></li>
+        <li><a href="#softmax">Why Softmax? (Euler's e &amp; probabilities)</a></li>
+        <li><a href="#multihead">Multi-Head Attention</a></li>
+        <li><a href="#positional">Positional Encoding</a></li>
+        <li><a href="#arch">Encoder/Decoder vs Decoder-Only (LLMs)</a></li>
+        <li><a href="#code">Self-Attention in numpy</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. MOTIVATION -->
+    <h2 class="section" id="motivation">1. Why Transformers? (vs RNNs)</h2>
+    <p class="muted">RNNs and LSTMs read a sequence one step at a time. Transformers read it all at once.</p>
+
+    <div class="concept">
+      <h3>The two problems transformers solve</h3>
+      <p>RNNs process tokens <strong>sequentially</strong>: to understand word 100 they must first
+      pass through words 1&hellip;99. This causes two pain points:</p>
+      <ul class="clean">
+        <li><strong>No parallelism</strong> &mdash; each step waits for the previous one, so training is slow on modern GPUs.</li>
+        <li><strong>Long-range dependencies fade</strong> &mdash; information from far-back words gets diluted step after step (the vanishing-gradient problem).</li>
+      </ul>
+      <p>A transformer fixes both: it compares <em>every</em> token to <em>every</em> other token
+      <strong>directly</strong> and <strong>in parallel</strong>. The distance between two words no
+      longer matters &mdash; word 1 and word 1000 are one attention step apart.</p>
+      <div class="why">
+        <strong>Why it matters:</strong> Parallel processing + direct long-range connections is exactly
+        what lets us train enormous models on enormous text &mdash; the recipe behind today's LLMs.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>RNN vs Transformer at a glance</h3>
+      <table>
+        <tr><th>&nbsp;</th><th>RNN / LSTM</th><th>Transformer</th></tr>
+        <tr><td>Processing order</td><td>One step at a time</td><td>Whole sequence at once</td></tr>
+        <tr><td>Parallel on GPU?</td><td>No (sequential)</td><td>Yes</td></tr>
+        <tr><td>Long-range links</td><td>Weaken with distance</td><td>Direct, distance-independent</td></tr>
+        <tr><td>Word order</td><td>Built in (via recurrence)</td><td>Added via positional encoding</td></tr>
+        <tr><td>Core operation</td><td>Hidden-state update</td><td>Self-attention</td></tr>
+      </table>
+    </div>
+
+    <!-- 2. SELF-ATTENTION -->
+    <h2 class="section" id="attention">2. Self-Attention: Query, Key, Value</h2>
+    <p class="muted">Every token asks a question, offers a label, and carries content &mdash; Q, K, V.</p>
+
+    <div class="concept">
+      <h3>The library analogy</h3>
+      <p>Attention is like searching a library. Each token produces three vectors from its embedding
+      (via three learned weight matrices):</p>
+      <ul class="clean">
+        <li><strong>Query (Q)</strong> &mdash; "what am I looking for?" (your search request)</li>
+        <li><strong>Key (K)</strong> &mdash; "what do I offer?" (the label on each book)</li>
+        <li><strong>Value (V)</strong> &mdash; "here is my actual content" (the book itself)</li>
+      </ul>
+      <p>A token compares its <strong>Query</strong> against every token's <strong>Key</strong>. Good
+      matches get high scores. Those scores become weights, and the token pulls in a
+      weighted blend of everyone's <strong>Value</strong>. Result: each token's new representation is
+      informed by exactly the other tokens that matter to it.</p>
+      <div class="formula">Q = XW<sub>Q</sub> &nbsp;&middot;&nbsp; K = XW<sub>K</sub> &nbsp;&middot;&nbsp; V = XW<sub>V</sub></div>
+
+      <svg class="diagram" viewBox="0 0 560 260" role="img"
+           aria-label="Self-attention flow: input tokens produce Query, Key and Value vectors; Query dotted with Keys makes scores; softmax turns scores into weights; weights multiply Values into a weighted sum output.">
+        <!-- input tokens -->
+        <rect x="20" y="20" width="70" height="34" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="55" y="42" fill="#e2e8f0" font-size="12" text-anchor="middle">tokens X</text>
+        <!-- Q K V boxes -->
+        <rect x="150" y="10"  width="60" height="30" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="180" y="30" fill="#38bdf8" font-size="13" text-anchor="middle">Q</text>
+        <rect x="150" y="55"  width="60" height="30" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="180" y="75" fill="#a78bfa" font-size="13" text-anchor="middle">K</text>
+        <rect x="150" y="100" width="60" height="30" rx="6" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="180" y="120" fill="#4ade80" font-size="13" text-anchor="middle">V</text>
+        <line x1="90" y1="37" x2="150" y2="25"  stroke="#e2e8f0" stroke-width="1.5" marker-end="url(#a2)"/>
+        <line x1="90" y1="37" x2="150" y2="70"  stroke="#e2e8f0" stroke-width="1.5" marker-end="url(#a2)"/>
+        <line x1="90" y1="37" x2="150" y2="115" stroke="#e2e8f0" stroke-width="1.5" marker-end="url(#a2)"/>
+        <!-- scores -->
+        <rect x="270" y="30" width="90" height="34" rx="6" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="315" y="47" fill="#fbbf24" font-size="11" text-anchor="middle">Q&middot;K&#7488;/&radic;d</text>
+        <line x1="210" y1="25" x2="270" y2="42" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a2)"/>
+        <line x1="210" y1="70" x2="270" y2="52" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#a2)"/>
+        <text x="315" y="80" fill="#94a3b8" font-size="10" text-anchor="middle">scores</text>
+        <!-- softmax -->
+        <rect x="270" y="105" width="90" height="34" rx="6" fill="#1e293b" stroke="#f472b6" stroke-width="2"/>
+        <text x="315" y="127" fill="#f472b6" font-size="12" text-anchor="middle">softmax</text>
+        <line x1="315" y1="64" x2="315" y2="105" stroke="#e2e8f0" stroke-width="1.5" marker-end="url(#a2)"/>
+        <text x="315" y="155" fill="#94a3b8" font-size="10" text-anchor="middle">weights (sum=1)</text>
+        <!-- weighted sum -->
+        <rect x="420" y="70" width="120" height="40" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="480" y="88" fill="#4ade80" font-size="12" text-anchor="middle">weighted sum</text>
+        <text x="480" y="103" fill="#94a3b8" font-size="10" text-anchor="middle">of Values</text>
+        <line x1="360" y1="122" x2="420" y2="95" stroke="#f472b6" stroke-width="1.5" marker-end="url(#a2)"/>
+        <line x1="210" y1="115" x2="420" y2="90" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#a2)"/>
+        <!-- output -->
+        <line x1="480" y1="110" x2="480" y2="150" stroke="#e2e8f0" stroke-width="1.5" marker-end="url(#a2)"/>
+        <text x="480" y="170" fill="#e2e8f0" font-size="12" text-anchor="middle">context-aware output</text>
+        <defs>
+          <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+
+      <div class="why">
+        <strong>Key idea:</strong> "self"-attention means Q, K and V all come from the <em>same</em>
+        sequence &mdash; the sentence is looking at itself to figure out which words explain which.
+      </div>
+    </div>
+
+    <!-- 3. FORMULA -->
+    <h2 class="section" id="formula">3. The Attention Formula</h2>
+
+    <div class="concept">
+      <h3>Scaled dot-product attention</h3>
+      <div class="formula">Attention(Q, K, V) = softmax( QK&#7488; &#8725; &radic;d<sub>k</sub> ) V</div>
+      <p>Read left to right, in plain words:</p>
+      <ul class="clean">
+        <li><strong>QK&#7488;</strong> &mdash; dot every Query with every Key. A large dot product means the two vectors point the same way &rarr; "these tokens are relevant to each other."</li>
+        <li><strong>&#8725; &radic;d<sub>k</sub></strong> &mdash; divide by the square root of the key dimension. Without this, big vectors make the scores huge, and softmax would become razor-sharp (one token grabs everything). Scaling keeps gradients healthy.</li>
+        <li><strong>softmax(&hellip;)</strong> &mdash; turn the raw scores into positive weights that sum to 1 (a probability distribution over "how much to attend to each token").</li>
+        <li><strong>&times; V</strong> &mdash; use those weights to take a weighted average of the Value vectors. That blend is the token's new, context-aware representation.</li>
+      </ul>
+      <div class="why">
+        <strong>Why divide by &radic;d<sub>k</sub>?</strong> If keys have dimension d<sub>k</sub>,
+        the dot products grow roughly like d<sub>k</sub>. Dividing by &radic;d<sub>k</sub> keeps the
+        numbers in a stable range so softmax doesn't saturate and stop learning.
+      </div>
+    </div>
+
+    <!-- 4. WHY SOFTMAX -->
+    <h2 class="section" id="softmax">4. Why Softmax? (Euler's e &amp; probabilities)</h2>
+    <p class="muted">Softmax turns any list of scores into a clean probability distribution.</p>
+
+    <div class="concept">
+      <h3>The softmax function</h3>
+      <div class="formula">softmax(x<sub>i</sub>) = e<sup>x<sub>i</sub></sup> &#8725; &Sigma;<sub>j</sub> e<sup>x<sub>j</sub></sup></div>
+      <p>Each score is passed through <strong>e<sup>x</sup></strong> (the exponential, built on
+      Euler's number <code>e &asymp; 2.71828</code>), then normalized so the whole set sums to 1.
+      Two properties make this perfect for attention:</p>
+      <ul class="clean">
+        <li><strong>Always positive</strong> &mdash; e<sup>x</sup> is never negative, so every attention weight is a valid, non-negative "amount of focus."</li>
+        <li><strong>Amplifies differences</strong> &mdash; because e<sup>x</sup> grows fast, a slightly higher score gets a disproportionately larger share. Attention can decisively favor the most relevant tokens while still spreading a little weight elsewhere.</li>
+      </ul>
+      <p>The result is a probability distribution: a set of weights between 0 and 1 that add up to
+      exactly 1 &mdash; literally "what fraction of my attention goes to each token."</p>
+      <div class="why">
+        <strong>Why e specifically?</strong> Using e<sup>x</sup> makes the math differentiable and the
+        gradient beautifully simple &mdash; the same reason cross-entropy + softmax pair so cleanly in
+        classification. That smoothness is what gradient descent needs to learn.
+      </div>
+    </div>
+
+    <!-- 5. MULTI-HEAD -->
+    <h2 class="section" id="multihead">5. Multi-Head Attention</h2>
+    <p class="muted">Run attention several times in parallel, each head learning a different kind of relationship.</p>
+
+    <div class="concept">
+      <h3>Many perspectives at once</h3>
+      <p>A single attention operation can only capture one "type" of relationship. Instead, transformers
+      split the vectors into several smaller <strong>heads</strong> and run attention in each
+      independently. One head might track grammatical subject&ndash;verb links, another might follow
+      pronoun references, another local phrasing.</p>
+      <div class="formula">MultiHead = Concat(head<sub>1</sub>, &hellip;, head<sub>h</sub>) W<sub>O</sub></div>
+      <p>Each head computes its own scaled dot-product attention on its slice of Q, K, V. The outputs
+      are concatenated back together and passed through a final weight matrix <code>W<sub>O</sub></code>.</p>
+
+      <svg class="diagram" viewBox="0 0 560 200" role="img"
+           aria-label="Multi-head attention: the input splits into several parallel attention heads, whose outputs are concatenated and projected into one final output.">
+        <rect x="20" y="80" width="70" height="40" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="55" y="104" fill="#38bdf8" font-size="12" text-anchor="middle">input</text>
+        <!-- heads -->
+        <rect x="180" y="20"  width="90" height="30" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="225" y="40" fill="#a78bfa" font-size="11" text-anchor="middle">head 1</text>
+        <rect x="180" y="65"  width="90" height="30" rx="6" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="225" y="85" fill="#4ade80" font-size="11" text-anchor="middle">head 2</text>
+        <rect x="180" y="110" width="90" height="30" rx="6" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="225" y="130" fill="#fbbf24" font-size="11" text-anchor="middle">head 3</text>
+        <rect x="180" y="155" width="90" height="30" rx="6" fill="#1e293b" stroke="#f472b6" stroke-width="2"/>
+        <text x="225" y="175" fill="#f472b6" font-size="11" text-anchor="middle">head h</text>
+        <line x1="90" y1="100" x2="180" y2="35"  stroke="#e2e8f0" stroke-width="1.3" marker-end="url(#a3)"/>
+        <line x1="90" y1="100" x2="180" y2="80"  stroke="#e2e8f0" stroke-width="1.3" marker-end="url(#a3)"/>
+        <line x1="90" y1="100" x2="180" y2="125" stroke="#e2e8f0" stroke-width="1.3" marker-end="url(#a3)"/>
+        <line x1="90" y1="100" x2="180" y2="170" stroke="#e2e8f0" stroke-width="1.3" marker-end="url(#a3)"/>
+        <!-- concat -->
+        <rect x="350" y="70" width="90" height="60" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="395" y="96" fill="#38bdf8" font-size="12" text-anchor="middle">concat</text>
+        <text x="395" y="112" fill="#94a3b8" font-size="10" text-anchor="middle">+ W&#8338;</text>
+        <line x1="270" y1="35"  x2="350" y2="90"  stroke="#94a3b8" stroke-width="1.3" marker-end="url(#a3)"/>
+        <line x1="270" y1="80"  x2="350" y2="95"  stroke="#94a3b8" stroke-width="1.3" marker-end="url(#a3)"/>
+        <line x1="270" y1="125" x2="350" y2="105" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#a3)"/>
+        <line x1="270" y1="170" x2="350" y2="110" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#a3)"/>
+        <!-- output -->
+        <line x1="440" y1="100" x2="510" y2="100" stroke="#e2e8f0" stroke-width="1.5" marker-end="url(#a3)"/>
+        <circle cx="528" cy="100" r="16" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="528" y="104" fill="#4ade80" font-size="11" text-anchor="middle">out</text>
+        <defs>
+          <marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+
+      <div class="why">
+        <strong>Why it matters:</strong> Multiple heads let the model attend to different things
+        simultaneously &mdash; like reading a sentence for grammar, meaning, and tone all at once.
+      </div>
+    </div>
+
+    <!-- 6. POSITIONAL ENCODING -->
+    <h2 class="section" id="positional">6. Positional Encoding</h2>
+    <p class="muted">Attention has no built-in sense of order, so we inject position into the inputs.</p>
+
+    <div class="concept">
+      <h3>Giving the model a sense of order</h3>
+      <p>Because a transformer looks at all tokens at once, "the cat sat" and "sat the cat" would look
+      identical to raw attention &mdash; it sees a <em>set</em>, not a <em>sequence</em>. To fix this we
+      add a <strong>positional encoding</strong> vector to each token's embedding, encoding <em>where</em>
+      it sits in the sequence.</p>
+      <p>The original transformer uses sine and cosine waves of different frequencies, so each position
+      gets a unique, smooth signature:</p>
+      <div class="formula">PE<sub>(pos, 2i)</sub> = sin( pos &#8725; 10000<sup>2i&#8725;d</sup> ) &nbsp;&middot;&nbsp; PE<sub>(pos, 2i+1)</sub> = cos( pos &#8725; 10000<sup>2i&#8725;d</sup> )</div>
+      <div class="why">
+        <strong>Why sine/cosine?</strong> Smooth periodic patterns let the model generalize to
+        positions (and sequence lengths) it never saw during training, and make relative distances easy
+        to compute. Modern LLMs often use learned or rotary (RoPE) encodings, but the goal is the same:
+        tell the model the <em>order</em> of the tokens.
+      </div>
+    </div>
+
+    <!-- 7. ARCHITECTURE -->
+    <h2 class="section" id="arch">7. Encoder/Decoder vs Decoder-Only (LLMs)</h2>
+    <p class="muted">The same attention block, arranged differently for different jobs.</p>
+
+    <div class="concept">
+      <h3>Three flavors of transformer</h3>
+      <table>
+        <tr><th>Type</th><th>Structure</th><th>Best at</th><th>Example</th></tr>
+        <tr>
+          <td>Encoder&ndash;Decoder</td>
+          <td>Encoder reads input, decoder writes output</td>
+          <td>Translation, summarization (seq &rarr; seq)</td>
+          <td>Original Transformer, T5</td>
+        </tr>
+        <tr>
+          <td>Encoder-only</td>
+          <td>Reads the whole input at once (bidirectional)</td>
+          <td>Understanding, classification, embeddings</td>
+          <td>BERT</td>
+        </tr>
+        <tr>
+          <td>Decoder-only</td>
+          <td>Predicts the next token, left to right (masked)</td>
+          <td>Text generation, chat</td>
+          <td>GPT, Llama, most LLMs</td>
+        </tr>
+      </table>
+      <p>Modern chat LLMs are almost all <strong>decoder-only</strong>: they use
+      <em>masked</em> self-attention so each token can only attend to tokens <em>before</em> it, then
+      predict the next token &mdash; over and over &mdash; to generate text.</p>
+      <div class="why">
+        <strong>Why transformers power modern LLMs:</strong> they scale. Because attention is parallel
+        and captures long-range meaning, you can pour in more data, more parameters, and more compute
+        and keep getting better &mdash; the "scaling laws" that took us from a research paper to
+        ChatGPT.
+      </div>
+    </div>
+
+    <!-- 8. CODE -->
+    <h2 class="section" id="code">8. Self-Attention in numpy</h2>
+    <div class="concept">
+      <h3>Scaled dot-product attention, from scratch</h3>
+      <p>The whole formula in a few lines &mdash; correct and runnable.</p>
+      <pre><code>import numpy as np
+
+def softmax(x, axis=-1):
+    e = np.exp(x - np.max(x, axis=axis, keepdims=True))  # stability shift
+    return e / e.sum(axis=axis, keepdims=True)
+
+def attention(Q, K, V):
+    # Q, K, V shapes: (seq_len, d_k)
+    d_k = Q.shape[-1]
+    scores = Q @ K.T / np.sqrt(d_k)   # QKᵀ / √d_k   -> (seq, seq)
+    weights = softmax(scores, axis=-1)  # rows sum to 1
+    return weights @ V, weights         # weighted sum of Values
+
+# Toy example: 3 tokens, each a 4-dim vector
+np.random.seed(0)
+X = np.random.randn(3, 4)
+
+# Learned projection matrices (random here for illustration)
+Wq = np.random.randn(4, 4)
+Wk = np.random.randn(4, 4)
+Wv = np.random.randn(4, 4)
+
+Q, K, V = X @ Wq, X @ Wk, X @ Wv
+out, attn = attention(Q, K, V)
+
+print("attention weights (each row sums to 1):")
+print(np.round(attn, 3))
+print("output shape:", out.shape)   # (3, 4): one context vector per token</code></pre>
+      <div class="why">
+        <strong>That's the core of a transformer.</strong> Stack this (with multi-head splitting,
+        a feed-forward layer, residual connections and layer-norm) dozens of times, add positional
+        encoding at the input, and you have the engine behind modern LLMs.
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">9. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">"Attention Is All You Need" &mdash; the original Transformer paper</a></li>
+        <li><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener">The Illustrated Transformer (Jay Alammar)</a></li>
+        <li><a href="https://www.3blue1brown.com/topics/neural-networks" target="_blank" rel="noopener">3Blue1Brown &mdash; Attention &amp; Transformers (video)</a></li>
+        <li><a href="http://nlp.seas.harvard.edu/annotated-transformer/" target="_blank" rel="noopener">The Annotated Transformer (Harvard NLP, code walkthrough)</a></li>
+        <li><a href="https://huggingface.co/learn/nlp-course/chapter1/1" target="_blank" rel="noopener">Hugging Face NLP Course</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>Transformers &amp; Attention &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

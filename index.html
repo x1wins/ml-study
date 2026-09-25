@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI/ML Learning Path — Beginner Guide</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #1e3a8a, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 640px; margin: 0 auto; }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+    .intro {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: -1.5rem;
+      position: relative;
+    }
+    h2 {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.5rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .card .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      color: #0f172a;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .card ul { list-style: none; }
+    .card li { color: var(--muted); font-size: 0.92rem; padding: 0.15rem 0; }
+    .card li::before { content: "▸ "; color: var(--accent); }
+    .path { counter-reset: step; }
+    .step {
+      background: var(--card);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .step h4 { color: var(--accent-2); }
+    .resources a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .resources a:hover { text-decoration: underline; }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+    code {
+      background: #0f172a;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #fbbf24;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🤖 AI / ML Learning Path</h1>
+    <p>A beginner's roadmap: everything you need to acknowledge before becoming an AI developer.</p>
+  </header>
+
+  <div class="container">
+    <div class="intro">
+      <p>
+        Welcome! This page is your starting point. Artificial Intelligence (AI) is about building
+        systems that can learn and make decisions. Machine Learning (ML) is the most common way we
+        build AI today — instead of writing rules by hand, we let the computer <strong>learn patterns
+        from data</strong>. Work through the sections below in order.
+      </p>
+    </div>
+
+    <!-- WHAT TO KNOW -->
+    <h2>📌 What You Need to Acknowledge</h2>
+    <div class="grid">
+      <div class="card">
+        <span class="num">1</span>
+        <h3>Math Foundations</h3>
+        <ul>
+          <li>Linear algebra (vectors, matrices)</li>
+          <li>Calculus (derivatives, gradients)</li>
+          <li>Probability &amp; statistics</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="num">2</span>
+        <h3>Programming</h3>
+        <ul>
+          <li>Python basics</li>
+          <li>NumPy &amp; Pandas</li>
+          <li>Jupyter Notebooks</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="num">3</span>
+        <h3>ML Fundamentals</h3>
+        <ul>
+          <li>Supervised vs unsupervised</li>
+          <li>Training / validation / test</li>
+          <li>Overfitting &amp; underfitting</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="num">4</span>
+        <h3>Core Algorithms</h3>
+        <ul>
+          <li>Linear &amp; logistic regression</li>
+          <li>Decision trees, k-means</li>
+          <li>Neural networks (weights, bias, backprop)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="num">5</span>
+        <h3>Deep Learning</h3>
+        <ul>
+          <li>CNNs (images)</li>
+          <li>RNNs / LSTMs (sequences)</li>
+          <li>Transformers (LLMs)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="num">6</span>
+        <h3>Tools &amp; Frameworks</h3>
+        <ul>
+          <li>scikit-learn</li>
+          <li>PyTorch / TensorFlow</li>
+          <li>Hugging Face</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="num">7</span>
+        <h3>ML Workflow</h3>
+        <ul>
+          <li>Collect &amp; clean data</li>
+          <li>Train &amp; evaluate</li>
+          <li>Deploy &amp; monitor</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="num">8</span>
+        <h3>Ethics &amp; Safety</h3>
+        <ul>
+          <li>Bias &amp; fairness</li>
+          <li>Data privacy</li>
+          <li>Responsible AI</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- DEEP DIVE TOPICS -->
+    <h2>📖 Deep Dive Topics</h2>
+    <p style="color: var(--muted); margin-bottom: 1rem;">Detailed guides — click any card to learn the concept with diagrams and runnable code.</p>
+    <div class="grid">
+      <a class="card" href="math-foundations.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>📐 Math Foundations →</h3>
+        <ul>
+          <li>Vectors, matrices, gradients</li>
+          <li>Probability &amp; statistics</li>
+        </ul>
+      </a>
+      <a class="card" href="neural-networks.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>🧠 Neural Networks →</h3>
+        <ul>
+          <li>Weights &amp; bias</li>
+          <li>Activation functions</li>
+          <li>Backpropagation</li>
+        </ul>
+      </a>
+      <a class="card" href="loss-functions.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>🎯 Loss Functions →</h3>
+        <ul>
+          <li>MSE &amp; MAE (regression)</li>
+          <li>Cross-entropy (classification)</li>
+          <li>Why loss drives learning</li>
+        </ul>
+      </a>
+      <a class="card" href="training-optimization.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>⚙️ Training &amp; Optimization →</h3>
+        <ul>
+          <li>SGD, momentum, Adam</li>
+          <li>Learning rate, epochs, batches</li>
+          <li>Overfitting &amp; regularization</li>
+        </ul>
+      </a>
+      <a class="card" href="cnn.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>🖼️ CNNs →</h3>
+        <ul>
+          <li>Convolution &amp; filters</li>
+          <li>Pooling &amp; feature maps</li>
+          <li>Why they work for images</li>
+        </ul>
+      </a>
+      <a class="card" href="rnn-lstm.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>🔁 RNNs &amp; LSTMs →</h3>
+        <ul>
+          <li>Sequences &amp; hidden state</li>
+          <li>Vanishing gradients</li>
+          <li>LSTM gates</li>
+        </ul>
+      </a>
+      <a class="card" href="transformers.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>🤖 Transformers →</h3>
+        <ul>
+          <li>Self-attention (Q/K/V)</li>
+          <li>Multi-head &amp; positional encoding</li>
+          <li>Why they power LLMs</li>
+        </ul>
+      </a>
+    </div>
+
+    <!-- LEARNING PATH -->
+    <h2>🗺️ Suggested Learning Order</h2>
+    <div class="path">
+      <div class="step">
+        <h4>Step 1 — Learn Python</h4>
+        Get comfortable writing code. Practice with small scripts before touching ML.
+      </div>
+      <div class="step">
+        <h4>Step 2 — Brush up on Math</h4>
+        You don't need a PhD. Focus on intuition for vectors, gradients, and probability.
+      </div>
+      <div class="step">
+        <h4>Step 3 — Classic ML with scikit-learn</h4>
+        Build your first model: predict house prices or classify flowers with <code>scikit-learn</code>.
+      </div>
+      <div class="step">
+        <h4>Step 4 — Deep Learning</h4>
+        Move to <code>PyTorch</code> or <code>TensorFlow</code>. Train a neural network on images.
+      </div>
+      <div class="step">
+        <h4>Step 5 — Build a Project</h4>
+        Apply what you learned end-to-end. A finished project teaches more than 10 tutorials.
+      </div>
+    </div>
+
+    <!-- FIRST MODEL EXAMPLE -->
+    <h2>💡 Your First Model (Concept)</h2>
+    <div class="card">
+      <p style="color: var(--muted);">A minimal example using scikit-learn:</p>
+      <pre style="background:#0f172a; padding:1rem; border-radius:8px; overflow-x:auto; margin-top:0.75rem;"><code>from sklearn.linear_model import LinearRegression
+
+# X = input data, y = answers we want to predict
+model = LinearRegression()
+model.fit(X, y)          # learn from data
+prediction = model.predict(X_new)  # make a guess</code></pre>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2>📚 Free Resources</h2>
+    <div class="card resources">
+      <ul>
+        <li><a href="https://www.python.org/about/gettingstarted/" target="_blank" rel="noopener">Python — Official Getting Started</a></li>
+        <li><a href="https://scikit-learn.org/stable/getting_started.html" target="_blank" rel="noopener">scikit-learn — Getting Started</a></li>
+        <li><a href="https://pytorch.org/tutorials/" target="_blank" rel="noopener">PyTorch Tutorials</a></li>
+        <li><a href="https://www.kaggle.com/learn" target="_blank" rel="noopener">Kaggle Learn — Free micro-courses</a></li>
+        <li><a href="https://huggingface.co/learn" target="_blank" rel="noopener">Hugging Face Courses</a></li>
+      </ul>
+    </div>
+
+    <footer>
+      <p>Created for your AI study journey · Keep building, keep learning 🚀</p>
+    </footer>
+  </div>
+</body>
+</html>
