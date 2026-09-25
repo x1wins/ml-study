@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logarithms — The Inverse of Exponentiation, and Why ML Loves Them</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#128208; Logarithms: The Inverse of Exponentiation</h1>
+    <p>What a log really is, the rules that make them tick, and why machine learning
+       turns products of probabilities into sums of logs &mdash; with runnable code.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> A logarithm answers the question
+      <em>"what power do I raise the base to, to get this number?"</em> Because logs turn
+      multiplication into addition and squeeze enormous ranges into small ones, they show up
+      everywhere in ML &mdash; especially in <em>log-likelihood</em> and <em>cross-entropy loss</em>.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#what">What a logarithm is</a></li>
+        <li><a href="#bases">Common bases: 10, 2, and natural log (e)</a></li>
+        <li><a href="#rules">The log rules</a></li>
+        <li><a href="#useful">Why logs are useful</a></li>
+        <li><a href="#derivative">The derivative of ln(x)</a></li>
+        <li><a href="#ml">Where logs appear in ML</a></li>
+        <li><a href="#code">Runnable code (numpy)</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. WHAT -->
+    <h2 class="section" id="what">1. What a logarithm is</h2>
+    <p class="muted">A logarithm is simply the <em>inverse</em> of raising a number to a power.</p>
+
+    <div class="concept">
+      <h3>The one idea to remember</h3>
+      <p>If a base <code>b</code> raised to the power <code>y</code> gives <code>x</code>, then the
+      logarithm base <code>b</code> of <code>x</code> is <code>y</code>. Exponentiation and logarithms
+      are two ways of writing the same relationship:</p>
+      <div class="formula">b<sup>y</sup> = x &nbsp;&hArr;&nbsp; log<sub>b</sub>(x) = y</div>
+      <p>Read <code>log<sub>b</sub>(x)</code> out loud as: <em>"the power you raise b to, to get x."</em>
+      For example, since 2<sup>3</sup> = 8, we have log<sub>2</sub>(8) = 3.</p>
+
+      <table>
+        <tr><th>Exponent form</th><th>Log form</th><th>In words</th></tr>
+        <tr><td>10<sup>2</sup> = 100</td><td>log<sub>10</sub>(100) = 2</td><td>10 to the power 2 is 100</td></tr>
+        <tr><td>2<sup>10</sup> = 1024</td><td>log<sub>2</sub>(1024) = 10</td><td>2 to the power 10 is 1024</td></tr>
+        <tr><td>e<sup>1</sup> = 2.718&hellip;</td><td>ln(2.718&hellip;) = 1</td><td>e to the power 1 is e</td></tr>
+        <tr><td>b<sup>0</sup> = 1</td><td>log<sub>b</sub>(1) = 0</td><td>anything to the power 0 is 1</td></tr>
+      </table>
+
+      <div class="why">
+        <strong>Why it matters:</strong> Exponentials <em>grow</em> explosively; logarithms <em>undo</em>
+        that growth. If a quantity multiplies, its logarithm just adds &mdash; and addition is much
+        easier and more numerically stable to work with.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Exponential and log are mirror images across y = x</h3>
+      <p>Because a log undoes an exponential, their graphs are reflections of each other across the
+      diagonal line <code>y = x</code>. Where the exponential shoots up, the log rises slowly.</p>
+
+      <svg class="diagram" viewBox="0 0 560 300" role="img"
+           aria-label="Graph showing the exponential curve and the logarithm curve as mirror images reflected across the dashed diagonal line y equals x.">
+        <!-- axes -->
+        <line x1="40" y1="260" x2="520" y2="260" stroke="#334155" stroke-width="1.5"/>
+        <line x1="40" y1="40"  x2="40"  y2="260" stroke="#334155" stroke-width="1.5"/>
+        <text x="512" y="278" fill="#94a3b8" font-size="12" text-anchor="end">x</text>
+        <text x="24"  y="52"  fill="#94a3b8" font-size="12" text-anchor="middle">y</text>
+        <!-- mirror line y = x -->
+        <line x1="40" y1="260" x2="260" y2="40" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5 5"/>
+        <text x="250" y="60" fill="#94a3b8" font-size="12">y = x</text>
+        <!-- exponential curve: b to the x power (rises steeply) -->
+        <path d="M 40 258 C 120 250, 170 210, 210 120 S 250 45, 270 42" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+        <text x="290" y="55" fill="#38bdf8" font-size="13">y = b&#8339; (exponential)</text>
+        <!-- log curve: log_b(x) (rises slowly) mirror of the above -->
+        <path d="M 58 258 C 60 178, 90 138, 178 98 S 400 60, 500 52" fill="none" stroke="#a78bfa" stroke-width="2.5"/>
+        <text x="300" y="120" fill="#a78bfa" font-size="13">y = log&#8347;(x)</text>
+        <!-- point (1,0) on log and (0,1) on exp -->
+        <circle cx="40" cy="240" r="3.5" fill="#38bdf8"/>
+        <circle cx="58" cy="258" r="3.5" fill="#a78bfa"/>
+      </svg>
+
+      <div class="why">
+        <strong>Key intuition:</strong> the exponential passes through (0, 1); its mirror, the log,
+        passes through (1, 0). The log grows without bound but ever more slowly &mdash; that slow
+        growth is exactly what lets it compress huge ranges.
+      </div>
+    </div>
+
+    <!-- 2. BASES -->
+    <h2 class="section" id="bases">2. Common bases: 10, 2, and natural log</h2>
+    <p class="muted">A log always has a base. Three bases dominate in practice.</p>
+
+    <div class="concept">
+      <h3>The three logs you will meet constantly</h3>
+      <table>
+        <tr><th>Base</th><th>Notation</th><th>Answers the question</th><th>Where it shows up</th></tr>
+        <tr>
+          <td>10</td>
+          <td><code>log<sub>10</sub>(x)</code> or <code>log(x)</code></td>
+          <td>How many powers of 10?</td>
+          <td>decibels, pH, "orders of magnitude", log-scale plots</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><code>log<sub>2</sub>(x)</code></td>
+          <td>How many doublings?</td>
+          <td>information / bits, entropy, algorithm complexity</td>
+        </tr>
+        <tr>
+          <td>e &asymp; 2.718</td>
+          <td><code>ln(x)</code> (natural log)</td>
+          <td>How many <em>e</em>-foldings?</td>
+          <td>calculus, gradients, log-likelihood, cross-entropy</td>
+        </tr>
+      </table>
+
+      <div class="why">
+        <strong>Why is <em>e</em> "natural"?</strong> Because the exponential <code>e<sup>x</sup></code>
+        is its own derivative, the natural log has the cleanest calculus of any base &mdash; which is
+        why ML almost always uses <code>ln</code>. See
+        <a href="euler-number.html">Euler's number (e)</a> for why <em>e</em> is special.
+      </div>
+
+      <p class="muted">Handy exact values: <code>log<sub>10</sub>(1000) = 3</code>,
+      <code>log<sub>2</sub>(8) = 3</code>, <code>ln(1) = 0</code>, and
+      <code>ln(e) = 1</code>.</p>
+    </div>
+
+    <!-- 3. RULES -->
+    <h2 class="section" id="rules">3. The log rules</h2>
+    <p class="muted">A handful of identities turn hard multiplications and powers into easy additions.</p>
+
+    <div class="concept">
+      <h3>The four rules that matter</h3>
+      <table>
+        <tr><th>Rule</th><th>Formula</th><th>Plain meaning</th></tr>
+        <tr>
+          <td>Product</td>
+          <td class="formula" style="margin:0; text-align:left; border:none; background:transparent;">log(a &middot; b) = log(a) + log(b)</td>
+          <td>a product becomes a sum</td>
+        </tr>
+        <tr>
+          <td>Quotient</td>
+          <td class="formula" style="margin:0; text-align:left; border:none; background:transparent;">log(a &divide; b) = log(a) &minus; log(b)</td>
+          <td>a ratio becomes a difference</td>
+        </tr>
+        <tr>
+          <td>Power</td>
+          <td class="formula" style="margin:0; text-align:left; border:none; background:transparent;">log(a<sup>n</sup>) = n &middot; log(a)</td>
+          <td>an exponent comes down as a multiplier</td>
+        </tr>
+        <tr>
+          <td>Change of base</td>
+          <td class="formula" style="margin:0; text-align:left; border:none; background:transparent;">log<sub>b</sub>(x) = ln(x) &divide; ln(b)</td>
+          <td>convert any base into natural log</td>
+        </tr>
+      </table>
+
+      <div class="formula">log<sub>b</sub>(a &middot; b) = log<sub>b</sub>(a) + log<sub>b</sub>(b) &nbsp;&nbsp;&middot;&nbsp;&nbsp; log<sub>b</sub>(a<sup>n</sup>) = n &middot; log<sub>b</sub>(a)</div>
+
+      <div class="why">
+        <strong>The product rule is the star of the show in ML.</strong> When you multiply thousands
+        of tiny probabilities together the result underflows to zero. Take the log and each factor
+        becomes a term you simply <em>add</em> &mdash; no underflow, and gradients stay well-behaved.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Rules in one worked example</h3>
+      <p>Say you need <code>log<sub>10</sub>(50)</code>. Write 50 as 100 &divide; 2 and apply the
+      quotient rule:</p>
+      <div class="formula">log<sub>10</sub>(50) = log<sub>10</sub>(100) &minus; log<sub>10</sub>(2) = 2 &minus; 0.301 = 1.699</div>
+      <p class="muted">Every messy computation with logs reduces to these add / subtract / multiply moves.</p>
+    </div>
+
+    <!-- 4. USEFUL -->
+    <h2 class="section" id="useful">4. Why logs are useful</h2>
+
+    <div class="concept">
+      <h3>Three superpowers</h3>
+      <ul class="clean">
+        <li><strong>Turn multiplication into addition</strong> &mdash; the product rule replaces a long
+            product with a sum, which computers add without losing precision.</li>
+        <li><strong>Compress huge ranges (log scale)</strong> &mdash; numbers from 1 to 1,000,000 span
+            just 0 to 6 on a base-10 log axis, so tiny and enormous values fit on one chart.</li>
+        <li><strong>Handle very small probabilities</strong> &mdash; a probability of
+            10<sup>&minus;300</sup> underflows to 0.0 in floating point, but its log
+            (&minus;690.8) is a perfectly ordinary number.</li>
+      </ul>
+
+      <svg class="diagram" viewBox="0 0 560 150" role="img"
+           aria-label="A base-10 logarithmic axis where evenly spaced tick marks represent 1, 10, 100, 1000, 10000, and 100000, showing how a log scale compresses a huge range.">
+        <line x1="40" y1="80" x2="520" y2="80" stroke="#94a3b8" stroke-width="1.5"/>
+        <!-- ticks evenly spaced but labels grow x10 -->
+        <g fill="#38bdf8" font-size="12" text-anchor="middle">
+          <line x1="60"  y1="72" x2="60"  y2="88" stroke="#38bdf8" stroke-width="2"/>
+          <text x="60"  y="108">1</text>
+          <line x1="150" y1="72" x2="150" y2="88" stroke="#38bdf8" stroke-width="2"/>
+          <text x="150" y="108">10</text>
+          <line x1="240" y1="72" x2="240" y2="88" stroke="#38bdf8" stroke-width="2"/>
+          <text x="240" y="108">100</text>
+          <line x1="330" y1="72" x2="330" y2="88" stroke="#38bdf8" stroke-width="2"/>
+          <text x="330" y="108">1,000</text>
+          <line x1="420" y1="72" x2="420" y2="88" stroke="#38bdf8" stroke-width="2"/>
+          <text x="420" y="108">10,000</text>
+          <line x1="510" y1="72" x2="510" y2="88" stroke="#38bdf8" stroke-width="2"/>
+          <text x="510" y="108">100,000</text>
+        </g>
+        <text x="280" y="35" fill="#a78bfa" font-size="13" text-anchor="middle">log&#8321;&#8320; scale: each equal step &times;10</text>
+        <text x="280" y="135" fill="#94a3b8" font-size="11" text-anchor="middle">six orders of magnitude fit in one line</text>
+      </svg>
+
+      <div class="why">
+        <strong>Why it matters in ML:</strong> loss values, learning rates, and gradients often span
+        many orders of magnitude. Plotting or searching them on a log scale makes patterns visible and
+        makes optimization stable. See <a href="math-foundations.html">Math Foundations</a> for the
+        broader toolkit.
+      </div>
+    </div>
+
+    <!-- 5. DERIVATIVE -->
+    <h2 class="section" id="derivative">5. The derivative of ln(x)</h2>
+
+    <div class="concept">
+      <h3>One of the cleanest results in calculus</h3>
+      <p>The slope of the natural log at any point <code>x</code> is just <code>1 / x</code>:</p>
+      <div class="formula">d/dx &middot; ln(x) = 1 / x</div>
+      <p>And by the chain rule, the log of a function has a slope of that function's derivative divided
+      by the function itself:</p>
+      <div class="formula">d/dx &middot; ln(f(x)) = f&prime;(x) / f(x)</div>
+
+      <div class="why">
+        <strong>Why it matters:</strong> because <code>ln</code> has such a simple derivative, taking
+        the log of a loss keeps the gradient math clean &mdash; the backbone of gradient descent. If
+        you need a refresher on slopes and the chain rule, see
+        <a href="derivatives.html">Derivatives</a>.
+      </div>
+    </div>
+
+    <!-- 6. ML -->
+    <h2 class="section" id="ml">6. Where logs appear in ML</h2>
+    <p class="muted">Logs are not a side topic in machine learning &mdash; they are load-bearing.</p>
+
+    <div class="concept">
+      <h3>Log-likelihood: products &rarr; sums</h3>
+      <p>Models often assign a probability to each data point, and the likelihood of the whole dataset
+      is the <em>product</em> of all of them. Multiplying thousands of numbers below 1 collapses to
+      zero. Taking the log converts that product into a sum:</p>
+      <div class="formula">log &prod;<sub>i</sub> p<sub>i</sub> = &Sigma;<sub>i</sub> log(p<sub>i</sub>)</div>
+      <p class="muted">We maximize the <em>log</em>-likelihood (equivalently, minimize the negative
+      log-likelihood) because it is numerically safe and easier to differentiate.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Cross-entropy / log loss</h3>
+      <p>The standard classification loss is built directly from logs. For a true distribution
+      <code>y</code> and predicted probabilities <code>&#375;</code>:</p>
+      <div class="formula">CE = &minus; &Sigma;<sub>i</sub> y<sub>i</sub> &middot; log(&#375;<sub>i</sub>)</div>
+      <p>For binary classification this becomes:</p>
+      <div class="formula">BCE = &minus;[ y &middot; log(&#375;) + (1 &minus; y) &middot; log(1 &minus; &#375;) ]</div>
+      <div class="why">
+        <strong>Intuition:</strong> if the model puts high probability on the correct class,
+        <code>log(&#375;)</code> is close to 0 (small loss). If it confidently predicts the wrong class,
+        <code>log(&#375;)</code> plunges toward &minus;&infin; (huge penalty). Dig deeper on the
+        <a href="loss-functions.html">Loss Functions</a> page.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Logits and log scales</h3>
+      <ul class="clean">
+        <li><strong>Logits</strong> &mdash; the raw pre-softmax scores of a network. The name literally
+            comes from "log-odds": logit = <code>log( p &divide; (1 &minus; p) )</code>.</li>
+        <li><strong>Log-scale hyperparameter sweeps</strong> &mdash; learning rates are searched across
+            orders of magnitude (0.1, 0.01, 0.001&hellip;), so we sample them uniformly in
+            <em>log</em> space rather than linear space.</li>
+      </ul>
+    </div>
+
+    <!-- 7. CODE -->
+    <h2 class="section" id="code">7. Runnable code (numpy)</h2>
+
+    <div class="concept">
+      <h3>Log turns a product into a sum</h3>
+      <pre><code>import numpy as np
+
+a, b = 7.0, 3.0
+
+# The product rule: log(a * b) == log(a) + log(b)
+lhs = np.log(a * b)          # log of the product
+rhs = np.log(a) + np.log(b)  # sum of the logs
+
+print(lhs)                   # 3.044522437723423
+print(rhs)                   # 3.044522437723423
+print(np.isclose(lhs, rhs))  # True
+
+# Scaled up: multiplying 1000 tiny probabilities underflows to 0.0,
+# but summing their logs stays finite.
+probs = np.full(1000, 0.01)          # 1000 probabilities of 0.01
+print(np.prod(probs))                # 0.0  (underflow!)
+print(np.sum(np.log(probs)))         # -4605.17...  (perfectly fine)</code></pre>
+      <div class="why">
+        <strong>Takeaway:</strong> <code>np.prod</code> underflows to <code>0.0</code>, destroying the
+        information; <code>np.sum(np.log(...))</code> preserves it. This is exactly why ML works in
+        log space.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Cross-entropy computed with logs</h3>
+      <pre><code>import numpy as np
+
+# True label: class 1 (one-hot over 3 classes)
+y_true = np.array([0.0, 1.0, 0.0])
+
+# Model's predicted probabilities (must sum to 1)
+y_pred = np.array([0.1, 0.7, 0.2])
+
+# Cross-entropy = -sum( y_true * log(y_pred) )
+# A tiny epsilon avoids log(0) = -inf if a prediction is exactly 0.
+eps = 1e-12
+ce = -np.sum(y_true * np.log(y_pred + eps))
+
+print(round(float(ce), 5))   # 0.35667  == -log(0.7)
+
+# Sanity check: because y_true is one-hot, CE is just -log(prob of correct class)
+print(round(float(-np.log(y_pred[1])), 5))  # 0.35667</code></pre>
+      <p class="muted">The loss equals <code>&minus;log(0.7) &asymp; 0.357</code>. Push the correct-class
+      probability toward 1 and the loss falls toward 0; let it drop toward 0 and the loss explodes.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>Logarithm</strong> &mdash; the inverse of exponentiation: b<sup>y</sup> = x means log<sub>b</sub>(x) = y</li>
+        <li><strong>Bases</strong> &mdash; 10 (orders of magnitude), 2 (bits), e (natural log, used in ML)</li>
+        <li><strong>Rules</strong> &mdash; product &rarr; sum, quotient &rarr; difference, power &rarr; multiplier</li>
+        <li><strong>Derivative</strong> &mdash; d/dx ln(x) = 1 / x, the cleanest slope in calculus</li>
+        <li><strong>In ML</strong> &mdash; log-likelihood, cross-entropy / log loss, logits, log-scale sweeps</li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">8. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:logs" target="_blank" rel="noopener">Khan Academy &mdash; Logarithms (full unit)</a></li>
+        <li><a href="https://www.3blue1brown.com/lessons/eulers-number" target="_blank" rel="noopener">3Blue1Brown &mdash; e and the natural log</a></li>
+        <li><a href="https://betterexplained.com/articles/using-logs-in-the-real-world/" target="_blank" rel="noopener">BetterExplained &mdash; Using Logs in the Real World</a></li>
+        <li><a href="euler-number.html">This site &mdash; Euler's number (e)</a></li>
+        <li><a href="derivatives.html">This site &mdash; Derivatives</a></li>
+        <li><a href="loss-functions.html">This site &mdash; Loss Functions</a></li>
+        <li><a href="math-foundations.html">This site &mdash; Math Foundations</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    
+    <div class="quizbox">
+      <h2 class="section" style="margin-top:0;" id="quiz">✅ Quick Quiz</h2>
+      <p class="muted">Test yourself on this page. Click an answer for instant feedback.</p>
+      <div id="quickquiz" data-quiz="1"></div>
+    </div>
+
+  <script>
+  (function () {
+    var DATA = [{"q": "A logarithm is the inverse of which operation?", "options": ["Addition", "Multiplication", "Exponentiation", "Differentiation"], "correct": 2, "explain": "If b^y = x then log_b(x) = y — the log undoes exponentiation."}, {"q": "The natural logarithm ln uses which base?", "options": ["10", "2", "e ≈ 2.71828", "1"], "correct": 2, "explain": "ln is log base e, the natural constant ≈ 2.71828."}, {"q": "By the product rule, log(a·b) equals:", "options": ["log a · log b", "log a + log b", "log a − log b", "(log a)^b"], "correct": 1, "explain": "Logs turn multiplication into addition: log(ab) = log a + log b."}, {"q": "Why do we sum log-probabilities instead of multiplying probabilities in ML?", "options": ["It looks nicer", "To avoid numeric underflow from many tiny products", "Logs are faster to type", "It changes the answer"], "correct": 1, "explain": "Multiplying many small probabilities underflows to 0; summing their logs is numerically stable."}, {"q": "The derivative of ln(x) is:", "options": ["ln(x)", "1/x", "x", "e^x"], "correct": 1, "explain": "d/dx ln(x) = 1/x — a clean derivative, which is why natural log is favored."}];
+    var host = document.getElementById("quickquiz");
+    if (!host || !DATA || !DATA.length) return;
+    var total = DATA.length, score = 0, answered = 0;
+    var bar = document.createElement("div");
+    bar.className = "quizbar";
+    bar.innerHTML = 'Score: <strong id="qqScore">0</strong> / ' + total;
+    host.appendChild(bar);
+    DATA.forEach(function (item, qi) {
+      var wrap = document.createElement("div");
+      wrap.className = "qq";
+      var qt = document.createElement("div");
+      qt.className = "qt";
+      qt.textContent = (qi + 1) + ". " + item.q;
+      wrap.appendChild(qt);
+      var ul = document.createElement("div");
+      ul.className = "qopts";
+      var locked = false;
+      item.options.forEach(function (opt, oi) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "qopt";
+        b.textContent = opt;
+        b.addEventListener("click", function () {
+          if (locked) return;
+          locked = true;
+          answered++;
+          var btns = ul.querySelectorAll(".qopt");
+          btns.forEach(function (bb, i) {
+            bb.disabled = true;
+            if (i === item.correct) bb.classList.add("correct");
+            if (i === oi && oi !== item.correct) bb.classList.add("wrong");
+          });
+          if (oi === item.correct) { score++; document.getElementById("qqScore").textContent = score; }
+          ex.classList.add("show");
+        });
+        ul.appendChild(b);
+      });
+      wrap.appendChild(ul);
+      var ex = document.createElement("div");
+      ex.className = "qex";
+      ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+      wrap.appendChild(ex);
+      host.appendChild(wrap);
+    });
+  })();
+  </script>
+
+    <footer>
+      <p>Logarithms &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

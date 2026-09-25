@@ -147,6 +147,27 @@
     .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
     .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
     .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
   </style>
 </head>
 <body>
@@ -440,6 +461,63 @@ print("CCE:", round(categorical_cross_entropy(Y, P), 4))  # 0.2899</code></pre>
     </div>
 
     <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    
+    <div class="quizbox">
+      <h2 class="section" style="margin-top:0;" id="quiz">✅ Quick Quiz</h2>
+      <p class="muted">Test yourself on this page. Click an answer for instant feedback.</p>
+      <div id="quickquiz" data-quiz="1"></div>
+    </div>
+
+  <script>
+  (function () {
+    var DATA = [{"q": "What does a loss function do?", "options": ["Speeds up matrix multiplication", "Turns 'how wrong the prediction was' into a single number, where lower is better", "Chooses the network's architecture", "Stores the model's weights"], "correct": 1, "explain": "A loss function compares prediction ŷ to target y and returns one number; a perfect prediction gives a loss of 0."}, {"q": "Why does MSE punish large errors more than MAE?", "options": ["Because it squares the errors", "Because it takes the logarithm of errors", "Because it divides by the number of samples twice", "Because it ignores small errors"], "correct": 0, "explain": "MSE squares each difference, so a miss of 4 contributes 16 while a miss of 2 contributes only 4, making it sensitive to outliers."}, {"q": "Which loss is more robust when the data contains outliers you don't want to dominate training?", "options": ["MSE", "Cross-entropy", "MAE", "Softmax"], "correct": 2, "explain": "MAE averages absolute errors and treats them proportionally, making it more robust to outliers than MSE."}, {"q": "Which loss function is used for classification, and what does it measure?", "options": ["MSE; the squared gap between numbers", "Cross-entropy; how confident the model was in the correct class", "MAE; the absolute error of a category", "Softmax; the sum of all outputs"], "correct": 1, "explain": "Cross-entropy is the classification loss; it penalizes low confidence in the true class (measuring 'surprise')."}, {"q": "When softmax (or sigmoid) is paired with cross-entropy, what does the gradient ∂L/∂z simplify to?", "options": ["ŷ × y", "prediction minus target (ŷ − y)", "log(ŷ)", "ŷ + y"], "correct": 1, "explain": "The messy chain-rule terms cancel, leaving the clean gradient ∂L/∂z = ŷ − y, which is stable and fast."}];
+    var host = document.getElementById("quickquiz");
+    if (!host || !DATA || !DATA.length) return;
+    var total = DATA.length, score = 0, answered = 0;
+    var bar = document.createElement("div");
+    bar.className = "quizbar";
+    bar.innerHTML = 'Score: <strong id="qqScore">0</strong> / ' + total;
+    host.appendChild(bar);
+    DATA.forEach(function (item, qi) {
+      var wrap = document.createElement("div");
+      wrap.className = "qq";
+      var qt = document.createElement("div");
+      qt.className = "qt";
+      qt.textContent = (qi + 1) + ". " + item.q;
+      wrap.appendChild(qt);
+      var ul = document.createElement("div");
+      ul.className = "qopts";
+      var locked = false;
+      item.options.forEach(function (opt, oi) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "qopt";
+        b.textContent = opt;
+        b.addEventListener("click", function () {
+          if (locked) return;
+          locked = true;
+          answered++;
+          var btns = ul.querySelectorAll(".qopt");
+          btns.forEach(function (bb, i) {
+            bb.disabled = true;
+            if (i === item.correct) bb.classList.add("correct");
+            if (i === oi && oi !== item.correct) bb.classList.add("wrong");
+          });
+          if (oi === item.correct) { score++; document.getElementById("qqScore").textContent = score; }
+          ex.classList.add("show");
+        });
+        ul.appendChild(b);
+      });
+      wrap.appendChild(ul);
+      var ex = document.createElement("div");
+      ex.className = "qex";
+      ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+      wrap.appendChild(ex);
+      host.appendChild(wrap);
+    });
+  })();
+  </script>
 
     <footer>
       <p>Loss Functions &middot; Part of your AI study journey &#128640;</p>

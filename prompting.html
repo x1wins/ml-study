@@ -166,6 +166,27 @@
     .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
     .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
     .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
   </style>
 </head>
 <body>
@@ -421,6 +442,63 @@ Review: "Best purchase I've made — wow."  &rarr;</code></pre>
     </div>
 
     <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    
+    <div class="quizbox">
+      <h2 class="section" style="margin-top:0;" id="quiz">✅ Quick Quiz</h2>
+      <p class="muted">Test yourself on this page. Click an answer for instant feedback.</p>
+      <div id="quickquiz" data-quiz="1"></div>
+    </div>
+
+  <script>
+  (function () {
+    var DATA = [{"q": "In the ladder of techniques, what is the recommended order to try when an LLM gives a weak answer?", "options": ["Fine-tuning → RAG → Prompting", "Prompting → RAG → Fine-tuning", "RAG → Prompting → Fine-tuning", "Fine-tuning → Prompting → RAG"], "correct": 1, "explain": "The page teaches to exhaust the cheapest rung first: Prompting → RAG → Fine-tuning."}, {"q": "In few-shot prompting, what does the number of 'shots' refer to?", "options": ["How many times you re-run the prompt", "How many worked examples you include before the real task", "How many tokens the model outputs", "How many models you compare"], "correct": 1, "explain": "'Shots' are the number of worked examples placed in the prompt (zero, one, or a few) before the actual task."}, {"q": "Which message role should hold durable rules like tone, format, and persona that persist across the whole chat?", "options": ["user", "assistant", "system", "function"], "correct": 2, "explain": "The system role sets behavior, rules, and persona for the whole conversation, so durable instructions belong there."}, {"q": "What is the main benefit of Chain-of-Thought prompting for reasoning or math tasks?", "options": ["It hides the answer from the user", "It makes the model faster", "Asking it to work through steps often improves correctness", "It reduces the token cost"], "correct": 2, "explain": "Asking the model to think step by step before answering often dramatically improves correctness on multi-step tasks."}, {"q": "According to the page, which technique helps reduce made-up (hallucinated) answers?", "options": ["Always demand a single-word answer", "Let the model say 'I don't know' if the answer isn't in the text", "Increase the temperature", "Ask multiple tasks in one prompt"], "correct": 1, "explain": "Allowing the model to say 'I don't know' when the answer isn't present reduces fabricated answers."}];
+    var host = document.getElementById("quickquiz");
+    if (!host || !DATA || !DATA.length) return;
+    var total = DATA.length, score = 0, answered = 0;
+    var bar = document.createElement("div");
+    bar.className = "quizbar";
+    bar.innerHTML = 'Score: <strong id="qqScore">0</strong> / ' + total;
+    host.appendChild(bar);
+    DATA.forEach(function (item, qi) {
+      var wrap = document.createElement("div");
+      wrap.className = "qq";
+      var qt = document.createElement("div");
+      qt.className = "qt";
+      qt.textContent = (qi + 1) + ". " + item.q;
+      wrap.appendChild(qt);
+      var ul = document.createElement("div");
+      ul.className = "qopts";
+      var locked = false;
+      item.options.forEach(function (opt, oi) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "qopt";
+        b.textContent = opt;
+        b.addEventListener("click", function () {
+          if (locked) return;
+          locked = true;
+          answered++;
+          var btns = ul.querySelectorAll(".qopt");
+          btns.forEach(function (bb, i) {
+            bb.disabled = true;
+            if (i === item.correct) bb.classList.add("correct");
+            if (i === oi && oi !== item.correct) bb.classList.add("wrong");
+          });
+          if (oi === item.correct) { score++; document.getElementById("qqScore").textContent = score; }
+          ex.classList.add("show");
+        });
+        ul.appendChild(b);
+      });
+      wrap.appendChild(ul);
+      var ex = document.createElement("div");
+      ex.className = "qex";
+      ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+      wrap.appendChild(ex);
+      host.appendChild(wrap);
+    });
+  })();
+  </script>
 
     <footer>
       <p>Prompt Engineering &middot; Part of your AI study journey &#128640;</p>

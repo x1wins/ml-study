@@ -147,6 +147,27 @@
     .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
     .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
     .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
   </style>
 </head>
 <body>
@@ -469,6 +490,63 @@ print("sums to        ->", probs.sum())         # 1.0</code></pre>
     </div>
 
     <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    
+    <div class="quizbox">
+      <h2 class="section" style="margin-top:0;" id="quiz">✅ Quick Quiz</h2>
+      <p class="muted">Test yourself on this page. Click an answer for instant feedback.</p>
+      <div id="quickquiz" data-quiz="1"></div>
+    </div>
+
+  <script>
+  (function () {
+    var DATA = [{"q": "What is the approximate value of Euler's number e?", "options": ["3.14159", "1.61803", "2.71828", "1.41421"], "correct": 2, "explain": "The page defines e = 2.71828..., the base of natural growth (like pi is for circles)."}, {"q": "Where does e come from in the compound-interest story?", "options": ["The limit of (1 + 1/n)^n as n goes to infinity", "The sum 1 + 2 + 3 + ... forever", "The ratio of a circle's circumference to diameter", "The square root of 2 times pi"], "correct": 0, "explain": "e is the value that (1 + 1/n)^n approaches as compounding becomes continuous (n → ∞)."}, {"q": "What is the 'magic property' of the function e^x described on the page?", "options": ["It equals zero everywhere", "It is its own derivative (slope equals height)", "It is always negative", "It repeats every 2π"], "correct": 1, "explain": "e^x is the function whose slope at every point equals its own value: d/dx e^x = e^x."}, {"q": "In the worked softmax example with scores [2.0, 1.0, 0.1], what does softmax do with e?", "options": ["Adds e to each score", "Exponentiates each score with e, then divides by the total", "Takes the natural log of each score", "Multiplies each score by e"], "correct": 1, "explain": "Softmax computes e^(score) for each value and divides by the sum so the probabilities sum to 1."}, {"q": "Why did machine learning standardize on e as the base for its formulas?", "options": ["Because e is a whole number", "Because e^x and ln(x) give the cleanest possible derivatives (e^x and 1/x)", "Because e is larger than pi", "Because e makes numbers grow faster"], "correct": 1, "explain": "Choosing e makes the ln constant factor equal 1, so gradients through e^x and ln collapse into clean expressions."}];
+    var host = document.getElementById("quickquiz");
+    if (!host || !DATA || !DATA.length) return;
+    var total = DATA.length, score = 0, answered = 0;
+    var bar = document.createElement("div");
+    bar.className = "quizbar";
+    bar.innerHTML = 'Score: <strong id="qqScore">0</strong> / ' + total;
+    host.appendChild(bar);
+    DATA.forEach(function (item, qi) {
+      var wrap = document.createElement("div");
+      wrap.className = "qq";
+      var qt = document.createElement("div");
+      qt.className = "qt";
+      qt.textContent = (qi + 1) + ". " + item.q;
+      wrap.appendChild(qt);
+      var ul = document.createElement("div");
+      ul.className = "qopts";
+      var locked = false;
+      item.options.forEach(function (opt, oi) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "qopt";
+        b.textContent = opt;
+        b.addEventListener("click", function () {
+          if (locked) return;
+          locked = true;
+          answered++;
+          var btns = ul.querySelectorAll(".qopt");
+          btns.forEach(function (bb, i) {
+            bb.disabled = true;
+            if (i === item.correct) bb.classList.add("correct");
+            if (i === oi && oi !== item.correct) bb.classList.add("wrong");
+          });
+          if (oi === item.correct) { score++; document.getElementById("qqScore").textContent = score; }
+          ex.classList.add("show");
+        });
+        ul.appendChild(b);
+      });
+      wrap.appendChild(ul);
+      var ex = document.createElement("div");
+      ex.className = "qex";
+      ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+      wrap.appendChild(ex);
+      host.appendChild(wrap);
+    });
+  })();
+  </script>
 
     <footer>
       <p>Euler&rsquo;s Number e &middot; Part of your AI study journey &#128640;</p>
