@@ -18,6 +18,9 @@ and (where useful) runnable Python code.
 | 1c | [Integration](integration.html) | Area under a curve, fundamental theorem, probability/AUC |
 | 1d | [Logarithms](logarithms.html) | Inverse of exponentials, ln, log rules, log-likelihood & cross-entropy |
 | 1e | [Trigonometry](trigonometry.html) | sin/cos/tan, unit circle, transformer positional encoding |
+| 1f | [Linear Algebra](linear-algebra.html) | Vectors, matrices, dot product, matrix multiply, norms, PCA |
+| 1g | [Probability & Statistics](probability-statistics.html) | Mean/variance, Gaussian, Bayes, expected value, likelihood |
+| 1h | [Gradient Descent](gradient-descent.html) | Gradient, downhill update rule, learning rate, SGD, backprop |
 | — | [Math Quiz](math-quiz.html) | Interactive self-check on e, derivatives, integration |
 | 2 | [Programming](programming.html) | Python, NumPy, Pandas, Jupyter |
 | 3 | [Neural Networks](neural-networks.html) | Weights, bias, activation, backpropagation |

@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Probability &amp; Statistics for AI — Distributions, Bayes &amp; Likelihood</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#127922; Probability &amp; Statistics for AI</h1>
+    <p>Describe data, model uncertainty, and update beliefs with evidence &mdash; the language every
+       machine-learning model speaks, explained simply with runnable code.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> ML models don't output certainties &mdash; they output
+      <em>probabilities</em>. Statistics tells us how to summarize data (mean, spread), probability
+      tells us how likely things are (0 to 1), and <em>Bayes' theorem</em> tells us how to update a
+      belief when new evidence arrives. Training a model is really just finding the parameters that
+      make the observed data most <em>likely</em>.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#descriptive">Descriptive Statistics (mean, variance, std)</a></li>
+        <li><a href="#normal">The Normal / Gaussian Distribution</a></li>
+        <li><a href="#probability">Probability Basics</a></li>
+        <li><a href="#conditional">Conditional Probability P(A|B)</a></li>
+        <li><a href="#bayes">Bayes' Theorem (with a worked example)</a></li>
+        <li><a href="#expected">Expected Value E[X]</a></li>
+        <li><a href="#likelihood">Likelihood &amp; Maximum Likelihood</a></li>
+        <li><a href="#ml-uses">How ML Uses Probability</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. DESCRIPTIVE STATS -->
+    <h2 class="section" id="descriptive">1. Descriptive Statistics</h2>
+    <p class="muted">Before modelling anything, summarize your data: where is its center, and how spread out is it?</p>
+
+    <div class="concept">
+      <h3>Mean (the average / center)</h3>
+      <p>The <strong>mean</strong> &mu; adds up all values and divides by how many there are. It's the
+      balance point of the data.</p>
+      <div class="formula">&mu; = (1/n) &middot; &Sigma; x<sub>i</sub></div>
+    </div>
+
+    <div class="concept">
+      <h3>Variance (how spread out?)</h3>
+      <p><strong>Variance</strong> &sigma;<sup>2</sup> measures the average <em>squared</em> distance
+      of each value from the mean. Squaring keeps everything positive and punishes big deviations more.</p>
+      <div class="formula">&sigma;<sup>2</sup> = (1/n) &middot; &Sigma; (x<sub>i</sub> &minus; &mu;)<sup>2</sup></div>
+    </div>
+
+    <div class="concept">
+      <h3>Standard deviation (spread in original units)</h3>
+      <p>The <strong>standard deviation</strong> &sigma; is the square root of the variance. Because we
+      undid the squaring, it's back in the same units as the data &mdash; easy to interpret.</p>
+      <div class="formula">&sigma; = &radic;( &sigma;<sup>2</sup> ) = &radic;( (1/n) &middot; &Sigma; (x<sub>i</sub> &minus; &mu;)<sup>2</sup> )</div>
+    </div>
+
+    <div class="concept">
+      <h3>Tiny worked example</h3>
+      <p>Take the data set <code>[2, 4, 4, 4, 5, 5, 7, 9]</code> (n = 8):</p>
+      <table>
+        <tr><th>Step</th><th>Computation</th><th>Result</th></tr>
+        <tr><td>Mean &mu;</td><td>(2+4+4+4+5+5+7+9) / 8 = 40 / 8</td><td><strong>5</strong></td></tr>
+        <tr><td>Squared diffs</td><td>9, 1, 1, 1, 0, 0, 4, 16</td><td>&Sigma; = 32</td></tr>
+        <tr><td>Variance &sigma;<sup>2</sup></td><td>32 / 8</td><td><strong>4</strong></td></tr>
+        <tr><td>Std dev &sigma;</td><td>&radic;4</td><td><strong>2</strong></td></tr>
+      </table>
+      <div class="why">
+        <strong>Why it matters:</strong> features on wildly different scales confuse many models.
+        Knowing &mu; and &sigma; lets you <em>standardize</em> data with <code>(x &minus; &mu;) / &sigma;</code>
+        so every feature is comparable &mdash; a routine first step in ML pipelines.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Mean &amp; std in code</h3>
+      <pre><code>import numpy as np
+
+data = np.array([2, 4, 4, 4, 5, 5, 7, 9])
+
+mean = data.mean()          # 5.0
+var  = data.var()           # 4.0   (population variance, divides by n)
+std  = data.std()           # 2.0   (sqrt of variance)
+
+print(f"mean = {mean}")     # mean = 5.0
+print(f"var  = {var}")      # var  = 4.0
+print(f"std  = {std}")      # std  = 2.0
+
+# NOTE: use ddof=1 for the *sample* variance (divides by n-1)
+print(data.var(ddof=1))     # 4.571...</code></pre>
+    </div>
+
+    <!-- 2. NORMAL DISTRIBUTION -->
+    <h2 class="section" id="normal">2. The Normal / Gaussian Distribution</h2>
+    <p class="muted">The famous "bell curve" &mdash; the most important distribution in statistics and ML.</p>
+
+    <div class="concept">
+      <h3>What is a distribution?</h3>
+      <p>A <strong>distribution</strong> describes how likely each possible value is. For continuous
+      data we use a <em>probability density function</em> (PDF). The <strong>normal</strong>
+      (Gaussian) distribution is the symmetric bell shape centered on the mean &mu;, with width set by
+      the standard deviation &sigma;.</p>
+      <div class="formula">f(x) = (1 / (&sigma;&radic;(2&pi;))) &middot; e<sup>&minus;(x &minus; &mu;)<sup>2</sup> / (2&sigma;<sup>2</sup>)</sup></div>
+      <p class="muted">In the simplest "standard normal" case (&mu; = 0, &sigma; = 1) the exponent is
+      just <code>&minus;x&sup2;/2</code>. The base of that exponential is Euler's number
+      <em>e</em> &mdash; see <a class="back" style="margin:0;" href="euler-number.html">Euler's number</a>.</p>
+    </div>
+
+    <div class="concept">
+      <h3>The bell curve</h3>
+      <svg class="diagram" viewBox="0 0 560 260" role="img"
+           aria-label="A normal distribution bell curve centered at the mean mu, with shaded bands one, two, and three standard deviations wide.">
+        <!-- baseline -->
+        <line x1="30" y1="210" x2="530" y2="210" stroke="#334155" stroke-width="1.5"/>
+        <!-- one-sigma band shading -->
+        <path d="M 210 210 C 250 210, 250 70, 280 65 C 310 70, 310 210, 350 210 Z"
+              fill="rgba(56,189,248,0.18)" stroke="none"/>
+        <!-- the bell curve -->
+        <path d="M 40 208 C 140 206, 180 200, 210 175 C 245 145, 255 70, 280 65
+                 C 305 70, 315 145, 350 175 C 380 200, 420 206, 520 208"
+              fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+        <!-- mean line -->
+        <line x1="280" y1="65" x2="280" y2="210" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="280" y="230" fill="#a78bfa" font-size="13" text-anchor="middle">&mu;</text>
+        <!-- sigma ticks -->
+        <line x1="210" y1="205" x2="210" y2="215" stroke="#fbbf24" stroke-width="2"/>
+        <line x1="350" y1="205" x2="350" y2="215" stroke="#fbbf24" stroke-width="2"/>
+        <line x1="140" y1="205" x2="140" y2="215" stroke="#94a3b8" stroke-width="2"/>
+        <line x1="420" y1="205" x2="420" y2="215" stroke="#94a3b8" stroke-width="2"/>
+        <text x="210" y="245" fill="#fbbf24" font-size="11" text-anchor="middle">&mu;&minus;&sigma;</text>
+        <text x="350" y="245" fill="#fbbf24" font-size="11" text-anchor="middle">&mu;+&sigma;</text>
+        <text x="140" y="245" fill="#94a3b8" font-size="11" text-anchor="middle">&mu;&minus;2&sigma;</text>
+        <text x="420" y="245" fill="#94a3b8" font-size="11" text-anchor="middle">&mu;+2&sigma;</text>
+        <!-- percentage label -->
+        <text x="280" y="130" fill="#e2e8f0" font-size="12" text-anchor="middle">&asymp; 68% within &plusmn;&sigma;</text>
+      </svg>
+      <ul class="clean">
+        <li>About <strong>68%</strong> of values fall within &plusmn;1&sigma; of the mean</li>
+        <li>About <strong>95%</strong> fall within &plusmn;2&sigma;</li>
+        <li>About <strong>99.7%</strong> fall within &plusmn;3&sigma;</li>
+      </ul>
+      <div class="why">
+        <strong>Total area = 1.</strong> The area under any PDF is exactly 1, because <em>some</em>
+        value must occur (probabilities sum to 100%). Computing that area is an
+        <a class="back" style="margin:0;" href="integration.html">integration</a> problem &mdash;
+        integrating the Gaussian over all x gives 1.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Gaussian PDF in code</h3>
+      <pre><code>import numpy as np
+
+def gaussian_pdf(x, mu=0.0, sigma=1.0):
+    coeff = 1.0 / (sigma * np.sqrt(2 * np.pi))
+    exponent = -((x - mu) ** 2) / (2 * sigma ** 2)
+    return coeff * np.exp(exponent)
+
+# Peak of the standard normal is at x = mu = 0
+print(gaussian_pdf(0.0))     # 0.3989422804014327  == 1/sqrt(2*pi)
+print(gaussian_pdf(1.0))     # 0.24197072451914337 (one std out)
+print(gaussian_pdf(-1.0))    # 0.24197072451914337 (symmetric)
+
+# The curve is symmetric, so f(1) == f(-1)
+assert np.isclose(gaussian_pdf(1.0), gaussian_pdf(-1.0))</code></pre>
+      <p class="muted">The peak value <code>1/&radic;(2&pi;) &asymp; 0.3989</code> confirms the formula
+      is correct for the standard normal.</p>
+    </div>
+
+    <!-- 3. PROBABILITY BASICS -->
+    <h2 class="section" id="probability">3. Probability Basics</h2>
+    <p class="muted">Probability is a number from 0 (impossible) to 1 (certain) that measures how likely an event is.</p>
+
+    <div class="concept">
+      <h3>The three rules you always need</h3>
+      <table>
+        <tr><th>Rule</th><th>Meaning</th><th>Formula</th></tr>
+        <tr>
+          <td>Range</td>
+          <td>Every probability is between 0 and 1</td>
+          <td><code>0 &le; P(A) &le; 1</code></td>
+        </tr>
+        <tr>
+          <td>Complement</td>
+          <td>The chance an event does <em>not</em> happen</td>
+          <td><code>P(not A) = 1 &minus; P(A)</code></td>
+        </tr>
+        <tr>
+          <td>Independence</td>
+          <td>Two events that don't affect each other: multiply</td>
+          <td><code>P(A and B) = P(A) &times; P(B)</code></td>
+        </tr>
+      </table>
+      <div class="why">
+        <strong>Why it matters:</strong> a classifier that says "90% cat" is stating <code>P(cat) = 0.9</code>,
+        which automatically means <code>P(not cat) = 0.1</code>. The independence rule is the whole idea
+        behind <em>Naive Bayes</em> (section 8).
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Independent events example</h3>
+      <p>Flip a fair coin twice. Each flip is independent with <code>P(heads) = 0.5</code>.</p>
+      <div class="formula">P(two heads) = 0.5 &times; 0.5 = 0.25</div>
+      <p class="muted">The chance of <em>at least one</em> tails is the complement:
+      <code>1 &minus; 0.25 = 0.75</code>.</p>
+    </div>
+
+    <!-- 4. CONDITIONAL -->
+    <h2 class="section" id="conditional">4. Conditional Probability P(A|B)</h2>
+    <p class="muted">The probability of A <em>given that</em> B already happened. New information changes the odds.</p>
+
+    <div class="concept">
+      <h3>Definition</h3>
+      <p><code>P(A|B)</code> reads "the probability of A given B." We narrow the world down to only the
+      cases where B is true, then ask how often A also holds.</p>
+      <div class="formula">P(A|B) = P(A and B) / P(B)</div>
+      <div class="why">
+        <strong>Why it matters:</strong> almost everything a model predicts is conditional &mdash; a
+        spam filter estimates <code>P(spam | the words in this email)</code>, not the raw base rate of
+        spam. Conditioning on evidence is the essence of prediction.
+      </div>
+    </div>
+
+    <!-- 5. BAYES -->
+    <h2 class="section" id="bayes">5. Bayes' Theorem</h2>
+    <p class="muted">The rule for flipping a conditional around &mdash; updating a belief when evidence arrives.</p>
+
+    <div class="concept">
+      <h3>The formula</h3>
+      <div class="formula">P(A|B) = ( P(B|A) &middot; P(A) ) / P(B)</div>
+      <ul class="clean">
+        <li><strong>P(A)</strong> &mdash; the <em>prior</em>: what we believed before seeing evidence</li>
+        <li><strong>P(B|A)</strong> &mdash; the <em>likelihood</em>: how well A explains the evidence</li>
+        <li><strong>P(B)</strong> &mdash; the <em>evidence</em>: total probability of seeing B</li>
+        <li><strong>P(A|B)</strong> &mdash; the <em>posterior</em>: our updated belief</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3>Worked example: a medical test</h3>
+      <p>A disease affects <strong>1%</strong> of people. A test is <strong>99%</strong> accurate:
+      it correctly flags 99% of sick people (true positives) and correctly clears 99% of healthy
+      people (so 1% false positives). You test <em>positive</em>. What's the chance you're actually
+      sick?</p>
+
+      <svg class="diagram" viewBox="0 0 560 250" role="img"
+           aria-label="A Bayes probability tree splitting the population into 1 percent sick and 99 percent healthy, then into positive and negative test results.">
+        <!-- root -->
+        <rect x="20" y="105" width="90" height="40" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="65" y="130" fill="#38bdf8" font-size="12" text-anchor="middle">10,000</text>
+        <!-- branches to sick / healthy -->
+        <line x1="110" y1="125" x2="230" y2="55" stroke="#a78bfa" stroke-width="2"/>
+        <line x1="110" y1="125" x2="230" y2="195" stroke="#94a3b8" stroke-width="2"/>
+        <text x="150" y="80" fill="#a78bfa" font-size="11">1% sick</text>
+        <text x="150" y="180" fill="#94a3b8" font-size="11">99% healthy</text>
+        <!-- sick node -->
+        <rect x="230" y="35" width="110" height="40" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="285" y="60" fill="#a78bfa" font-size="12" text-anchor="middle">100 sick</text>
+        <!-- healthy node -->
+        <rect x="230" y="175" width="110" height="40" rx="8" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+        <text x="285" y="200" fill="#94a3b8" font-size="12" text-anchor="middle">9,900 healthy</text>
+        <!-- sick -> positive -->
+        <line x1="340" y1="55" x2="440" y2="40" stroke="#4ade80" stroke-width="2"/>
+        <rect x="440" y="20" width="100" height="36" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="490" y="43" fill="#4ade80" font-size="11" text-anchor="middle">99 true +</text>
+        <!-- healthy -> positive (false) -->
+        <line x1="340" y1="195" x2="440" y2="120" stroke="#f87171" stroke-width="2"/>
+        <rect x="440" y="102" width="100" height="36" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+        <text x="490" y="125" fill="#f87171" font-size="11" text-anchor="middle">99 false +</text>
+      </svg>
+
+      <p>Imagine 10,000 people. <strong>100</strong> are sick (1%). Of those, 99 test positive.
+      Of the <strong>9,900</strong> healthy people, 1% &mdash; that's 99 &mdash; also test positive by
+      mistake. So <em>198 people test positive</em>, but only 99 are truly sick.</p>
+      <div class="formula">P(sick | positive) = 99 / (99 + 99) = 99 / 198 = <strong>0.5</strong></div>
+      <p>Plugging into Bayes' theorem directly, with A = sick, B = positive:</p>
+      <div class="formula">P(A|B) = (0.99 &middot; 0.01) / (0.99 &middot; 0.01 + 0.01 &middot; 0.99) = 0.0099 / 0.0198 = 0.5</div>
+      <div class="why">
+        <strong>Why it matters:</strong> despite a "99% accurate" test, a positive result only means a
+        <strong>50%</strong> chance of being sick &mdash; because the disease is rare (low prior). This
+        <em>base-rate</em> effect is why models must weigh evidence against how common something is.
+        The identical logic drives Naive Bayes spam filters.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Bayes in code</h3>
+      <pre><code>import numpy as np
+
+p_sick        = 0.01        # prior P(A)
+p_pos_if_sick = 0.99        # likelihood P(B|A)
+p_pos_if_well = 0.01        # false-positive rate P(B|not A)
+
+# total probability of testing positive P(B)
+p_pos = p_pos_if_sick * p_sick + p_pos_if_well * (1 - p_sick)
+
+# posterior P(A|B)
+posterior = (p_pos_if_sick * p_sick) / p_pos
+print(round(posterior, 4))  # 0.5</code></pre>
+    </div>
+
+    <!-- 6. EXPECTED VALUE -->
+    <h2 class="section" id="expected">6. Expected Value E[X]</h2>
+    <p class="muted">The long-run average outcome, weighting each value by how likely it is.</p>
+
+    <div class="concept">
+      <h3>Definition</h3>
+      <p>The <strong>expected value</strong> is a probability-weighted average: multiply each possible
+      value by its probability, then sum.</p>
+      <div class="formula">E[X] = &Sigma; x &middot; p(x)</div>
+    </div>
+
+    <div class="concept">
+      <h3>Example: a weighted die bet</h3>
+      <p>A game pays you the number rolled on a fair six-sided die. Each face has probability
+      <code>1/6</code>:</p>
+      <div class="formula">E[X] = (1+2+3+4+5+6) &middot; (1/6) = 21/6 = 3.5</div>
+      <pre><code>import numpy as np
+
+values = np.array([1, 2, 3, 4, 5, 6])
+probs  = np.full(6, 1/6)           # each face equally likely
+
+expected = np.sum(values * probs)  # dot-product style sum
+print(expected)                    # 3.5</code></pre>
+      <div class="why">
+        <strong>Why it matters:</strong> a loss function is an <em>expected</em> value &mdash; the
+        average error over the data distribution. Training minimizes that expectation. See
+        <a class="back" style="margin:0;" href="loss-functions.html">loss functions</a>.
+      </div>
+    </div>
+
+    <!-- 7. LIKELIHOOD -->
+    <h2 class="section" id="likelihood">7. Likelihood &amp; Maximum Likelihood</h2>
+    <p class="muted">The intuition behind almost all model training: pick the parameters that make your data most probable.</p>
+
+    <div class="concept">
+      <h3>Probability vs. likelihood</h3>
+      <p><strong>Probability:</strong> parameters are fixed, we ask how likely some data is.
+      <strong>Likelihood:</strong> the data is fixed (we observed it), and we ask which
+      <em>parameters</em> best explain it. <strong>Maximum likelihood estimation (MLE)</strong> chooses
+      the parameters that maximize the probability of the observed data.</p>
+      <div class="formula">&theta;* = argmax<sub>&theta;</sub> &prod;<sub>i</sub> P(x<sub>i</sub> | &theta;)</div>
+    </div>
+
+    <div class="concept">
+      <h3>Why we take the log</h3>
+      <p>Multiplying many small probabilities gives a tiny number that underflows to zero. Taking the
+      <strong>log</strong> turns the product into a sum, which is stable and easy to differentiate.
+      Because log is monotonic, whatever maximizes the likelihood also maximizes the log-likelihood.</p>
+      <div class="formula">log &prod;<sub>i</sub> P(x<sub>i</sub>|&theta;) = &Sigma;<sub>i</sub> log P(x<sub>i</sub>|&theta;)</div>
+      <div class="why">
+        <strong>The big connection:</strong> minimizing <em>cross-entropy loss</em> is exactly the same
+        as maximizing log-likelihood (with a minus sign in front). That's why classifiers are trained
+        with cross-entropy. See <a class="back" style="margin:0;" href="logarithms.html">logarithms</a>
+        and <a class="back" style="margin:0;" href="loss-functions.html">loss functions</a>.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Log-likelihood in code</h3>
+      <pre><code>import numpy as np
+
+# Observed coin flips (1 = heads). We want the p that best explains them.
+flips = np.array([1, 1, 0, 1, 0, 1, 1, 0, 1, 1])
+
+def log_likelihood(p, data):
+    # P(x|p) = p if heads else (1-p); sum the logs
+    return np.sum(np.log(np.where(data == 1, p, 1 - p)))
+
+for p in [0.3, 0.5, 0.7, 0.9]:
+    print(f"p={p}: log-likelihood={log_likelihood(p, flips):.3f}")
+
+# The MLE for a coin is just the observed head fraction:
+p_mle = flips.mean()
+print(f"MLE p = {p_mle}")   # 0.7  (7 heads out of 10)</code></pre>
+      <p class="muted">The log-likelihood peaks near <code>p = 0.7</code>, matching the 7-of-10 heads we
+      observed &mdash; MLE recovers the intuitive answer.</p>
+    </div>
+
+    <!-- 8. ML USES -->
+    <h2 class="section" id="ml-uses">8. How ML Uses Probability</h2>
+    <div class="concept">
+      <h3>Everywhere you look</h3>
+      <ul class="clean">
+        <li><strong>Classifiers output probabilities</strong> &mdash; softmax turns scores into
+            <code>P(class)</code> values that sum to 1</li>
+        <li><strong>Naive Bayes</strong> &mdash; combines Bayes' theorem with the independence rule
+            (multiply per-feature probabilities) for fast, surprisingly strong text classifiers</li>
+        <li><strong>Uncertainty</strong> &mdash; a well-calibrated model says "70% sure," letting
+            downstream systems decide when to defer to a human</li>
+        <li><strong>Sampling &amp; temperature</strong> &mdash; language models draw the next token from a
+            probability distribution; <em>temperature</em> reshapes it (low = confident/repetitive,
+            high = diverse/creative)</li>
+        <li><strong>Evaluation</strong> &mdash; metrics like precision, recall, and ROC-AUC are built on
+            conditional probabilities. See
+            <a class="back" style="margin:0;" href="evaluation-metrics.html">evaluation metrics</a></li>
+      </ul>
+      <div class="why">
+        <strong>Foundation:</strong> the algebra behind all of this &mdash; sums, products, vectors and
+        matrices &mdash; lives in
+        <a class="back" style="margin:0;" href="math-foundations.html">math foundations</a>, and the
+        exponential curve at the heart of the Gaussian comes from
+        <a class="back" style="margin:0;" href="euler-number.html">Euler's number</a>.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>Mean / variance / std</strong> &mdash; center and spread of data</li>
+        <li><strong>Normal distribution</strong> &mdash; the bell curve; total area under it is 1</li>
+        <li><strong>Probability</strong> &mdash; a number in 0&hellip;1; complements subtract, independents multiply</li>
+        <li><strong>Bayes' theorem</strong> &mdash; update a prior belief with new evidence</li>
+        <li><strong>Expected value</strong> &mdash; probability-weighted average, <code>&Sigma; x&middot;p(x)</code></li>
+        <li><strong>Maximum likelihood</strong> &mdash; pick parameters that make the data most probable (&harr; cross-entropy)</li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">9. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://www.3blue1brown.com/topics/probability" target="_blank" rel="noopener">3Blue1Brown &mdash; Probability (video series)</a></li>
+        <li><a href="https://seeing-theory.brown.edu/" target="_blank" rel="noopener">Seeing Theory &mdash; visual introduction to probability &amp; statistics</a></li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability" target="_blank" rel="noopener">Khan Academy &mdash; Statistics &amp; Probability</a></li>
+        <li><a href="https://setosa.io/conditional/" target="_blank" rel="noopener">Setosa &mdash; interactive Conditional Probability</a></li>
+        <li><a href="https://numpy.org/doc/stable/reference/random/index.html" target="_blank" rel="noopener">NumPy &mdash; random sampling &amp; distributions</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    
+    <div class="quizbox">
+      <h2 class="section" style="margin-top:0;" id="quiz">✅ Quick Quiz</h2>
+      <p class="muted">Test yourself on this page. Click an answer for instant feedback.</p>
+      <div id="quickquiz" data-quiz="1"></div>
+    </div>
+
+  <script>
+  (function () {
+    var DATA = [{"q": "Standard deviation measures:", "options": ["The average value", "How spread out the data is around the mean", "The largest value", "The number of items"], "correct": 1, "explain": "Std dev (√variance) quantifies dispersion around the mean."}, {"q": "The normal (Gaussian) distribution's formula is built on which constant?", "options": ["π only", "e (via e^(−x²/2))", "The golden ratio", "1"], "correct": 1, "explain": "The bell curve uses e^(−x²/2); its total area integrates to 1."}, {"q": "For two independent events, P(A and B) equals:", "options": ["P(A) + P(B)", "P(A) × P(B)", "P(A) − P(B)", "P(A) / P(B)"], "correct": 1, "explain": "Independent probabilities multiply: P(A and B) = P(A)·P(B)."}, {"q": "Bayes' theorem is used to:", "options": ["Sort data", "Update a prior belief into a posterior given new evidence", "Compute slopes", "Multiply matrices"], "correct": 1, "explain": "Bayes updates P(A) into P(A|B) using P(B|A)P(A)/P(B) when evidence arrives."}, {"q": "The expected value E[X] of a random variable is:", "options": ["Its maximum", "The probability-weighted average Σ x·p(x)", "Its variance", "Always 0.5"], "correct": 1, "explain": "Expected value is the long-run average: each outcome weighted by its probability."}];
+    var host = document.getElementById("quickquiz");
+    if (!host || !DATA || !DATA.length) return;
+    var total = DATA.length, score = 0, answered = 0;
+    var bar = document.createElement("div");
+    bar.className = "quizbar";
+    bar.innerHTML = 'Score: <strong id="qqScore">0</strong> / ' + total;
+    host.appendChild(bar);
+    DATA.forEach(function (item, qi) {
+      var wrap = document.createElement("div");
+      wrap.className = "qq";
+      var qt = document.createElement("div");
+      qt.className = "qt";
+      qt.textContent = (qi + 1) + ". " + item.q;
+      wrap.appendChild(qt);
+      var ul = document.createElement("div");
+      ul.className = "qopts";
+      var locked = false;
+      item.options.forEach(function (opt, oi) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "qopt";
+        b.textContent = opt;
+        b.addEventListener("click", function () {
+          if (locked) return;
+          locked = true;
+          answered++;
+          var btns = ul.querySelectorAll(".qopt");
+          btns.forEach(function (bb, i) {
+            bb.disabled = true;
+            if (i === item.correct) bb.classList.add("correct");
+            if (i === oi && oi !== item.correct) bb.classList.add("wrong");
+          });
+          if (oi === item.correct) { score++; document.getElementById("qqScore").textContent = score; }
+          ex.classList.add("show");
+        });
+        ul.appendChild(b);
+      });
+      wrap.appendChild(ul);
+      var ex = document.createElement("div");
+      ex.className = "qex";
+      ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+      wrap.appendChild(ex);
+      host.appendChild(wrap);
+    });
+  })();
+  </script>
+
+    <footer>
+      <p>Probability &amp; Statistics &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

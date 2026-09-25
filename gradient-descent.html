@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gradients &amp; Gradient Descent — How Models Learn</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#128201; Gradients &amp; Gradient Descent</h1>
+    <p>The single algorithm behind almost all learning: follow the slope downhill to make the
+       loss smaller, one small step at a time.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> Training a model means finding the numbers (weights) that make the
+      error smallest. <em>Gradient descent</em> does this by repeatedly asking "which way is downhill?"
+      (the <em>gradient</em>) and taking a small step that way. That's how nearly every model &mdash; from
+      linear regression to giant neural networks &mdash; actually learns.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#recap">Recap: derivative = slope</a></li>
+        <li><a href="#gradient">The gradient &nabla;f (steepest increase)</a></li>
+        <li><a href="#update">The update rule &amp; why the minus sign</a></li>
+        <li><a href="#lr">Learning rate: too big vs. too small</a></li>
+        <li><a href="#surface">The loss surface &mdash; walking downhill</a></li>
+        <li><a href="#variants">Batch, Stochastic &amp; Mini-batch</a></li>
+        <li><a href="#minima">Local vs. global minima</a></li>
+        <li><a href="#backprop">Backprop: gradients via the chain rule</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. RECAP -->
+    <h2 class="section" id="recap">1. Recap: the derivative is a slope</h2>
+    <p class="muted">Everything here builds on one idea: a derivative tells you which way &mdash; and how steeply &mdash; a function is heading.</p>
+
+    <div class="concept">
+      <h3>Slope in one variable</h3>
+      <p>For a single-variable function <code>f(x)</code>, the derivative <code>f&#8242;(x)</code> (also
+      written <code>df/dx</code>) is the <strong>slope</strong> at a point: how fast the output changes as
+      you nudge <code>x</code>. A positive slope means the function is going up as <code>x</code> increases;
+      a negative slope means it is going down.</p>
+      <div class="formula">f(x) = x&sup2; &nbsp;&rarr;&nbsp; f&#8242;(x) = 2x</div>
+      <p>So at <code>x = 10</code> the slope is <code>2 &middot; 10 = 20</code> (steeply uphill), and at
+      <code>x = 0</code> the slope is <code>0</code> (flat &mdash; the bottom of the bowl).</p>
+      <div class="why">
+        <strong>Need a refresher?</strong> See <a href="derivatives.html">Derivatives</a> for the full
+        story on slopes, rates of change, and how to differentiate. Gradient descent is derivatives put
+        to work.
+      </div>
+    </div>
+
+    <!-- 2. THE GRADIENT -->
+    <h2 class="section" id="gradient">2. The gradient &nabla;f &mdash; steepest increase</h2>
+    <p class="muted">Real models have thousands or millions of weights. The gradient generalizes "slope" to many dimensions.</p>
+
+    <div class="concept">
+      <h3>A gradient is a vector of partial derivatives</h3>
+      <p>When a function has several inputs, we take the derivative with respect to each one separately &mdash;
+      a <strong>partial derivative</strong>, written with <code>&part;</code>. Stack them into a vector and you
+      get the <strong>gradient</strong>, written <code>&nabla;f</code> ("nabla f" or "grad f").</p>
+      <div class="formula">&nabla;f = [ &part;f/&part;x&#8321;, &part;f/&part;x&#8322;, &hellip;, &part;f/&part;x<sub>n</sub> ]</div>
+      <p>For <code>f(x, y) = x&sup2; + y&sup2;</code> the partials are <code>&part;f/&part;x = 2x</code> and
+      <code>&part;f/&part;y = 2y</code>, so <code>&nabla;f = [2x, 2y]</code>.</p>
+      <div class="why">
+        <strong>Why it matters:</strong> The gradient points in the direction of <em>steepest increase</em> &mdash;
+        the fastest way <em>uphill</em>. Its length tells you how steep the climb is. To reduce the loss we
+        simply go the opposite way: downhill.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Gradient arrows on a bowl</h3>
+      <p>Imagine looking straight down at the bowl <code>f(x, y) = x&sup2; + y&sup2;</code>. At every point the
+      gradient <code>&nabla;f</code> points <em>away</em> from the center (steepest increase). We move along
+      <code>&minus;&nabla;f</code> (toward the center) to shrink the loss.</p>
+
+      <svg class="diagram" viewBox="0 0 560 240" role="img"
+           aria-label="Top-down view of a bowl-shaped surface. Arrows point outward from the center showing the gradient, the direction of steepest increase; a dashed inward arrow shows the negative gradient step toward the minimum.">
+        <!-- concentric contour rings -->
+        <ellipse cx="280" cy="120" rx="40"  ry="26"  fill="none" stroke="#334155" stroke-width="1"/>
+        <ellipse cx="280" cy="120" rx="90"  ry="58"  fill="none" stroke="#334155" stroke-width="1"/>
+        <ellipse cx="280" cy="120" rx="140" ry="90"  fill="none" stroke="#334155" stroke-width="1"/>
+        <ellipse cx="280" cy="120" rx="190" ry="108" fill="none" stroke="#334155" stroke-width="1"/>
+        <!-- center (minimum) -->
+        <circle cx="280" cy="120" r="5" fill="#4ade80"/>
+        <text x="280" y="145" fill="#4ade80" font-size="11" text-anchor="middle">minimum</text>
+        <!-- outward gradient arrows (steepest increase) -->
+        <line x1="280" y1="120" x2="430" y2="120" stroke="#a78bfa" stroke-width="2.5" marker-end="url(#gv)"/>
+        <line x1="280" y1="120" x2="150" y2="60"  stroke="#a78bfa" stroke-width="2.5" marker-end="url(#gv)"/>
+        <line x1="280" y1="120" x2="380" y2="200" stroke="#a78bfa" stroke-width="2.5" marker-end="url(#gv)"/>
+        <text x="440" y="112" fill="#a78bfa" font-size="12">&nabla;f (uphill)</text>
+        <!-- inward step (negative gradient) -->
+        <line x1="470" y1="60" x2="330" y2="108" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#gb)"/>
+        <text x="410" y="45" fill="#38bdf8" font-size="12">&minus;&nabla;f (downhill step)</text>
+        <defs>
+          <marker id="gv" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#a78bfa"/>
+          </marker>
+          <marker id="gb" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#38bdf8"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- 3. THE UPDATE RULE -->
+    <h2 class="section" id="update">3. The update rule &mdash; and why the minus sign</h2>
+    <p class="muted">This one line is the heartbeat of machine learning.</p>
+
+    <div class="concept">
+      <h3>The rule</h3>
+      <div class="formula">new_w = old_w &minus; learning_rate &times; gradient</div>
+      <p>In symbols, with learning rate <code>&eta;</code> (often written <code>lr</code> or the Greek letter
+      eta): <code>w &larr; w &minus; &eta; &middot; &nabla;f</code>.</p>
+      <div class="why">
+        <strong>Why the minus sign?</strong> The gradient points <em>uphill</em> (toward larger loss). We want
+        <em>smaller</em> loss, so we step in the <em>opposite</em> direction &mdash; downhill. Subtracting the
+        gradient does exactly that. If instead you <em>added</em> it (gradient <em>ascent</em>), the loss would
+        climb and the model would get worse.
+      </div>
+      <p>The <strong>learning rate</strong> <code>&eta;</code> controls the step size: how far we move each
+      iteration in the downhill direction.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Minimize f(x) = x&sup2; by gradient descent</h3>
+      <p>Starting from <code>x&#8320; = 10</code>, the slope is <code>f&#8242;(x) = 2x</code>. Each step subtracts
+      <code>&eta; &middot; 2x</code>, sliding <code>x</code> toward <code>0</code> (the minimum).</p>
+      <pre><code>import numpy as np
+
+def f(x):      return x ** 2      # the function we minimize
+def grad(x):   return 2 * x       # its derivative (slope)
+
+x = 10.0            # starting point x0
+lr = 0.1            # learning rate (step size)
+
+for step in range(25):
+    g = grad(x)                   # which way is uphill?
+    x = x - lr * g                # step downhill (note the minus sign)
+    if step % 5 == 0:
+        print(f"step {step:2d}: x={x:8.4f}  f(x)={f(x):8.4f}")
+
+print(f"\nfinal x = {x:.6f}  (true minimum is x = 0)")</code></pre>
+      <p class="muted">Output: <code>x</code> shrinks 10 &rarr; 8 &rarr; 6.4 &rarr; &hellip; &rarr; ~0, and
+      <code>f(x)</code> falls toward 0. Each step, <code>x</code> is multiplied by <code>(1 &minus; 2&middot;lr) = 0.8</code>,
+      so it decays smoothly to the minimum.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Two variables: minimize f(x, y) = x&sup2; + y&sup2;</h3>
+      <p>The same loop, but now the gradient is a vector <code>&nabla;f = [2x, 2y]</code>. We update the whole
+      point at once.</p>
+      <pre><code>import numpy as np
+
+def f(p):      return p[0]**2 + p[1]**2        # bowl: x^2 + y^2
+def grad(p):   return np.array([2*p[0], 2*p[1]])  # gradient [2x, 2y]
+
+p = np.array([8.0, -6.0])   # start at (x, y) = (8, -6)
+lr = 0.1
+
+for step in range(25):
+    g = grad(p)             # gradient vector (points uphill)
+    p = p - lr * g          # step downhill along -gradient
+    if step % 5 == 0:
+        print(f"step {step:2d}: x={p[0]:7.4f}  y={p[1]:7.4f}  f={f(p):8.4f}")
+
+print(f"\nfinal point = ({p[0]:.5f}, {p[1]:.5f})  (true minimum is (0, 0))")</code></pre>
+      <p class="muted">Both <code>x</code> and <code>y</code> slide toward 0 together, and the loss
+      <code>f</code> heads to 0. This is exactly what happens with millions of weights &mdash; just a much
+      longer vector.</p>
+    </div>
+
+    <!-- 4. LEARNING RATE -->
+    <h2 class="section" id="lr">4. Learning rate: too big vs. too small</h2>
+    <p class="muted">The learning rate is the single most important knob to get right.</p>
+
+    <div class="concept">
+      <h3>The Goldilocks problem</h3>
+      <table>
+        <tr><th>Learning rate</th><th>What happens</th><th>Symptom</th></tr>
+        <tr><td>Too small</td><td>Tiny steps; barely moves each iteration</td><td>Training is painfully slow; may never arrive</td></tr>
+        <tr><td>Just right</td><td>Steady, quick descent to the minimum</td><td>Loss drops smoothly and settles</td></tr>
+        <tr><td>Too big</td><td>Overshoots the bottom, bounces to the other side</td><td>Loss oscillates or explodes to &infin; (diverges)</td></tr>
+      </table>
+
+      <svg class="diagram" viewBox="0 0 560 240" role="img"
+           aria-label="A parabola-shaped loss bowl. On the left, small steps creep slowly down toward the bottom. On the right, a large step overshoots the minimum and lands higher on the opposite wall.">
+        <!-- bowl curve -->
+        <path d="M 30 30 Q 280 300 530 30" fill="none" stroke="#334155" stroke-width="2"/>
+        <!-- minimum marker -->
+        <circle cx="280" cy="188" r="4" fill="#4ade80"/>
+        <text x="280" y="212" fill="#4ade80" font-size="11" text-anchor="middle">minimum</text>
+
+        <!-- small steps (left side, cyan) creeping down -->
+        <circle cx="90"  cy="123" r="5" fill="#38bdf8"/>
+        <circle cx="130" cy="150" r="5" fill="#38bdf8"/>
+        <circle cx="165" cy="168" r="5" fill="#38bdf8"/>
+        <circle cx="195" cy="179" r="5" fill="#38bdf8"/>
+        <line x1="90"  y1="123" x2="130" y2="150" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="4 3"/>
+        <line x1="130" y1="150" x2="165" y2="168" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="4 3"/>
+        <line x1="165" y1="168" x2="195" y2="179" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="4 3"/>
+        <text x="105" y="112" fill="#38bdf8" font-size="11">too small: slow</text>
+
+        <!-- big step (right side, red) overshooting -->
+        <circle cx="470" cy="123" r="5" fill="#f87171"/>
+        <circle cx="150" cy="158" r="5" fill="#f87171"/>
+        <path d="M 470 123 Q 320 260 150 158" fill="none" stroke="#f87171" stroke-width="2" marker-end="url(#os)"/>
+        <text x="360" y="120" fill="#f87171" font-size="11">too big: overshoots</text>
+        <defs>
+          <marker id="os" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#f87171"/>
+          </marker>
+        </defs>
+      </svg>
+
+      <div class="why">
+        <strong>Why it matters:</strong> With <code>f(x) = x&sup2;</code> and <code>lr = 0.1</code>, each step
+        multiplies <code>x</code> by 0.8 &mdash; smooth convergence. But at <code>lr = 1.1</code> the multiplier is
+        <code>(1 &minus; 2&middot;1.1) = &minus;1.2</code>: <code>x</code> flips sign and <em>grows</em> every
+        step, diverging to &infin;. Try changing <code>lr</code> in the code above to see it.
+      </div>
+    </div>
+
+    <!-- 5. LOSS SURFACE -->
+    <h2 class="section" id="surface">5. The loss surface &mdash; walking downhill</h2>
+    <div class="concept">
+      <h3>Learning is descending a landscape</h3>
+      <p>Picture the loss as a <strong>surface</strong>: the horizontal directions are the model's weights,
+      and the height is how wrong the model is. Training = a blindfolded walk downhill. You cannot see the
+      whole valley, but at your feet you can feel the slope (the gradient) and always step in the steepest
+      downhill direction.</p>
+      <ul class="clean">
+        <li>Height of the surface = loss (error)</li>
+        <li>Position on the surface = current weights</li>
+        <li>Slope under your feet = the gradient <code>&nabla;f</code></li>
+        <li>Each footstep = one update <code>w &larr; w &minus; &eta; &middot; &nabla;f</code></li>
+      </ul>
+      <div class="why">
+        <strong>Why it matters:</strong> The loss surface connects everything &mdash; the
+        <a href="loss-functions.html">loss function</a> defines the landscape, the gradient tells you which
+        way to step, and <a href="training-optimization.html">optimization</a> is the strategy for walking it
+        efficiently.
+      </div>
+    </div>
+
+    <!-- 6. VARIANTS -->
+    <h2 class="section" id="variants">6. Batch, Stochastic &amp; Mini-batch</h2>
+    <p class="muted">The difference is simply <em>how much data</em> you use to estimate the gradient each step.</p>
+
+    <div class="concept">
+      <h3>Three flavors of gradient descent</h3>
+      <table>
+        <tr><th>Variant</th><th>Data per step</th><th>Pros</th><th>Cons</th></tr>
+        <tr>
+          <td>Batch GD</td>
+          <td>The entire dataset</td>
+          <td>Accurate, stable gradient</td>
+          <td>Slow / memory-heavy on big data</td>
+        </tr>
+        <tr>
+          <td>Stochastic (SGD)</td>
+          <td>One example at a time</td>
+          <td>Fast updates; noise can escape shallow traps</td>
+          <td>Noisy, jittery path to the minimum</td>
+        </tr>
+        <tr>
+          <td>Mini-batch</td>
+          <td>A small group (e.g., 32&ndash;256)</td>
+          <td>Best of both; hardware-friendly</td>
+          <td>Extra knob: batch size to tune</td>
+        </tr>
+      </table>
+      <div class="why">
+        <strong>In practice:</strong> almost everyone uses <strong>mini-batch</strong> GD (people often just
+        call it "SGD"). It balances the smoothness of full batch with the speed of single-example updates.
+      </div>
+    </div>
+
+    <!-- 7. MINIMA -->
+    <h2 class="section" id="minima">7. Local vs. global minima</h2>
+    <div class="concept">
+      <h3>Not all valleys are the deepest</h3>
+      <p>A simple bowl like <code>x&sup2;</code> has one bottom &mdash; the <strong>global minimum</strong>. Complex
+      loss surfaces have many dips. A <strong>local minimum</strong> is lower than its neighbors but not the
+      lowest point overall. Plain gradient descent only feels the slope right at its feet, so it can settle
+      into a local minimum and stop.</p>
+
+      <svg class="diagram" viewBox="0 0 560 200" role="img"
+           aria-label="A wavy curve with two dips. A shallow dip on the left is labeled local minimum; a deeper dip on the right is labeled global minimum. A ball rests in the shallow dip.">
+        <path d="M 20 40 C 90 40, 110 150, 170 150 C 230 150, 250 70, 320 70 C 400 70, 410 175, 480 175 C 520 175, 530 90, 545 90"
+              fill="none" stroke="#334155" stroke-width="2"/>
+        <!-- local min ball -->
+        <circle cx="170" cy="140" r="7" fill="#f87171"/>
+        <text x="170" y="120" fill="#f87171" font-size="11" text-anchor="middle">local min</text>
+        <!-- global min -->
+        <circle cx="443" cy="165" r="5" fill="#4ade80"/>
+        <text x="443" y="150" fill="#4ade80" font-size="11" text-anchor="middle">global min</text>
+      </svg>
+
+      <div class="why">
+        <strong>The good news:</strong> in the very high-dimensional loss surfaces of deep networks, truly
+        bad local minima are rare &mdash; most are nearly as good as the global one. The noise of SGD and tricks
+        like <a href="training-optimization.html">momentum and adaptive optimizers</a> help escape shallow
+        traps and keep training moving.
+      </div>
+    </div>
+
+    <!-- 8. BACKPROP -->
+    <h2 class="section" id="backprop">8. Backprop: gradients via the chain rule</h2>
+    <p class="muted">Gradient descent needs a gradient. In a neural network, backpropagation is how we get it.</p>
+
+    <div class="concept">
+      <h3>Where do the gradients come from?</h3>
+      <p>A neural network is a long chain of functions: inputs &rarr; weighted sums &rarr; activations &rarr;
+      &hellip; &rarr; loss. To update a weight we need <code>&part;L/&part;w</code> &mdash; how the final loss
+      changes when that one weight wiggles. <strong>Backpropagation</strong> computes this efficiently using
+      the <strong>chain rule</strong>: multiply the local slopes along the path from the weight to the loss.</p>
+      <div class="formula">&part;L/&part;w = (&part;L/&part;&#375;) &times; (&part;&#375;/&part;z) &times; (&part;z/&part;w)</div>
+      <p>The error is measured at the output and pushed <em>backward</em> through the layers, splitting the
+      "blame" for the error across every weight. Those blame values <em>are</em> the gradient &mdash; and gradient
+      descent then does <code>w &larr; w &minus; &eta; &middot; &nabla;L</code>.</p>
+
+      <svg class="diagram" viewBox="0 0 560 160" role="img"
+           aria-label="Forward pass moves left to right from weight to sum to activation to loss. Backpropagation sends gradient signals right to left, applying the chain rule to compute the derivative of loss with respect to the weight.">
+        <rect x="20"  y="55" width="80"  height="40" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="60"  y="80" fill="#38bdf8" font-size="12" text-anchor="middle">w</text>
+        <rect x="150" y="55" width="80"  height="40" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="190" y="80" fill="#fbbf24" font-size="12" text-anchor="middle">z</text>
+        <rect x="280" y="55" width="90"  height="40" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="325" y="80" fill="#a78bfa" font-size="12" text-anchor="middle">&#375; (activ.)</text>
+        <rect x="420" y="55" width="90"  height="40" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+        <text x="465" y="80" fill="#f87171" font-size="12" text-anchor="middle">Loss L</text>
+        <!-- forward arrows -->
+        <line x1="100" y1="70" x2="150" y2="70" stroke="#e2e8f0" stroke-width="2" marker-end="url(#fw)"/>
+        <line x1="230" y1="70" x2="280" y2="70" stroke="#e2e8f0" stroke-width="2" marker-end="url(#fw)"/>
+        <line x1="370" y1="70" x2="420" y2="70" stroke="#e2e8f0" stroke-width="2" marker-end="url(#fw)"/>
+        <text x="265" y="40" fill="#94a3b8" font-size="10" text-anchor="middle">forward &rarr;</text>
+        <!-- backward gradient arrows -->
+        <line x1="420" y1="112" x2="370" y2="112" stroke="#4ade80" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#bw)"/>
+        <line x1="280" y1="112" x2="230" y2="112" stroke="#4ade80" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#bw)"/>
+        <line x1="150" y1="112" x2="100" y2="112" stroke="#4ade80" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#bw)"/>
+        <text x="265" y="135" fill="#4ade80" font-size="10" text-anchor="middle">&larr; backprop gradients</text>
+        <defs>
+          <marker id="fw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#e2e8f0"/>
+          </marker>
+          <marker id="bw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#4ade80"/>
+          </marker>
+        </defs>
+      </svg>
+
+      <div class="why">
+        <strong>The whole pipeline:</strong> <a href="derivatives.html">derivatives</a> give the local slopes,
+        the chain rule stitches them into a gradient, backpropagation computes that gradient for every weight
+        in a <a href="neural-networks.html">neural network</a>, and gradient descent takes the step. Repeat
+        until the loss is small.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>Derivative</strong> &mdash; slope of a function at a point</li>
+        <li><strong>Gradient &nabla;f</strong> &mdash; vector of partial derivatives; points uphill (steepest increase)</li>
+        <li><strong>Update rule</strong> &mdash; <code>new_w = old_w &minus; lr &times; gradient</code> (minus = go downhill)</li>
+        <li><strong>Learning rate</strong> &mdash; step size; too big diverges, too small crawls</li>
+        <li><strong>Variants</strong> &mdash; batch (all data), SGD (one example), mini-batch (a small group)</li>
+        <li><strong>Backpropagation</strong> &mdash; the chain rule computing gradients for every weight</li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">9. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://www.3blue1brown.com/lessons/gradient-descent" target="_blank" rel="noopener">3Blue1Brown &mdash; Gradient descent, how neural networks learn</a></li>
+        <li><a href="https://cs231n.github.io/optimization-1/" target="_blank" rel="noopener">Stanford CS231n &mdash; Optimization &amp; gradient descent notes</a></li>
+        <li><a href="https://www.deeplearningbook.org/contents/numerical.html" target="_blank" rel="noopener">Deep Learning Book &mdash; Numerical computation &amp; gradient-based optimization</a></li>
+        <li><a href="https://distill.pub/2017/momentum/" target="_blank" rel="noopener">Distill &mdash; Why momentum really works</a></li>
+        <li><a href="https://playground.tensorflow.org/" target="_blank" rel="noopener">TensorFlow Playground &mdash; watch descent happen live</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    
+    <div class="quizbox">
+      <h2 class="section" style="margin-top:0;" id="quiz">✅ Quick Quiz</h2>
+      <p class="muted">Test yourself on this page. Click an answer for instant feedback.</p>
+      <div id="quickquiz" data-quiz="1"></div>
+    </div>
+
+  <script>
+  (function () {
+    var DATA = [{"q": "The gradient ∇f points in the direction of:", "options": ["Steepest decrease", "Steepest increase", "Zero change", "The origin"], "correct": 1, "explain": "The gradient points uphill (steepest increase); to minimize loss we step the opposite way."}, {"q": "In the update rule new_w = old_w − lr × gradient, why the minus sign?", "options": ["To increase the loss", "To move downhill and reduce the loss", "It is a typo", "To normalize the weights"], "correct": 1, "explain": "Subtracting the gradient moves against the uphill direction — i.e., downhill toward lower loss."}, {"q": "If the learning rate is far too large, training will typically:", "options": ["Converge instantly", "Overshoot and may diverge", "Do nothing", "Always find the global minimum"], "correct": 1, "explain": "Too-large steps overshoot the minimum and can oscillate or blow up (diverge)."}, {"q": "Stochastic Gradient Descent (SGD) updates weights using:", "options": ["The entire dataset each step", "One (or a few) examples per step", "No data", "Only the first example ever"], "correct": 1, "explain": "SGD/mini-batch uses a small sample per step — faster, noisier updates than full-batch."}, {"q": "How does a neural network compute the gradients for gradient descent?", "options": ["Random guessing", "Backpropagation (the chain rule applied layer by layer)", "Matrix inversion", "Sorting the weights"], "correct": 1, "explain": "Backprop applies the chain rule from the output back through each layer to get every weight's gradient."}];
+    var host = document.getElementById("quickquiz");
+    if (!host || !DATA || !DATA.length) return;
+    var total = DATA.length, score = 0, answered = 0;
+    var bar = document.createElement("div");
+    bar.className = "quizbar";
+    bar.innerHTML = 'Score: <strong id="qqScore">0</strong> / ' + total;
+    host.appendChild(bar);
+    DATA.forEach(function (item, qi) {
+      var wrap = document.createElement("div");
+      wrap.className = "qq";
+      var qt = document.createElement("div");
+      qt.className = "qt";
+      qt.textContent = (qi + 1) + ". " + item.q;
+      wrap.appendChild(qt);
+      var ul = document.createElement("div");
+      ul.className = "qopts";
+      var locked = false;
+      item.options.forEach(function (opt, oi) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "qopt";
+        b.textContent = opt;
+        b.addEventListener("click", function () {
+          if (locked) return;
+          locked = true;
+          answered++;
+          var btns = ul.querySelectorAll(".qopt");
+          btns.forEach(function (bb, i) {
+            bb.disabled = true;
+            if (i === item.correct) bb.classList.add("correct");
+            if (i === oi && oi !== item.correct) bb.classList.add("wrong");
+          });
+          if (oi === item.correct) { score++; document.getElementById("qqScore").textContent = score; }
+          ex.classList.add("show");
+        });
+        ul.appendChild(b);
+      });
+      wrap.appendChild(ul);
+      var ex = document.createElement("div");
+      ex.className = "qex";
+      ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+      wrap.appendChild(ex);
+      host.appendChild(wrap);
+    });
+  })();
+  </script>
+
+    <footer>
+      <p>Gradients &amp; Gradient Descent &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>
