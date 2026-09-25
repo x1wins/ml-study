@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The ML Workflow — From Problem to Production Lifecycle</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#128260; The ML Workflow</h1>
+    <p>The full machine-learning lifecycle &mdash; from defining the problem to deploying,
+       monitoring, and retraining a model in production, one stage at a time.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> Building a model is only one small step. A real ML project is a
+      <em>loop</em>: define &rarr; collect &rarr; clean &rarr; split &rarr; train &rarr; evaluate
+      &rarr; tune &rarr; deploy &rarr; monitor &rarr; (retrain). Most of the effort &mdash; and most
+      of the value &mdash; lives in the data and the loop, not in the model itself.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#pipeline">The Lifecycle at a Glance</a></li>
+        <li><a href="#define">Define the Problem</a></li>
+        <li><a href="#collect">Collect Data</a></li>
+        <li><a href="#clean">Clean &amp; Prepare Data</a></li>
+        <li><a href="#split">Split Train / Validation / Test</a></li>
+        <li><a href="#train">Choose &amp; Train a Model</a></li>
+        <li><a href="#evaluate">Evaluate</a></li>
+        <li><a href="#tune">Tune (Hyperparameters &amp; Cross-Validation)</a></li>
+        <li><a href="#deploy">Deploy</a></li>
+        <li><a href="#monitor">Monitor &amp; Retrain</a></li>
+        <li><a href="#pipeline-code">Putting It Together (scikit-learn)</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. PIPELINE OVERVIEW -->
+    <h2 class="section" id="pipeline">1. The Lifecycle at a Glance</h2>
+    <p class="muted">Every ML project moves through the same stages. The last stage feeds back into the first.</p>
+
+    <div class="concept">
+      <h3>The pipeline (with a feedback loop)</h3>
+      <svg class="diagram" viewBox="0 0 560 260" role="img"
+           aria-label="The machine learning lifecycle as a pipeline: define, collect data, clean and prepare, split, train, evaluate, tune, deploy, then monitor, with a dashed loop from monitor back to collect and clean for retraining.">
+        <defs>
+          <marker id="arw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+
+        <!-- row 1 -->
+        <rect x="15"  y="30" width="90" height="38" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="60"  y="54" fill="#38bdf8" font-size="11" text-anchor="middle">1. Define</text>
+        <rect x="130" y="30" width="90" height="38" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="175" y="54" fill="#38bdf8" font-size="11" text-anchor="middle">2. Collect</text>
+        <rect x="245" y="30" width="90" height="38" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="290" y="54" fill="#38bdf8" font-size="11" text-anchor="middle">3. Clean</text>
+        <rect x="360" y="30" width="90" height="38" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="405" y="54" fill="#38bdf8" font-size="11" text-anchor="middle">4. Split</text>
+
+        <line x1="105" y1="49" x2="130" y2="49" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="220" y1="49" x2="245" y2="49" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="335" y1="49" x2="360" y2="49" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <!-- down to row 2 -->
+        <path d="M 450 49 C 505 49, 505 130, 450 130" fill="none" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+
+        <!-- row 2 (right to left) -->
+        <rect x="360" y="111" width="90" height="38" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="405" y="135" fill="#a78bfa" font-size="11" text-anchor="middle">5. Train</text>
+        <rect x="245" y="111" width="90" height="38" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="290" y="135" fill="#a78bfa" font-size="11" text-anchor="middle">6. Evaluate</text>
+        <rect x="130" y="111" width="90" height="38" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="175" y="135" fill="#a78bfa" font-size="11" text-anchor="middle">7. Tune</text>
+        <rect x="15"  y="111" width="90" height="38" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="60"  y="135" fill="#fbbf24" font-size="11" text-anchor="middle">8. Deploy</text>
+
+        <line x1="360" y1="130" x2="335" y2="130" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="245" y1="130" x2="220" y2="130" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="130" y1="130" x2="105" y2="130" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <!-- down to row 3 -->
+        <path d="M 60 149 C 15 149, 15 205, 60 205" fill="none" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+
+        <!-- row 3 -->
+        <rect x="60"  y="186" width="110" height="38" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="115" y="210" fill="#4ade80" font-size="11" text-anchor="middle">9. Monitor</text>
+
+        <!-- feedback loop: monitor back to collect/clean -->
+        <path d="M 170 205 C 400 205, 300 78, 260 70" fill="none" stroke="#f87171" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+        <text x="330" y="200" fill="#f87171" font-size="10" text-anchor="middle">drift detected &rarr; retrain</text>
+      </svg>
+
+      <div class="why">
+        <strong>Why it's a loop, not a line:</strong> Once a model is live, the world keeps changing.
+        Monitoring catches when performance drops (<em>drift</em>), which sends you back to collect
+        fresh data and retrain. A model is a living system, not a one-time deliverable.
+      </div>
+    </div>
+
+    <!-- 2. DEFINE -->
+    <h2 class="section" id="define">2. Define the Problem</h2>
+    <p class="muted">The most skipped &mdash; and most important &mdash; stage. Get this wrong and everything downstream is wasted.</p>
+
+    <div class="concept">
+      <h3>Turn a business goal into an ML question</h3>
+      <p>Before touching data, answer: <strong>What are we predicting, and how will we know if it
+      worked?</strong></p>
+      <ul class="clean">
+        <li><strong>Task type</strong> &mdash; classification, regression, ranking, clustering?</li>
+        <li><strong>Target</strong> &mdash; exactly what value/label are we predicting?</li>
+        <li><strong>Success metric</strong> &mdash; accuracy, revenue, latency, fewer false negatives?</li>
+        <li><strong>Baseline</strong> &mdash; what does a simple rule (or the current process) achieve?</li>
+        <li><strong>Constraints</strong> &mdash; must it run in real time? on a phone? be explainable?</li>
+      </ul>
+      <div class="why">
+        <strong>Why it matters:</strong> "Improve customer retention" is a goal, not an ML task.
+        "Predict which subscribers will cancel in the next 30 days" is an ML task with a clear target
+        and a measurable metric. Framing decides everything.
+      </div>
+    </div>
+
+    <!-- 3. COLLECT -->
+    <h2 class="section" id="collect">3. Collect Data</h2>
+    <p class="muted">Gather the raw material the model learns from &mdash; the single biggest driver of results.</p>
+
+    <div class="concept">
+      <h3>Where data comes from</h3>
+      <ul class="clean">
+        <li><strong>Databases &amp; warehouses</strong> &mdash; SQL tables, event logs</li>
+        <li><strong>APIs &amp; third parties</strong> &mdash; external signals, enrichment</li>
+        <li><strong>Files</strong> &mdash; CSV, Parquet, JSON, images, text</li>
+        <li><strong>Labels</strong> &mdash; human annotation, historical outcomes, feedback</li>
+      </ul>
+      <p>Ask: is the data <strong>representative</strong> of what the model will see in production?
+      Is it <strong>enough</strong>? Are the labels <strong>trustworthy</strong>?</p>
+      <div class="why">
+        <strong>Watch for leakage:</strong> data leakage happens when a feature secretly contains the
+        answer (e.g., using <code>refund_issued</code> to predict <code>will_return_item</code>). It
+        makes offline scores look amazing and production performance collapse.
+      </div>
+    </div>
+
+    <!-- 4. CLEAN -->
+    <h2 class="section" id="clean">4. Clean &amp; Prepare Data</h2>
+    <p class="muted">Turn messy raw data into clean, numeric features a model can actually use. This is where most time goes.</p>
+
+    <div class="why">
+      <strong>Garbage in, garbage out.</strong> A model can only be as good as the data it learns
+      from. No algorithm &mdash; however fancy &mdash; can recover signal from mislabeled, biased, or
+      inconsistent data. Improving data quality almost always beats swapping in a fancier model.
+      Budget for it: teams routinely spend <strong>60&ndash;80%</strong> of a project here.
+    </div>
+
+    <div class="concept">
+      <h3>Missing values</h3>
+      <p>Real data has holes. Options, roughly from simplest to smartest:</p>
+      <ul class="clean">
+        <li><strong>Drop</strong> rows/columns &mdash; only if very few are missing</li>
+        <li><strong>Impute</strong> &mdash; fill with the mean/median (numeric) or most-frequent (categorical)</li>
+        <li><strong>Flag</strong> &mdash; add an "is_missing" column so the model knows it was absent</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3>Encoding categories</h3>
+      <p>Models do math on numbers, so text categories must become numbers.</p>
+      <table>
+        <tr><th>Technique</th><th>What it does</th><th>Best for</th></tr>
+        <tr><td>One-hot</td><td>One 0/1 column per category</td><td>Few, unordered categories (color, city)</td></tr>
+        <tr><td>Ordinal</td><td>Maps categories to ordered integers</td><td>Ranked categories (low &lt; med &lt; high)</td></tr>
+        <tr><td>Target / frequency</td><td>Replaces category with a stat</td><td>High-cardinality columns (zip codes)</td></tr>
+      </table>
+    </div>
+
+    <div class="concept">
+      <h3>Scaling numeric features</h3>
+      <p>Many models are sensitive to scale: a feature ranging 0&ndash;1,000,000 will drown out one
+      ranging 0&ndash;1. Two common fixes:</p>
+      <div class="formula">Standardize:&nbsp; z = (x &minus; &mu;) &divide; &sigma;</div>
+      <div class="formula">Min&ndash;Max:&nbsp; x&prime; = (x &minus; x<sub>min</sub>) &divide; (x<sub>max</sub> &minus; x<sub>min</sub>)</div>
+      <p class="muted">Standardization centers each feature at mean 0 with standard deviation 1;
+      min&ndash;max squeezes values into the range 0 &rarr; 1.</p>
+      <div class="why">
+        <strong>Fit on train only:</strong> compute &mu;, &sigma; (or min/max) from the <em>training
+        set</em>, then apply those same numbers to validation and test. Using the whole dataset to
+        scale leaks information from the test set into training.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Feature engineering</h3>
+      <p>Creating new, more informative inputs from raw columns &mdash; often the highest-leverage
+      thing you can do.</p>
+      <ul class="clean">
+        <li>Extract parts of a timestamp &rarr; hour, day-of-week, is_weekend</li>
+        <li>Combine columns &rarr; <code>price &divide; area</code> = price per square meter</li>
+        <li>Aggregate history &rarr; average purchase over the last 30 days</li>
+        <li>Text &rarr; counts, TF&ndash;IDF, or embeddings</li>
+      </ul>
+    </div>
+
+    <!-- 5. SPLIT -->
+    <h2 class="section" id="split">5. Split Train / Validation / Test</h2>
+    <p class="muted">Hold data back so you can measure how the model performs on examples it has never seen.</p>
+
+    <div class="concept">
+      <h3>Three buckets, three jobs</h3>
+      <table>
+        <tr><th>Split</th><th>Typical size</th><th>Used for</th></tr>
+        <tr><td>Train</td><td>~60&ndash;80%</td><td>Fitting the model's parameters</td></tr>
+        <tr><td>Validation</td><td>~10&ndash;20%</td><td>Choosing hyperparameters &amp; comparing models</td></tr>
+        <tr><td>Test</td><td>~10&ndash;20%</td><td>Final, one-time estimate of real-world performance</td></tr>
+      </table>
+
+      <svg class="diagram" viewBox="0 0 560 120" role="img"
+           aria-label="A dataset bar split into three parts: a large training section, a smaller validation section, and a smaller test section.">
+        <text x="280" y="24" fill="#94a3b8" font-size="12" text-anchor="middle">Full dataset</text>
+        <rect x="30"  y="40" width="330" height="46" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="195" y="68" fill="#38bdf8" font-size="13" text-anchor="middle">Train (70%)</text>
+        <rect x="366" y="40" width="80" height="46" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="406" y="68" fill="#a78bfa" font-size="11" text-anchor="middle">Val</text>
+        <rect x="452" y="40" width="78" height="46" rx="6" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="491" y="68" fill="#4ade80" font-size="11" text-anchor="middle">Test</text>
+        <text x="280" y="108" fill="#94a3b8" font-size="10" text-anchor="middle">Touch the test set only once, at the very end.</text>
+      </svg>
+
+      <div class="why">
+        <strong>Why it matters:</strong> A model that memorizes its training data (<em>overfitting</em>)
+        can score 100% on data it has seen and fail badly on new data. The test set is your honest
+        report card &mdash; peek at it repeatedly and it stops being honest.
+      </div>
+    </div>
+
+    <!-- 6. TRAIN -->
+    <h2 class="section" id="train">6. Choose &amp; Train a Model</h2>
+    <p class="muted">Pick an algorithm suited to the problem, then let it learn patterns from the training data.</p>
+
+    <div class="concept">
+      <h3>Start simple, then escalate</h3>
+      <ul class="clean">
+        <li><strong>Baselines</strong> &mdash; linear/logistic regression, decision tree</li>
+        <li><strong>Strong defaults</strong> &mdash; random forests, gradient boosting (XGBoost, LightGBM)</li>
+        <li><strong>Deep learning</strong> &mdash; neural networks for images, text, audio, large data</li>
+      </ul>
+      <p>Training means the algorithm adjusts its internal parameters to minimize a loss function on
+      the training set. For the mechanics of gradients, learning rate, epochs, and overfitting, see
+      <a class="back" style="margin:0;" href="training-optimization.html">Training &amp; Optimization &rarr;</a></p>
+      <div class="why">
+        <strong>Rule of thumb:</strong> beat your simple baseline first. If logistic regression solves
+        it, you may not need a neural network. Complexity is a cost, not a badge.
+      </div>
+    </div>
+
+    <!-- 7. EVALUATE -->
+    <h2 class="section" id="evaluate">7. Evaluate</h2>
+    <p class="muted">Measure how well the model does on data it did not train on &mdash; using the right metric for the task.</p>
+
+    <div class="concept">
+      <h3>Pick a metric that matches the goal</h3>
+      <ul class="clean">
+        <li><strong>Classification</strong> &mdash; accuracy, precision, recall, F1, ROC-AUC</li>
+        <li><strong>Regression</strong> &mdash; MAE, MSE, RMSE, R&sup2;</li>
+        <li><strong>Beyond one number</strong> &mdash; confusion matrix, per-segment performance, fairness</li>
+      </ul>
+      <p>Accuracy can lie on imbalanced data: if 99% of transactions are legit, a model that always
+      says "legit" scores 99% and catches zero fraud. Choose the metric that reflects the real cost of
+      each mistake.</p>
+      <div class="why">
+        <strong>Go deeper:</strong> the full breakdown of precision, recall, F1, ROC-AUC, and when to
+        use each lives in <a class="back" style="margin:0;" href="evaluation-metrics.html">Evaluation Metrics &rarr;</a>
+      </div>
+    </div>
+
+    <!-- 8. TUNE -->
+    <h2 class="section" id="tune">8. Tune (Hyperparameters &amp; Cross-Validation)</h2>
+    <p class="muted">Search for the settings that squeeze out the best validated performance &mdash; without touching the test set.</p>
+
+    <div class="concept">
+      <h3>Parameters vs. hyperparameters</h3>
+      <table>
+        <tr><th>&nbsp;</th><th>Parameters</th><th>Hyperparameters</th></tr>
+        <tr><td>Who sets them</td><td>Learned by training</td><td>Chosen by you (before training)</td></tr>
+        <tr><td>Examples</td><td>weights, biases</td><td>learning rate, tree depth, #layers, regularization</td></tr>
+      </table>
+      <p>Search strategies: <strong>grid search</strong> (try every combination), <strong>random
+      search</strong> (sample combinations &mdash; often faster), and <strong>Bayesian
+      optimization</strong> (learn where to look next).</p>
+    </div>
+
+    <div class="concept">
+      <h3>K-fold cross-validation</h3>
+      <p>Instead of one train/val split, rotate the validation slice K times so every example gets a
+      turn being validated. Average the K scores for a more stable estimate.</p>
+
+      <svg class="diagram" viewBox="0 0 560 190" role="img"
+           aria-label="Five-fold cross-validation: five rows, each splitting the data into four training blocks and one validation block, with the validation block moving one position per row.">
+        <defs>
+          <marker id="arw2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+        <text x="280" y="18" fill="#94a3b8" font-size="11" text-anchor="middle">5-fold cross-validation (val block shifts each round)</text>
+        <!-- 5 rows x 5 blocks -->
+        <!-- row 1: val at block 5 -->
+        <g>
+          <rect x="60"  y="30" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="148" y="30" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="236" y="30" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="324" y="30" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="412" y="30" width="86" height="22" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        </g>
+        <!-- row 2 -->
+        <g>
+          <rect x="60"  y="58" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="148" y="58" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="236" y="58" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="324" y="58" width="86" height="22" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+          <rect x="412" y="58" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+        </g>
+        <!-- row 3 -->
+        <g>
+          <rect x="60"  y="86" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="148" y="86" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="236" y="86" width="86" height="22" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+          <rect x="324" y="86" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="412" y="86" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+        </g>
+        <!-- row 4 -->
+        <g>
+          <rect x="60"  y="114" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="148" y="114" width="86" height="22" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+          <rect x="236" y="114" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="324" y="114" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="412" y="114" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+        </g>
+        <!-- row 5 -->
+        <g>
+          <rect x="60"  y="142" width="86" height="22" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+          <rect x="148" y="142" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="236" y="142" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="324" y="142" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <rect x="412" y="142" width="86" height="22" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+        </g>
+        <text x="30" y="180" fill="#38bdf8" font-size="10">&#9632; train</text>
+        <text x="130" y="180" fill="#a78bfa" font-size="10">&#9632; validation</text>
+      </svg>
+
+      <div class="why">
+        <strong>Why it matters:</strong> With small datasets, a single validation split is noisy &mdash;
+        you might get lucky or unlucky. Cross-validation averages over K rounds so your hyperparameter
+        choice is based on a stabler signal, not one random split.
+      </div>
+    </div>
+
+    <!-- 9. DEPLOY -->
+    <h2 class="section" id="deploy">9. Deploy</h2>
+    <p class="muted">Get the trained model out of the notebook and into a place where it makes real predictions.</p>
+
+    <div class="concept">
+      <h3>Two common serving patterns</h3>
+      <table>
+        <tr><th>Pattern</th><th>How it works</th><th>Good for</th></tr>
+        <tr><td>Online / API</td><td>Model behind an HTTP endpoint, predicts per request</td><td>Real-time needs (fraud check at checkout)</td></tr>
+        <tr><td>Batch</td><td>Score a big table on a schedule, store results</td><td>Nightly jobs (tomorrow's recommendations)</td></tr>
+      </table>
+      <h3>Serialization</h3>
+      <p>You save the trained model to a file so it can be loaded later without retraining. Common
+      formats: <code>joblib</code>/<code>pickle</code> (scikit-learn), <code>ONNX</code>
+      (framework-neutral), and <code>SavedModel</code>/<code>state_dict</code> (TensorFlow/PyTorch).</p>
+      <pre><code>import joblib
+
+# save the fitted pipeline after training
+joblib.dump(model, "model.joblib")
+
+# later, inside the serving app
+model = joblib.load("model.joblib")
+prediction = model.predict(new_data)</code></pre>
+      <div class="why">
+        <strong>Watch for training/serving skew:</strong> the exact same preprocessing used in
+        training must run at serving time. Packaging preprocessing <em>inside</em> the model (a
+        pipeline, see below) is the simplest way to guarantee this.
+      </div>
+    </div>
+
+    <!-- 10. MONITOR -->
+    <h2 class="section" id="monitor">10. Monitor &amp; Retrain</h2>
+    <p class="muted">A deployed model silently decays as the world shifts. Monitoring closes the loop.</p>
+
+    <div class="concept">
+      <h3>What to watch for</h3>
+      <ul class="clean">
+        <li><strong>Data drift</strong> &mdash; the input distribution changes (new user behavior, new products)</li>
+        <li><strong>Concept drift</strong> &mdash; the relationship between inputs and target changes (spam tactics evolve)</li>
+        <li><strong>Performance decay</strong> &mdash; accuracy/precision slide once true labels arrive</li>
+        <li><strong>Operational health</strong> &mdash; latency, error rate, prediction volume</li>
+      </ul>
+      <p>When drift crosses a threshold, you trigger <strong>retraining</strong> on fresh data &mdash;
+      the dashed red arrow in the lifecycle diagram at the top. That is what makes the workflow a
+      loop rather than a straight line.</p>
+      <div class="why">
+        <strong>Why it matters:</strong> The most common cause of a "failed" ML project isn't a bad
+        model &mdash; it's a good model that was never monitored and quietly rotted. Plan for
+        monitoring and retraining from day one.
+      </div>
+    </div>
+
+    <!-- 11. PIPELINE CODE -->
+    <h2 class="section" id="pipeline-code">11. Putting It Together (scikit-learn)</h2>
+    <div class="concept">
+      <h3>Split + preprocessing pipeline + train + evaluate</h3>
+      <p>A scikit-learn <code>Pipeline</code> bundles preprocessing and the model into one object, so
+      the exact same steps run at training and serving time &mdash; no skew.</p>
+      <pre><code>import numpy as np
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+
+# 1) load some example data (all-numeric for a self-contained demo)
+data = load_breast_cancer()
+X, y = data.data, data.target
+
+# 2) split: hold out a test set the model never sees during tuning
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# 3) bundle preprocessing + model into one pipeline
+#    (impute missing values -> scale -> classify)
+model = Pipeline([
+    ("impute", SimpleImputer(strategy="median")),
+    ("scale",  StandardScaler()),
+    ("clf",    LogisticRegression(max_iter=1000)),
+])
+
+# 4) cross-validate on the TRAINING set to sanity-check the setup
+cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring="accuracy")
+print(f"5-fold CV accuracy: {cv_scores.mean():.3f} +/- {cv_scores.std():.3f}")
+
+# 5) fit on all training data
+model.fit(X_train, y_train)
+
+# 6) evaluate ONCE on the untouched test set
+preds = model.predict(X_test)
+print(f"test accuracy: {accuracy_score(y_test, preds):.3f}")
+print(classification_report(y_test, preds, digits=3))
+
+# 7) (deploy) serialize the whole pipeline for later use
+# import joblib; joblib.dump(model, "model.joblib")</code></pre>
+      <p class="muted">The scaler learns its &mu;/&sigma; only from the training folds and reapplies
+      them everywhere else &mdash; the pipeline enforces that automatically, preventing test-set
+      leakage.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>Define</strong> &mdash; frame a clear, measurable ML question</li>
+        <li><strong>Collect</strong> &mdash; gather representative, leak-free data</li>
+        <li><strong>Clean</strong> &mdash; missing values, encoding, scaling, feature engineering</li>
+        <li><strong>Split</strong> &mdash; train / validation / test, kept separate</li>
+        <li><strong>Train</strong> &mdash; start simple, beat the baseline</li>
+        <li><strong>Evaluate</strong> &mdash; the right metric for the task</li>
+        <li><strong>Tune</strong> &mdash; hyperparameters via cross-validation</li>
+        <li><strong>Deploy</strong> &mdash; API or batch, with serialized preprocessing</li>
+        <li><strong>Monitor</strong> &mdash; catch drift, retrain, close the loop</li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">12. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://developers.google.com/machine-learning/crash-course" target="_blank" rel="noopener">Google &mdash; Machine Learning Crash Course</a></li>
+        <li><a href="https://scikit-learn.org/stable/tutorial/index.html" target="_blank" rel="noopener">scikit-learn &mdash; Official Tutorials</a></li>
+        <li><a href="https://scikit-learn.org/stable/modules/compose.html" target="_blank" rel="noopener">scikit-learn &mdash; Pipelines &amp; Composite Estimators</a></li>
+        <li><a href="https://ml-ops.org/" target="_blank" rel="noopener">MLOps.org &mdash; the deploy &amp; monitor side of the lifecycle</a></li>
+        <li><a href="https://madewithml.com/" target="_blank" rel="noopener">Made With ML &mdash; end-to-end applied ML course</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>The ML Workflow &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Programming for ML &mdash; Python, NumPy, Pandas &amp; scikit-learn</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#128187; Programming for ML</h1>
+    <p>The practical toolkit: Python, NumPy, Pandas, notebooks, and scikit-learn &mdash;
+       everything you need to load data, crunch numbers, and train your first model.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> Machine learning is mostly moving data around and doing math on it.
+      Python is the glue; <em>NumPy</em> does the fast math; <em>Pandas</em> wrangles the tables;
+      <em>scikit-learn</em> trains the models. Learn these four and you can build real ML pipelines.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#why-python">Why Python?</a></li>
+        <li><a href="#essentials">Python Essentials for ML</a></li>
+        <li><a href="#numpy">NumPy &mdash; fast arrays &amp; broadcasting</a></li>
+        <li><a href="#pandas">Pandas &mdash; wrangling tables</a></li>
+        <li><a href="#notebooks">Jupyter &amp; Colab notebooks</a></li>
+        <li><a href="#matplotlib">Plotting with matplotlib</a></li>
+        <li><a href="#pipeline">End-to-end: data &rarr; model</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. WHY PYTHON -->
+    <h2 class="section" id="why-python">1. Why Python?</h2>
+    <p class="muted">Not the fastest language &mdash; but by far the most practical one for machine learning.</p>
+
+    <div class="concept">
+      <h3>What makes Python the ML language</h3>
+      <p>Python reads almost like English, so you spend your time on <strong>ideas</strong>, not
+      syntax. More importantly, nearly every ML tool in the world has a Python interface.</p>
+      <ul class="clean">
+        <li><strong>Readable</strong> &mdash; clean, low-ceremony syntax that beginners can pick up fast</li>
+        <li><strong>Batteries included</strong> &mdash; huge ecosystem: NumPy, Pandas, scikit-learn, PyTorch, TensorFlow</li>
+        <li><strong>Fast under the hood</strong> &mdash; the heavy math runs in C/Fortran; Python just orchestrates</li>
+        <li><strong>Community</strong> &mdash; tutorials, answers, and pre-trained models everywhere</li>
+      </ul>
+      <div class="why">
+        <strong>Why it matters:</strong> The math you learn in
+        <a href="math-foundations.html" class="back" style="margin:0;">math-foundations.html</a>
+        (vectors, matrices, gradients) maps almost one-to-one onto NumPy code. Python is where the
+        theory becomes something you can run.
+      </div>
+    </div>
+
+    <!-- 2. PYTHON ESSENTIALS -->
+    <h2 class="section" id="essentials">2. Python Essentials for ML</h2>
+    <p class="muted">You don't need to master all of Python &mdash; just a handful of building blocks.</p>
+
+    <div class="concept">
+      <h3>Lists and dictionaries</h3>
+      <p>A <strong>list</strong> is an ordered collection; a <strong>dict</strong> maps keys to values.
+      These two structures show up constantly &mdash; feature names, label mappings, config settings.</p>
+      <pre><code>features = ["age", "income", "score"]   # list: ordered
+features.append("region")               # add an item
+print(features[0])                       # "age"
+
+# dict: key -> value lookups
+label_map = {0: "cat", 1: "dog", 2: "bird"}
+print(label_map[1])                      # "dog"
+
+# iterate over a dict
+for key, name in label_map.items():
+    print(key, "&rarr;", name)</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>Functions</h3>
+      <p>A <strong>function</strong> packages logic you reuse. In ML you'll write functions for things
+      like preprocessing, scoring, and math operations such as the mean squared error.</p>
+      <pre><code>def mse(predictions, targets):
+    """Mean squared error: average of (pred &minus; target)&sup2;."""
+    total = 0.0
+    for p, t in zip(predictions, targets):
+        total += (p - t) ** 2
+    return total / len(predictions)
+
+print(mse([2.0, 3.0], [2.5, 2.0]))   # 0.625</code></pre>
+      <p class="muted">Note: <code>(p - t) ** 2</code> is Python's way to square a value &mdash;
+      <code>**</code> is the exponent operator, never <code>^</code> (that means something else in Python).</p>
+    </div>
+
+    <div class="concept">
+      <h3>Comprehensions</h3>
+      <p>A <strong>comprehension</strong> builds a new list (or dict) in one compact line &mdash; the
+      Pythonic replacement for a simple loop. You'll see these everywhere in ML code.</p>
+      <pre><code># square each number
+nums = [1, 2, 3, 4]
+squares = [n ** 2 for n in nums]          # [1, 4, 9, 16]
+
+# keep only the even ones
+evens = [n for n in nums if n % 2 == 0]   # [2, 4]
+
+# dict comprehension: number -&gt; its square
+sq_map = {n: n ** 2 for n in nums}        # {1: 1, 2: 4, 3: 9, 4: 16}
+print(squares, evens, sq_map)</code></pre>
+      <div class="why">
+        <strong>Why it matters:</strong> Comprehensions are concise and fast. But for real numeric
+        work you'll reach for NumPy, which does the same thing across millions of values at once &mdash;
+        without any Python loop.
+      </div>
+    </div>
+
+    <!-- 3. NUMPY -->
+    <h2 class="section" id="numpy">3. NumPy &mdash; fast arrays &amp; broadcasting</h2>
+    <p class="muted">The foundation of scientific Python. Everything numeric in ML sits on top of NumPy arrays.</p>
+
+    <div class="concept">
+      <h3>Arrays vs. lists</h3>
+      <p>A NumPy <strong>array</strong> (<code>ndarray</code>) holds numbers in a tight block of memory
+      and runs math in optimized C. A Python list of a million numbers is slow to add up; a NumPy
+      array does it in one <em>vectorized</em> operation.</p>
+      <pre><code>import numpy as np
+
+a = np.array([1, 2, 3, 4])
+b = np.array([10, 20, 30, 40])
+
+# vectorized: no loop needed, whole arrays at once
+print(a + b)        # [11 22 33 44]
+print(a * 2)        # [2 4 6 8]
+print(a.mean())     # 2.5
+print(a @ b)        # dot product: 1*10 + 2*20 + 3*30 + 4*40 = 300</code></pre>
+      <div class="why">
+        <strong>Vectorization</strong> means applying an operation to a whole array at once instead of
+        looping element by element. It's shorter to write <em>and</em> dramatically faster.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Broadcasting</h3>
+      <p><strong>Broadcasting</strong> is NumPy's rule for combining arrays of different shapes. A
+      smaller array is "stretched" to match the larger one &mdash; without actually copying data.</p>
+      <div class="formula">matrix (3 &times; 2) + row (1 &times; 2) &rarr; row added to every row</div>
+      <pre><code>import numpy as np
+
+matrix = np.array([[1, 2],
+                   [3, 4],
+                   [5, 6]])     # shape (3, 2)
+
+row = np.array([10, 20])        # shape (2,)
+
+# row is broadcast across all 3 rows of the matrix
+print(matrix + row)
+# [[11 22]
+#  [13 24]
+#  [15 26]]
+
+# normalize columns: subtract the mean of each column
+print(matrix - matrix.mean(axis=0))</code></pre>
+
+      <svg class="diagram" viewBox="0 0 560 200" role="img"
+           aria-label="Broadcasting: a single row of two values is added to every row of a three by two matrix, producing a three by two result.">
+        <!-- matrix -->
+        <rect x="30" y="40" width="120" height="120" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="90" y="30" fill="#38bdf8" font-size="12" text-anchor="middle">matrix 3&times;2</text>
+        <text x="60" y="75"  fill="#e2e8f0" font-size="13" text-anchor="middle">1</text>
+        <text x="120" y="75" fill="#e2e8f0" font-size="13" text-anchor="middle">2</text>
+        <text x="60" y="105" fill="#e2e8f0" font-size="13" text-anchor="middle">3</text>
+        <text x="120" y="105" fill="#e2e8f0" font-size="13" text-anchor="middle">4</text>
+        <text x="60" y="135" fill="#e2e8f0" font-size="13" text-anchor="middle">5</text>
+        <text x="120" y="135" fill="#e2e8f0" font-size="13" text-anchor="middle">6</text>
+        <!-- plus -->
+        <text x="185" y="105" fill="#fbbf24" font-size="22" text-anchor="middle">+</text>
+        <!-- row -->
+        <rect x="215" y="85" width="120" height="30" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="275" y="75" fill="#a78bfa" font-size="12" text-anchor="middle">row 1&times;2</text>
+        <text x="245" y="105" fill="#e2e8f0" font-size="13" text-anchor="middle">10</text>
+        <text x="305" y="105" fill="#e2e8f0" font-size="13" text-anchor="middle">20</text>
+        <!-- equals -->
+        <text x="365" y="105" fill="#94a3b8" font-size="22" text-anchor="middle">=</text>
+        <!-- result -->
+        <rect x="400" y="40" width="130" height="120" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="465" y="30" fill="#4ade80" font-size="12" text-anchor="middle">result 3&times;2</text>
+        <text x="432" y="75"  fill="#e2e8f0" font-size="13" text-anchor="middle">11</text>
+        <text x="498" y="75"  fill="#e2e8f0" font-size="13" text-anchor="middle">22</text>
+        <text x="432" y="105" fill="#e2e8f0" font-size="13" text-anchor="middle">13</text>
+        <text x="498" y="105" fill="#e2e8f0" font-size="13" text-anchor="middle">24</text>
+        <text x="432" y="135" fill="#e2e8f0" font-size="13" text-anchor="middle">15</text>
+        <text x="498" y="135" fill="#e2e8f0" font-size="13" text-anchor="middle">26</text>
+      </svg>
+
+      <div class="why">
+        <strong>Why it matters:</strong> Broadcasting is how you add a bias to every neuron, scale
+        every feature, or normalize a whole dataset in a single line &mdash; no loops, no copies.
+      </div>
+    </div>
+
+    <!-- 4. PANDAS -->
+    <h2 class="section" id="pandas">4. Pandas &mdash; wrangling tables</h2>
+    <p class="muted">If NumPy is arrays of numbers, Pandas is labeled tables &mdash; like a spreadsheet in code.</p>
+
+    <div class="concept">
+      <h3>The DataFrame</h3>
+      <p>A <strong>DataFrame</strong> is a 2D table with named columns and an index. It's where most
+      ML projects begin: load a CSV, look at it, clean it, then hand the numbers to a model.</p>
+      <pre><code>import pandas as pd
+
+# build a DataFrame from a dict of columns
+df = pd.DataFrame({
+    "name":   ["Ada", "Alan", "Grace", "Linus"],
+    "age":    [36, 41, 45, 24],
+    "score":  [88, 72, 95, 60],
+    "team":   ["A", "B", "A", "B"],
+})
+
+print(df.head())     # first rows
+print(df.shape)      # (4, 4)  -> 4 rows, 4 columns
+print(df.describe()) # summary stats for numeric columns</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>Load a CSV, select, and filter</h3>
+      <pre><code>import pandas as pd
+
+# load a CSV file from disk (or a URL)
+df = pd.read_csv("students.csv")
+
+# select a single column (a Series) or several columns
+ages = df["age"]
+subset = df[["name", "score"]]
+
+# filter rows with a boolean condition
+high_scorers = df[df["score"] &gt; 80]
+
+# combine conditions with &amp; (and) / | (or)
+team_a_adults = df[(df["team"] == "A") &amp; (df["age"] &gt;= 30)]
+
+print(high_scorers)</code></pre>
+      <p class="muted">Note in code we use <code>&amp;</code> and <code>|</code> (not the words
+      <code>and</code>/<code>or</code>) to combine Pandas conditions, and each condition needs its own
+      parentheses.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Group and aggregate</h3>
+      <p><strong>groupby</strong> splits the table into groups, applies an aggregation (mean, sum,
+      count&hellip;) to each, then combines the results &mdash; the "split &rarr; apply &rarr; combine" pattern.</p>
+      <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    "team":  ["A", "B", "A", "B"],
+    "score": [88, 72, 95, 60],
+})
+
+# average score per team
+print(df.groupby("team")["score"].mean())
+# team
+# A    91.5
+# B    66.0
+
+# multiple aggregations at once
+print(df.groupby("team")["score"].agg(["mean", "max", "count"]))</code></pre>
+      <div class="why">
+        <strong>Why it matters:</strong> Real datasets are messy tables. Pandas is how you inspect,
+        clean, and reshape them into the tidy numeric matrix a model expects.
+      </div>
+    </div>
+
+    <!-- 5. NOTEBOOKS -->
+    <h2 class="section" id="notebooks">5. Jupyter &amp; Colab notebooks</h2>
+    <p class="muted">The interactive scratchpad where most ML exploration happens.</p>
+
+    <div class="concept">
+      <h3>What is a notebook?</h3>
+      <p>A <strong>notebook</strong> mixes runnable code <em>cells</em> with text, math, and plots in
+      one document. You run a cell, see the output right below it, tweak, and re-run &mdash; perfect for
+      exploring data and iterating on models.</p>
+      <table>
+        <tr><th>Tool</th><th>Where it runs</th><th>Best for</th></tr>
+        <tr><td>Jupyter Notebook / Lab</td><td>Your own machine</td><td>Local work, full control of files</td></tr>
+        <tr><td>Google Colab</td><td>In the browser (free)</td><td>No setup, free GPUs, easy sharing</td></tr>
+        <tr><td>VS Code notebooks</td><td>Your editor</td><td>Mixing notebooks with regular code</td></tr>
+      </table>
+      <pre><code># In a notebook cell you can run shell commands with a leading !
+# (this installs a package into the current environment)
+# !pip install scikit-learn pandas matplotlib
+
+# then use them normally in the next cell
+import pandas as pd
+df = pd.read_csv("students.csv")
+df.head()   # the last expression in a cell is auto-displayed</code></pre>
+      <div class="why">
+        <strong>Tip:</strong> <strong>Google Colab</strong> is the fastest way to start &mdash; nothing to
+        install, and it gives you a free GPU for deep learning. See
+        <a href="tools-frameworks.html" class="back" style="margin:0;">tools-frameworks.html</a>
+        for more on the surrounding ecosystem.
+      </div>
+    </div>
+
+    <!-- 6. MATPLOTLIB -->
+    <h2 class="section" id="matplotlib">6. Plotting with matplotlib</h2>
+    <p class="muted">Seeing your data beats guessing. matplotlib is the standard plotting library.</p>
+
+    <div class="concept">
+      <h3>A quick plot</h3>
+      <p>A picture reveals trends, outliers, and mistakes that raw numbers hide. The basic recipe:
+      call a plot function, label it, and show it.</p>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(0, 10, 100)   # 100 points from 0 to 10
+y = np.sin(x)
+
+plt.plot(x, y, label="sin(x)")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("A simple line plot")
+plt.legend()
+plt.show()          # in a notebook the figure appears inline</code></pre>
+      <p class="muted">Common plot types: <code>plt.plot</code> (lines), <code>plt.scatter</code>
+      (points), <code>plt.hist</code> (distributions), <code>plt.bar</code> (categories). Libraries
+      like <em>seaborn</em> build on matplotlib for prettier statistical charts.</p>
+    </div>
+
+    <!-- 7. END-TO-END PIPELINE -->
+    <h2 class="section" id="pipeline">7. End-to-end: data &rarr; model</h2>
+    <p class="muted">The whole workflow in miniature: load, inspect, then train a real model with scikit-learn.</p>
+
+    <div class="concept">
+      <h3>The data flow</h3>
+      <p>Every ML project follows the same path. Raw data comes in as a CSV, Pandas tidies it into a
+      table, NumPy arrays feed the math, and a model (here from scikit-learn) learns from it.</p>
+
+      <svg class="diagram" viewBox="0 0 560 130" role="img"
+           aria-label="Data flow pipeline: a CSV file feeds into Pandas, which produces NumPy arrays, which feed a scikit-learn model, which outputs predictions.">
+        <rect x="15"  y="45" width="90" height="40" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="60"  y="70" fill="#fbbf24" font-size="12" text-anchor="middle">CSV file</text>
+        <rect x="140" y="45" width="90" height="40" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="185" y="70" fill="#38bdf8" font-size="12" text-anchor="middle">Pandas</text>
+        <rect x="265" y="45" width="90" height="40" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="310" y="70" fill="#a78bfa" font-size="12" text-anchor="middle">NumPy</text>
+        <rect x="390" y="45" width="90" height="40" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="435" y="70" fill="#4ade80" font-size="12" text-anchor="middle">Model</text>
+        <rect x="500" y="45" width="50" height="40" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+        <text x="525" y="66" fill="#f87171" font-size="10" text-anchor="middle">pred-</text>
+        <text x="525" y="78" fill="#f87171" font-size="10" text-anchor="middle">ictions</text>
+        <!-- arrows -->
+        <line x1="105" y1="65" x2="140" y2="65" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="230" y1="65" x2="265" y2="65" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="355" y1="65" x2="390" y2="65" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="480" y1="65" x2="500" y2="65" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <defs>
+          <marker id="arw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="concept">
+      <h3>Load &rarr; inspect &rarr; train (scikit-learn)</h3>
+      <p>This runnable example uses the built-in Iris dataset (no download needed), inspects it with
+      Pandas, then trains and scores a simple classifier &mdash; the complete beginner ML loop.</p>
+      <pre><code>import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+# 1) LOAD  -------------------------------------------------
+data = load_iris(as_frame=True)
+df = data.frame                     # a Pandas DataFrame
+X = data.data                       # features  (150 rows &times; 4 columns)
+y = data.target                     # labels    (0, 1, 2)
+
+# 2) INSPECT  ----------------------------------------------
+print(df.head())                    # peek at the table
+print(df.shape)                     # (150, 5)
+print(df["target"].value_counts())  # how many of each class
+
+# 3) SPLIT into train / test  ------------------------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42)
+
+# 4) TRAIN a simple model  ---------------------------------
+model = LogisticRegression(max_iter=200)
+model.fit(X_train, y_train)         # learn from training data
+
+# 5) EVALUATE  ---------------------------------------------
+preds = model.predict(X_test)
+print("accuracy:", accuracy_score(y_test, preds))  # ~0.97</code></pre>
+      <div class="why">
+        <strong>That's a full ML pipeline.</strong> scikit-learn's <code>.fit()</code> / <code>.predict()</code>
+        pattern is the same for dozens of models &mdash; swap <code>LogisticRegression</code> for a decision
+        tree or random forest and the rest of the code is unchanged.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>Python</strong> &mdash; readable glue language with a giant ML ecosystem</li>
+        <li><strong>NumPy</strong> &mdash; fast arrays, vectorized math, broadcasting</li>
+        <li><strong>Pandas</strong> &mdash; load CSVs, select, filter, and groupby on labeled tables</li>
+        <li><strong>Notebooks</strong> &mdash; Jupyter / Colab for interactive exploration</li>
+        <li><strong>matplotlib</strong> &mdash; see your data before you model it</li>
+        <li><strong>scikit-learn</strong> &mdash; <code>fit</code> / <code>predict</code> to train real models</li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">8. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://docs.python.org/3/tutorial/" target="_blank" rel="noopener">The official Python Tutorial</a></li>
+        <li><a href="https://numpy.org/doc/stable/user/absolute_beginners.html" target="_blank" rel="noopener">NumPy &mdash; Absolute Beginner's Guide</a></li>
+        <li><a href="https://pandas.pydata.org/docs/getting_started/intro_tutorials/" target="_blank" rel="noopener">Pandas &mdash; Getting Started tutorials</a></li>
+        <li><a href="https://scikit-learn.org/stable/getting_started.html" target="_blank" rel="noopener">scikit-learn &mdash; Getting Started</a></li>
+        <li><a href="https://matplotlib.org/stable/tutorials/pyplot.html" target="_blank" rel="noopener">matplotlib &mdash; Pyplot tutorial</a></li>
+        <li><a href="https://colab.research.google.com/" target="_blank" rel="noopener">Google Colab &mdash; free notebooks in the browser</a></li>
+      </ul>
+      <p class="muted" style="margin-top:0.75rem;">Next up: strengthen the theory in
+        <a href="math-foundations.html" class="back" style="margin:0;">math-foundations.html</a>,
+        or survey the wider toolset in
+        <a href="tools-frameworks.html" class="back" style="margin:0;">tools-frameworks.html</a>.</p>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>Programming for ML &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

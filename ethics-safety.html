@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ethics &amp; Safety in AI/ML — Bias, Privacy, Transparency &amp; Responsible AI</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#9878;&#65039; Ethics &amp; Safety in AI/ML</h1>
+    <p>Bias &amp; fairness, privacy, transparency, accountability, and safety &mdash;
+       the human side of building machine learning systems that people can trust.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> A model that is accurate but unfair, opaque, or unsafe can cause
+      real harm. Responsible AI means thinking about <em>who</em> is affected and <em>how</em> a system
+      could go wrong &mdash; not just how well it scores on a test set.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#pillars">The Five Pillars (the big picture)</a></li>
+        <li><a href="#bias">Bias &amp; Fairness</a></li>
+        <li><a href="#privacy">Data Privacy</a></li>
+        <li><a href="#transparency">Transparency &amp; Explainability</a></li>
+        <li><a href="#accountability">Accountability &amp; Human Oversight</a></li>
+        <li><a href="#safety">Safety Concerns</a></li>
+        <li><a href="#responsible">Responsible AI Practices</a></li>
+        <li><a href="#collapse">Model Collapse &amp; Synthetic Data</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. PILLARS -->
+    <h2 class="section" id="pillars">1. The Five Pillars &mdash; the big picture</h2>
+    <p class="muted">Most "responsible AI" frameworks come back to the same handful of concerns. Here they are at a glance.</p>
+
+    <div class="concept">
+      <h3>Responsible AI rests on five pillars</h3>
+      <p>Different organizations use slightly different words, but the core ideas overlap. Each pillar
+      answers a different question about a system.</p>
+
+      <svg class="diagram" viewBox="0 0 560 260" role="img"
+           aria-label="Five pillars of responsible AI — Fairness, Privacy, Transparency, Accountability, and Safety — supporting a roof labeled Trustworthy AI.">
+        <!-- roof / beam -->
+        <rect x="40" y="40" width="480" height="26" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="280" y="58" fill="#38bdf8" font-size="14" text-anchor="middle">Trustworthy AI</text>
+        <!-- five pillars -->
+        <rect x="52"  y="80" width="80" height="120" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="92"  y="145" fill="#e2e8f0" font-size="12" text-anchor="middle">Fairness</text>
+        <rect x="148" y="80" width="80" height="120" rx="6" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="188" y="145" fill="#e2e8f0" font-size="12" text-anchor="middle">Privacy</text>
+        <rect x="244" y="80" width="80" height="120" rx="6" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="284" y="139" fill="#e2e8f0" font-size="12" text-anchor="middle">Trans-</text>
+        <text x="284" y="155" fill="#e2e8f0" font-size="12" text-anchor="middle">parency</text>
+        <rect x="340" y="80" width="80" height="120" rx="6" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+        <text x="380" y="139" fill="#e2e8f0" font-size="12" text-anchor="middle">Account-</text>
+        <text x="380" y="155" fill="#e2e8f0" font-size="12" text-anchor="middle">ability</text>
+        <rect x="436" y="80" width="80" height="120" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="476" y="145" fill="#e2e8f0" font-size="12" text-anchor="middle">Safety</text>
+        <!-- ground -->
+        <rect x="40" y="212" width="480" height="18" rx="6" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+        <text x="280" y="225" fill="#94a3b8" font-size="11" text-anchor="middle">Data, people &amp; process foundations</text>
+      </svg>
+
+      <table>
+        <tr><th>Pillar</th><th>Question it answers</th></tr>
+        <tr><td>Fairness</td><td>Does the system treat different groups of people equitably?</td></tr>
+        <tr><td>Privacy</td><td>Is personal data collected, stored, and used responsibly?</td></tr>
+        <tr><td>Transparency</td><td>Can people understand what the system does and why?</td></tr>
+        <tr><td>Accountability</td><td>Who is responsible when something goes wrong, and can a human intervene?</td></tr>
+        <tr><td>Safety</td><td>Does the system avoid causing harm, even when misused or under stress?</td></tr>
+      </table>
+      <div class="why">
+        <strong>Why it matters:</strong> These concerns are not "extra" work bolted on at the end. The
+        cheapest time to address them is <em>while</em> you design the data pipeline and model &mdash;
+        fixing a biased or privacy-leaking system after deployment is far harder.
+      </div>
+    </div>
+
+    <!-- 2. BIAS & FAIRNESS -->
+    <h2 class="section" id="bias">2. Bias &amp; Fairness</h2>
+    <p class="muted">Models learn patterns from data. If the data reflects unfair patterns, the model can repeat and even amplify them.</p>
+
+    <div class="concept">
+      <h3>Where bias comes from</h3>
+      <p>Bias can enter at almost any stage of the pipeline. It usually is not intentional &mdash; it
+      creeps in through the data and the choices made around it.</p>
+      <table>
+        <tr><th>Source</th><th>What happens</th><th>Example</th></tr>
+        <tr>
+          <td>Data collection</td>
+          <td>Some groups are under- or over-represented in the training data.</td>
+          <td>A voice model trained mostly on one accent works poorly for others.</td>
+        </tr>
+        <tr>
+          <td>Historical / societal</td>
+          <td>Past human decisions in the data already encode inequity.</td>
+          <td>Hiring data reflecting past discrimination teaches the model the same pattern.</td>
+        </tr>
+        <tr>
+          <td>Labeling</td>
+          <td>Human annotators bring their own assumptions to the labels.</td>
+          <td>Ambiguous content labeled inconsistently across cultures.</td>
+        </tr>
+        <tr>
+          <td>Feature / proxy</td>
+          <td>A seemingly neutral feature stands in for a protected attribute.</td>
+          <td>Postal code acting as a proxy for race or income.</td>
+        </tr>
+        <tr>
+          <td>Deployment</td>
+          <td>The model is used on a population different from its training data.</td>
+          <td>A medical model trained in one country used in another with different demographics.</td>
+        </tr>
+        <tr>
+          <td>Feedback loops</td>
+          <td>The model's own outputs shape future data, reinforcing the pattern.</td>
+          <td>Predictive policing sends patrols to the same areas, generating more recorded incidents there.</td>
+        </tr>
+      </table>
+      <div class="why">
+        <strong>Why it matters:</strong> "Garbage in, garbage out" applies to fairness too. A model
+        cannot magically become fair if the data it learns from is skewed.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Fairness notions (high level)</h3>
+      <p>There is no single definition of "fair." Researchers use several notions, and &mdash;
+      importantly &mdash; they can conflict: satisfying one may make another impossible. The right
+      choice depends on context and values, not math alone.</p>
+      <ul class="clean">
+        <li><strong>Group fairness</strong> &mdash; outcomes are similar across groups (e.g., similar approval rates or error rates for different demographics).</li>
+        <li><strong>Equal opportunity</strong> &mdash; qualified individuals have an equal chance of a positive outcome regardless of group.</li>
+        <li><strong>Individual fairness</strong> &mdash; similar individuals receive similar treatment.</li>
+        <li><strong>Awareness vs. blindness</strong> &mdash; sometimes ignoring a protected attribute hides bias; sometimes measuring it is needed to detect and correct bias.</li>
+      </ul>
+      <div class="why">
+        <strong>Key idea:</strong> Because fairness definitions can trade off against each other, teams
+        must decide <em>which</em> notion matters for their use case and document why &mdash; there is
+        no universal "fairness" switch.
+      </div>
+    </div>
+
+    <!-- 3. PRIVACY -->
+    <h2 class="section" id="privacy">3. Data Privacy</h2>
+    <p class="muted">ML often runs on data about real people. Handling that data responsibly is both an ethical duty and, in many places, a legal one.</p>
+
+    <div class="concept">
+      <h3>Core privacy concepts</h3>
+      <table>
+        <tr><th>Concept</th><th>Meaning</th></tr>
+        <tr><td>PII</td><td>Personally Identifiable Information &mdash; data that can identify a person (name, email, address, ID numbers, biometrics).</td></tr>
+        <tr><td>Consent</td><td>People should understand and agree to how their data is used, ideally for clearly stated purposes.</td></tr>
+        <tr><td>Data minimization</td><td>Collect and keep only the data you actually need, for only as long as you need it.</td></tr>
+        <tr><td>Anonymization</td><td>Removing or obscuring identifiers so data can't be traced to a person. Note: true anonymization is hard &mdash; combining "anonymous" fields can re-identify people.</td></tr>
+        <tr><td>Pseudonymization</td><td>Replacing identifiers with tokens; can be reversed with a separate key, so it is weaker than full anonymization.</td></tr>
+        <tr><td>Purpose limitation</td><td>Use data only for the purpose it was collected for, not silently for new ones.</td></tr>
+      </table>
+      <div class="why">
+        <strong>Why it matters:</strong> Training data can memorize and later leak examples. Minimizing
+        and protecting personal data reduces both harm and legal risk if a breach or leak occurs.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>GDPR-style ideas (general, not legal advice)</h3>
+      <p>Many modern privacy regulations (the EU's GDPR is the best-known example) share a set of
+      recurring principles. These are useful design goals regardless of jurisdiction:</p>
+      <ul class="clean">
+        <li><strong>Lawful, fair, transparent</strong> processing of personal data.</li>
+        <li><strong>Purpose limitation</strong> &mdash; a clear, stated reason for collecting data.</li>
+        <li><strong>Data minimization</strong> &mdash; only what is necessary.</li>
+        <li><strong>Accuracy</strong> &mdash; keep personal data correct and up to date.</li>
+        <li><strong>Storage limitation</strong> &mdash; don't keep data longer than needed.</li>
+        <li><strong>Integrity &amp; confidentiality</strong> &mdash; keep it secure.</li>
+        <li><strong>Individual rights</strong> &mdash; people can often access, correct, or request deletion of their data.</li>
+      </ul>
+      <p class="muted">This page describes concepts for learning only and is <strong>not legal advice</strong>;
+      real compliance depends on your jurisdiction and specific circumstances.</p>
+    </div>
+
+    <!-- 4. TRANSPARENCY -->
+    <h2 class="section" id="transparency">4. Transparency &amp; Explainability</h2>
+    <p class="muted">If a system affects people, they and their overseers should be able to understand what it does.</p>
+
+    <div class="concept">
+      <h3>Two related ideas</h3>
+      <ul class="clean">
+        <li><strong>Transparency</strong> &mdash; being open about that an AI is in use, what data it uses, and its known limits.</li>
+        <li><strong>Explainability (interpretability)</strong> &mdash; being able to explain <em>why</em> a model produced a particular output.</li>
+      </ul>
+      <p>Simple models (like a small decision tree or linear model) are relatively easy to interpret.
+      Large models (deep networks, large language models) are often "black boxes" &mdash; accurate but
+      hard to explain, which is why explainability tools and clear documentation matter.</p>
+      <table>
+        <tr><th>Approach</th><th>Idea</th></tr>
+        <tr><td>Intrinsically interpretable models</td><td>Choose a simpler model whose logic is readable when the stakes require it.</td></tr>
+        <tr><td>Feature importance</td><td>Estimate which inputs mattered most for a prediction.</td></tr>
+        <tr><td>Local explanations</td><td>Explain a single prediction (e.g., "denied mainly because of X and Y").</td></tr>
+        <tr><td>Clear disclosure</td><td>Tell users an AI system is involved and what it can and cannot do.</td></tr>
+      </table>
+      <div class="why">
+        <strong>Why it matters:</strong> Explanations let people contest wrong decisions, help engineers
+        debug models, and are increasingly expected in high-stakes areas like lending, hiring, and health.
+      </div>
+    </div>
+
+    <!-- 5. ACCOUNTABILITY -->
+    <h2 class="section" id="accountability">5. Accountability &amp; Human Oversight</h2>
+    <p class="muted">Someone must be responsible for a system's behavior, and a human should be able to step in.</p>
+
+    <div class="concept">
+      <h3>What good oversight looks like</h3>
+      <ul class="clean">
+        <li><strong>Clear ownership</strong> &mdash; a named team or person is responsible for the system's outcomes.</li>
+        <li><strong>Human-in-the-loop</strong> &mdash; a person reviews or approves high-stakes decisions before they take effect.</li>
+        <li><strong>Human-on-the-loop</strong> &mdash; a person monitors an automated system and can intervene or override.</li>
+        <li><strong>Appeal &amp; redress</strong> &mdash; affected people can question a decision and get it corrected.</li>
+        <li><strong>Audit trails</strong> &mdash; logging inputs, outputs, and versions so decisions can be reviewed later.</li>
+        <li><strong>Kill switch</strong> &mdash; a reliable way to pause or roll back a misbehaving system.</li>
+      </ul>
+      <div class="why">
+        <strong>Why it matters:</strong> "The algorithm decided" is never an acceptable excuse. The more
+        impact a decision has on a person's life, the more meaningful human oversight it needs.
+      </div>
+    </div>
+
+    <!-- 6. SAFETY -->
+    <h2 class="section" id="safety">6. Safety Concerns</h2>
+    <p class="muted">Beyond fairness and privacy, models can fail or be abused in ways that cause harm.</p>
+
+    <div class="concept">
+      <h3>Common safety concerns</h3>
+      <table>
+        <tr><th>Concern</th><th>What it is</th><th>Mitigation direction</th></tr>
+        <tr>
+          <td>Hallucination</td>
+          <td>A model (especially a language model) confidently produces false or made-up information.</td>
+          <td>Ground outputs in trusted sources, cite references, verify facts, warn users.</td>
+        </tr>
+        <tr>
+          <td>Misuse</td>
+          <td>People use a system for harmful ends it wasn't intended for.</td>
+          <td>Usage policies, safety filters, rate limits, monitoring for abuse.</td>
+        </tr>
+        <tr>
+          <td>Over-reliance</td>
+          <td>Users trust outputs too much and stop checking them ("automation bias").</td>
+          <td>Show confidence/uncertainty, encourage verification, keep humans engaged.</td>
+        </tr>
+        <tr>
+          <td>Distribution shift</td>
+          <td>The world changes and inputs no longer match training data, so accuracy silently drops.</td>
+          <td>Monitor performance over time, retrain, alert on anomalies.</td>
+        </tr>
+        <tr>
+          <td>Security attacks</td>
+          <td>Adversarial inputs, data poisoning, or prompt injection manipulate the model.</td>
+          <td>Input validation, robustness testing, treat external content as untrusted.</td>
+        </tr>
+      </table>
+      <div class="why">
+        <strong>Why it matters:</strong> A confident wrong answer can be more dangerous than an obvious
+        error, because people are more likely to act on it. Designing for graceful failure and honest
+        uncertainty is a core safety practice.
+      </div>
+    </div>
+
+    <!-- 7. RESPONSIBLE AI PRACTICES -->
+    <h2 class="section" id="responsible">7. Responsible AI Practices</h2>
+    <p class="muted">Concrete habits that turn the five pillars into everyday engineering work.</p>
+
+    <div class="concept">
+      <h3>Documentation: model cards &amp; datasheets</h3>
+      <p>Two widely-used documentation ideas help teams and users understand a system:</p>
+      <ul class="clean">
+        <li><strong>Model cards</strong> &mdash; a short document describing a model's intended use, performance across different groups, known limitations, and ethical considerations.</li>
+        <li><strong>Datasheets for datasets</strong> &mdash; a document describing how a dataset was collected, what it contains, its intended uses, and its limitations.</li>
+      </ul>
+      <table>
+        <tr><th>A model card often covers</th><th>Why</th></tr>
+        <tr><td>Intended use &amp; out-of-scope uses</td><td>Prevents misuse in situations it wasn't built for.</td></tr>
+        <tr><td>Performance by subgroup</td><td>Surfaces fairness gaps instead of hiding them in an overall average.</td></tr>
+        <tr><td>Training data summary</td><td>Reveals what the model has (and hasn't) seen.</td></tr>
+        <tr><td>Known limitations &amp; risks</td><td>Sets honest expectations for users.</td></tr>
+      </table>
+    </div>
+
+    <div class="concept">
+      <h3>Testing and process habits</h3>
+      <ul class="clean">
+        <li><strong>Test for bias</strong> &mdash; measure accuracy and error rates <em>per group</em>, not just overall.</li>
+        <li><strong>Use diverse, representative data</strong> &mdash; make sure important groups appear in the training and test sets.</li>
+        <li><strong>Red-teaming</strong> &mdash; deliberately try to make the system fail or produce harmful output before release.</li>
+        <li><strong>Impact assessment</strong> &mdash; think through who could be harmed and how, before deploying.</li>
+        <li><strong>Ongoing monitoring</strong> &mdash; watch real-world behavior; models drift over time.</li>
+        <li><strong>Diverse teams</strong> &mdash; people with different backgrounds catch problems others miss.</li>
+      </ul>
+      <div class="why">
+        <strong>Why it matters:</strong> An overall accuracy number can look great while the model quietly
+        fails a minority group. Testing per subgroup is how you catch that before users do.
+      </div>
+    </div>
+
+    <!-- 8. MODEL COLLAPSE -->
+    <h2 class="section" id="collapse">8. Model Collapse &amp; Synthetic Data</h2>
+    <p class="muted">A newer data-quality concern as more of the internet is written by AI.</p>
+
+    <div class="concept">
+      <h3>Training on AI-generated data</h3>
+      <p>As generative models produce more text and images, that output increasingly ends up back in the
+      data used to train the next generation of models. When models are trained mostly on the output of
+      earlier models, quality can degrade over successive generations &mdash; a phenomenon often called
+      <strong>model collapse</strong>.</p>
+      <ul class="clean">
+        <li>Rare details and edge cases from the original human data gradually disappear.</li>
+        <li>Errors and biases in generated data can compound generation after generation.</li>
+        <li>Outputs can drift toward blander, less diverse "average" content.</li>
+      </ul>
+      <div class="why">
+        <strong>Why it matters:</strong> It reframes an ethics topic as a data-quality and safety issue:
+        keeping high-quality, verified <em>human</em> data in the mix, tracking data provenance, and being
+        cautious about recycling synthetic data all help preserve model quality and reliability.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>Bias &amp; fairness</strong> &mdash; watch where bias enters; there's no single definition of fair</li>
+        <li><strong>Privacy</strong> &mdash; minimize data, get consent, protect PII</li>
+        <li><strong>Transparency</strong> &mdash; disclose AI use and be able to explain decisions</li>
+        <li><strong>Accountability</strong> &mdash; clear ownership plus meaningful human oversight</li>
+        <li><strong>Safety</strong> &mdash; guard against hallucination, misuse, and over-reliance</li>
+        <li><strong>Responsible practices</strong> &mdash; document, test per group, use diverse data, monitor</li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">9. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://ai.google/responsibility/responsible-ai-practices/" target="_blank" rel="noopener">Google &mdash; Responsible AI Practices</a></li>
+        <li><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST &mdash; AI Risk Management Framework</a></li>
+        <li><a href="https://fairmlbook.org/" target="_blank" rel="noopener">Fairness and Machine Learning (free online book)</a></li>
+        <li><a href="https://modelcards.withgoogle.com/about" target="_blank" rel="noopener">Model Cards &mdash; overview and examples</a></li>
+        <li><a href="https://gdpr.eu/what-is-gdpr/" target="_blank" rel="noopener">GDPR.eu &mdash; What is GDPR? (privacy principles overview)</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>Ethics &amp; Safety &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>
