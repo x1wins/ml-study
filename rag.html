@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAG &mdash; Retrieval-Augmented Generation for Beginners</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>&#128218; RAG: Retrieval-Augmented Generation</h1>
+    <p>Give a frozen language model an open book. Retrieve the right facts, paste them into the
+       prompt, and let the model answer with citations &mdash; explained simply, with runnable code.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> A language model only knows what it saw during training. RAG lets
+      it look things up <em>at question time</em> from <em>your</em> documents &mdash; so it can answer
+      about private, recent, or niche data it was never trained on, and cite where the answer came from.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#problem">The Problem RAG Solves</a></li>
+        <li><a href="#pipeline">The RAG Pipeline (indexing + query)</a></li>
+        <li><a href="#embeddings">Embeddings &amp; Cosine Similarity</a></li>
+        <li><a href="#example">End-to-End RAG in Python</a></li>
+        <li><a href="#vs">RAG vs Fine-Tuning</a></li>
+        <li><a href="#chunking">Chunking &amp; Evaluation</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. PROBLEM -->
+    <h2 class="section" id="problem">1. The Problem RAG Solves</h2>
+    <p class="muted">A trained model is a snapshot in time. That snapshot creates three headaches.</p>
+
+    <div class="concept">
+      <h3>Why a plain LLM falls short</h3>
+      <ul class="clean">
+        <li><strong>Frozen knowledge</strong> &mdash; it only knows what existed before its training cutoff. Ask about last week and it guesses.</li>
+        <li><strong>No private data</strong> &mdash; your company wiki, contracts, and support tickets were never in its training set.</li>
+        <li><strong>Hallucination</strong> &mdash; when it doesn't know, it often invents a confident, wrong answer instead of saying "I don't know".</li>
+      </ul>
+      <div class="why">
+        <strong>The open-book-exam analogy:</strong> A closed-book exam forces you to recall everything
+        from memory &mdash; and you'll bluff on questions you forgot. An <em>open-book</em> exam lets you
+        look up the exact page first, then answer. RAG turns the LLM's closed-book exam into an open-book
+        one: retrieve the relevant pages, hand them to the model, then ask the question.
+      </div>
+    </div>
+
+    <!-- 2. PIPELINE -->
+    <h2 class="section" id="pipeline">2. The RAG Pipeline</h2>
+    <p class="muted">RAG has two phases: <strong>indexing</strong> (done once, ahead of time) and
+      <strong>query</strong> (done every time a user asks something).</p>
+
+    <div class="concept">
+      <h3>Phase A &mdash; Indexing (build the searchable library)</h3>
+      <ol style="padding-left:1.25rem; color:var(--muted);">
+        <li><strong>Load</strong> your documents (PDFs, wiki pages, docs).</li>
+        <li><strong>Chunk</strong> them into small passages (a few hundred tokens each).</li>
+        <li><strong>Embed</strong> each chunk into a vector (a list of numbers capturing its meaning).</li>
+        <li><strong>Store</strong> the vectors in a vector database for fast similarity search.</li>
+      </ol>
+    </div>
+
+    <div class="concept">
+      <h3>Phase B &mdash; Query (answer a question)</h3>
+      <ol style="padding-left:1.25rem; color:var(--muted);">
+        <li><strong>Embed the question</strong> with the same embedding model.</li>
+        <li><strong>Similarity search</strong> &mdash; find the chunks whose vectors are closest to the question's vector.</li>
+        <li><strong>Augment the prompt</strong> &mdash; paste those chunks into the prompt as context.</li>
+        <li><strong>Generate</strong> &mdash; the LLM answers using that context and cites the sources.</li>
+      </ol>
+
+      <svg class="diagram" viewBox="0 0 560 320" role="img"
+           aria-label="RAG pipeline: indexing phase loads documents, chunks, embeds, and stores vectors in a vector database; query phase embeds the question, does similarity search against the database, augments the prompt, and the language model generates a cited answer.">
+        <!-- indexing row -->
+        <text x="20" y="28" fill="#a78bfa" font-size="13" font-weight="bold">INDEXING (once)</text>
+        <rect x="20"  y="40" width="90" height="42" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="65"  y="66" fill="#38bdf8" font-size="12" text-anchor="middle">Load docs</text>
+        <rect x="140" y="40" width="80" height="42" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="180" y="66" fill="#38bdf8" font-size="12" text-anchor="middle">Chunk</text>
+        <rect x="250" y="40" width="80" height="42" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="290" y="66" fill="#38bdf8" font-size="12" text-anchor="middle">Embed</text>
+        <line x1="110" y1="61" x2="140" y2="61" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="220" y1="61" x2="250" y2="61" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="330" y1="61" x2="400" y2="90" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <!-- vector DB (center, shared) -->
+        <rect x="400" y="70" width="140" height="60" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="2.5"/>
+        <text x="470" y="96"  fill="#fbbf24" font-size="13" text-anchor="middle">Vector DB</text>
+        <text x="470" y="114" fill="#94a3b8" font-size="10" text-anchor="middle">(stored vectors)</text>
+        <!-- query row -->
+        <text x="20" y="180" fill="#a78bfa" font-size="13" font-weight="bold">QUERY (each question)</text>
+        <rect x="20"  y="195" width="100" height="42" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="70"  y="221" fill="#4ade80" font-size="12" text-anchor="middle">Question</text>
+        <rect x="150" y="195" width="90" height="42" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="195" y="221" fill="#4ade80" font-size="12" text-anchor="middle">Embed q</text>
+        <rect x="270" y="195" width="120" height="42" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="330" y="216" fill="#4ade80" font-size="11" text-anchor="middle">Similarity</text>
+        <text x="330" y="230" fill="#4ade80" font-size="11" text-anchor="middle">search</text>
+        <line x1="120" y1="216" x2="150" y2="216" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="240" y1="216" x2="270" y2="216" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <!-- search reads from DB -->
+        <line x1="410" y1="130" x2="360" y2="195" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+        <text x="415" y="168" fill="#94a3b8" font-size="10">top-k chunks</text>
+        <!-- augment + generate -->
+        <rect x="270" y="258" width="120" height="42" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="330" y="284" fill="#a78bfa" font-size="12" text-anchor="middle">Augment prompt</text>
+        <rect x="420" y="258" width="120" height="42" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="480" y="279" fill="#38bdf8" font-size="11" text-anchor="middle">LLM answer</text>
+        <text x="480" y="293" fill="#94a3b8" font-size="10" text-anchor="middle">+ citations</text>
+        <line x1="330" y1="237" x2="330" y2="258" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="390" y1="279" x2="420" y2="279" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <defs>
+          <marker id="arw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+
+      <div class="why">
+        <strong>Key insight:</strong> the LLM is never retrained. RAG changes the <em>input</em> (what
+        context we feed it), not the model's weights. Update your documents and answers update
+        instantly &mdash; no training required.
+      </div>
+    </div>
+
+    <!-- 3. EMBEDDINGS -->
+    <h2 class="section" id="embeddings">3. Embeddings &amp; Cosine Similarity</h2>
+    <p class="muted">The trick that lets a computer find text "about the same thing" without matching exact words.</p>
+
+    <div class="concept">
+      <h3>What is an embedding?</h3>
+      <p>An <strong>embedding</strong> is a list of numbers (a vector) that captures the <em>meaning</em>
+      of a piece of text. Texts with similar meaning get vectors that point in similar directions, even
+      if they share no words. "How do I reset my password?" and "I forgot my login credentials" land
+      close together.</p>
+      <div class="why">
+        <strong>Where do embeddings come from?</strong> The same Transformer machinery that powers
+        LLMs. See the <a href="transformers.html">Transformers</a> and
+        <a href="e-softmax.html">e / softmax</a> pages &mdash; embeddings are the vectors flowing
+        through those attention layers.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Cosine similarity &mdash; measuring "same direction"</h3>
+      <p>To compare two vectors we measure the angle between them. <strong>Cosine similarity</strong> is
+      the cosine of that angle: <code>1</code> means identical direction (very similar), <code>0</code>
+      means unrelated (perpendicular), <code>&minus;1</code> means opposite.</p>
+      <div class="formula">cos(&theta;) = (A &middot; B) / (&#8214;A&#8214; &times; &#8214;B&#8214;)</div>
+      <p class="muted">The dot product <code>A &middot; B = &Sigma;<sub>i</sub> A<sub>i</sub>B<sub>i</sub></code>
+      divided by the two magnitudes <code>&#8214;A&#8214; = &radic;(&Sigma;<sub>i</sub> A<sub>i</sub>&sup2;)</code>.</p>
+      <pre><code>import numpy as np
+
+def cosine_similarity(a, b):
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+q    = np.array([0.9, 0.1, 0.2])   # "reset password"
+doc1 = np.array([0.8, 0.2, 0.1])   # "forgot login"     -> similar
+doc2 = np.array([0.1, 0.9, 0.7])   # "billing invoice"  -> different
+
+print(round(cosine_similarity(q, doc1), 3))  # 0.987  (close)
+print(round(cosine_similarity(q, doc2), 3))  # 0.301  (far)</code></pre>
+      <div class="why">
+        <strong>Why matters:</strong> "find the most relevant chunk" becomes "find the stored vector
+        with the highest cosine similarity to the question vector." That single number drives
+        retrieval.
+      </div>
+    </div>
+
+    <!-- 4. END-TO-END EXAMPLE -->
+    <h2 class="section" id="example">4. End-to-End RAG in Python</h2>
+    <p class="muted">A complete, minimal RAG loop: embed a few documents, retrieve the best match for a
+      question, and build the augmented prompt.</p>
+
+    <div class="concept">
+      <h3>Minimal RAG (sentence-transformers + numpy search)</h3>
+      <p class="muted"><strong>Reference-only:</strong> needs <code>pip install sentence-transformers</code>
+      (downloads a model on first run). The retrieval math is plain numpy &mdash; no vector DB needed for
+      a small demo.</p>
+      <pre><code># reference-only: requires `pip install sentence-transformers numpy`
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+# --- INDEXING (done once) ---
+docs = [
+    "To reset your password, open Settings and click 'Forgot password'.",
+    "Invoices are billed monthly on the first day of each month.",
+    "Our office hours are 9am to 5pm, Monday through Friday.",
+]
+
+model = SentenceTransformer("all-MiniLM-L6-v2")   # small, fast, CPU-friendly
+doc_vecs = model.encode(docs, normalize_embeddings=True)   # shape (3, 384)
+
+def cosine(a, b):
+    # vectors are already normalized, so dot product == cosine similarity
+    return float(np.dot(a, b))
+
+# --- QUERY (each question) ---
+question = "How do I change my login password?"
+q_vec = model.encode(question, normalize_embeddings=True)
+
+# similarity search: score every doc, take the best
+scores  = [cosine(q_vec, d) for d in doc_vecs]
+best_i  = int(np.argmax(scores))
+context = docs[best_i]
+
+# --- AUGMENT the prompt ---
+prompt = f"""Answer the question using ONLY the context below.
+If the answer is not in the context, say you don't know.
+
+Context:
+{context}
+
+Question: {question}
+Answer:"""
+
+print(f"Retrieved (score={scores[best_i]:.3f}): {context}")
+print("--- prompt sent to the LLM ---")
+print(prompt)
+# Next step: send `prompt` to your LLM (e.g. Ollama) to generate the final answer.</code></pre>
+      <div class="why">
+        <strong>Practical local stack:</strong> for a private, self-hosted setup run
+        <strong>Ollama</strong> for the LLM (e.g. <code>ollama run llama3</code>) and store vectors in
+        <strong>pgvector on Postgres</strong> (great if you already run Postgres) or a dedicated store
+        like <strong>Chroma</strong> or <strong>FAISS</strong>. The retrieved <code>context</code> is
+        pasted into the prompt exactly as above &mdash; only the storage/generation backends change.
+      </div>
+      <pre><code># reference-only sketch: pgvector + Ollama (requires those services running)
+# 1) In Postgres:   CREATE EXTENSION vector;  and a table with a vector(384) column.
+# 2) Query nearest chunks with the cosine distance operator (&lt;=&gt;):
+#      SELECT text FROM chunks ORDER BY embedding &lt;=&gt; %s LIMIT 4;
+# 3) Send the augmented prompt to a local model:
+#      import ollama
+#      reply = ollama.chat(model="llama3",
+#                          messages=[{"role": "user", "content": prompt}])
+#      print(reply["message"]["content"])</code></pre>
+    </div>
+
+    <!-- 5. RAG VS FINE-TUNING -->
+    <h2 class="section" id="vs">5. RAG vs Fine-Tuning</h2>
+    <p class="muted">Two ways to specialize an LLM &mdash; they solve different problems. See the
+      <a href="fine-tuning.html">Fine-Tuning</a> page for the other side.</p>
+
+    <div class="concept">
+      <h3>Side-by-side comparison</h3>
+      <table>
+        <tr><th>&nbsp;</th><th>RAG</th><th>Fine-Tuning</th></tr>
+        <tr><td>What changes</td><td>The prompt (adds retrieved context)</td><td>The model's weights</td></tr>
+        <tr><td>Best for</td><td>Injecting <em>knowledge</em> / facts</td><td>Teaching <em>behavior</em>, style, format, skills</td></tr>
+        <tr><td>Fresh data</td><td>Instant &mdash; just update documents</td><td>Requires retraining</td></tr>
+        <tr><td>Citations</td><td>Yes &mdash; you know the source chunk</td><td>No &mdash; knowledge is baked in, opaque</td></tr>
+        <tr><td>Hallucination</td><td>Lower &mdash; grounded in retrieved text</td><td>Unchanged / can still invent facts</td></tr>
+        <tr><td>Upfront cost</td><td>Low &mdash; build an index</td><td>High &mdash; GPUs + labeled data + training</td></tr>
+        <tr><td>Per-query cost</td><td>Higher &mdash; retrieval + longer prompt</td><td>Lower &mdash; no retrieval step</td></tr>
+        <tr><td>Latency</td><td>Higher (search + bigger prompt)</td><td>Lower (single forward pass)</td></tr>
+        <tr><td>Data needed</td><td>Documents (unlabeled)</td><td>Curated input&rarr;output examples</td></tr>
+        <tr><td>Access control</td><td>Easy &mdash; filter which docs are retrievable per user</td><td>Hard &mdash; knowledge is fused into weights</td></tr>
+      </table>
+      <div class="why">
+        <strong>Decision rule:</strong> Need knowledge &rarr; RAG. Need behavior/skill/format &rarr;
+        Fine-tune. Need both &rarr; do both, try RAG first.
+      </div>
+    </div>
+
+    <!-- 6. CHUNKING & EVALUATION -->
+    <h2 class="section" id="chunking">6. Chunking &amp; Evaluation</h2>
+
+    <div class="concept">
+      <h3>Chunking tips</h3>
+      <ul class="clean">
+        <li><strong>Size:</strong> aim for ~200&ndash;500 tokens per chunk &mdash; big enough to hold a complete idea, small enough to stay focused.</li>
+        <li><strong>Overlap:</strong> let chunks overlap by ~10&ndash;20% so a sentence split across a boundary isn't lost.</li>
+        <li><strong>Respect structure:</strong> split on natural boundaries (headings, paragraphs) rather than mid-sentence.</li>
+        <li><strong>Keep metadata:</strong> store the source title, page, and URL with each chunk so you can cite it.</li>
+        <li><strong>Match the model:</strong> use the <em>same</em> embedding model for indexing and querying, or the vectors won't be comparable.</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3>Evaluating a RAG system</h3>
+      <p>Two things can go wrong: retrieval finds the wrong chunks, or generation ignores the good
+      chunks. Measure both.</p>
+      <table>
+        <tr><th>Metric</th><th>Question it answers</th></tr>
+        <tr><td>Context recall</td><td>Did retrieval find the chunks that actually contain the answer?</td></tr>
+        <tr><td>Context precision</td><td>Were the retrieved chunks relevant (not noise)?</td></tr>
+        <tr><td>Faithfulness / grounding</td><td>Is every claim in the answer supported by the retrieved context (no invented facts)?</td></tr>
+        <tr><td>Answer relevance</td><td>Does the answer actually address the question?</td></tr>
+      </table>
+      <div class="why">
+        <strong>Grounding is the whole point.</strong> A faithful answer states only what the retrieved
+        context supports &mdash; and says "I don't know" when the context is silent. That's how RAG
+        fights hallucination.
+      </div>
+    </div>
+
+    <!-- 7. RESOURCES -->
+    <h2 class="section" id="resources">7. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://python.langchain.com/docs/tutorials/rag/" target="_blank" rel="noopener">LangChain &mdash; RAG tutorial</a></li>
+        <li><a href="https://docs.llamaindex.ai/en/stable/" target="_blank" rel="noopener">LlamaIndex &mdash; documentation</a></li>
+        <li><a href="https://www.sbert.net/" target="_blank" rel="noopener">sentence-transformers (SBERT) &mdash; embeddings</a></li>
+        <li><a href="https://docs.trychroma.com/" target="_blank" rel="noopener">Chroma &mdash; vector database docs</a></li>
+        <li><a href="https://github.com/pgvector/pgvector" target="_blank" rel="noopener">pgvector &mdash; vector search inside Postgres</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>RAG (Retrieval-Augmented Generation) &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

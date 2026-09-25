@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fine-Tuning &mdash; Teaching a Pretrained Model New Behavior</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>&#127891; Fine-Tuning: Teaching a Model New Behavior</h1>
+    <p>Continue training a pretrained model on your own examples to change its weights &mdash;
+       and with them its behavior, style, format, and skills.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> Prompting <em>asks</em> a model to behave a certain way each time.
+      Fine-tuning <em>rewires</em> the model's weights so the behavior is baked in. It is like
+      studying before an exam instead of frantically re-reading the question every time.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#what">What Fine-Tuning Is (and Why)</a></li>
+        <li><a href="#types">Full Fine-Tuning vs. PEFT (LoRA / QLoRA)</a></li>
+        <li><a href="#data">Preparing Your Data</a></li>
+        <li><a href="#training">The Training Process</a></li>
+        <li><a href="#vs-rag">Fine-Tuning vs. RAG</a></li>
+        <li><a href="#practical">Practical: Data + Code</a></li>
+        <li><a href="#pitfalls">Pitfalls to Avoid</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. WHAT -->
+    <h2 class="section" id="what">1. What Fine-Tuning Is (and Why)</h2>
+    <p class="muted">Fine-tuning takes an already-trained model and keeps training it on <em>your</em> examples.</p>
+
+    <div class="concept">
+      <h3>The core idea</h3>
+      <p>A pretrained model (like a base LLM) already learned language from a huge dataset. Its
+      knowledge lives in its <strong>weights</strong>. <strong>Fine-tuning</strong> continues that
+      training on a smaller, focused dataset so the weights shift toward the exact
+      <strong>behavior, style, format, or skill</strong> you want.</p>
+      <div class="formula">pretrained weights + your examples &rarr; updated weights &rarr; new behavior</div>
+      <div class="why">
+        <strong>The "studying before the exam" analogy:</strong> A base model is a smart student who
+        read the whole library. Prompting is handing them a cheat sheet at the exam. Fine-tuning is
+        making them <em>study your specific subject beforehand</em> &mdash; so the knowledge is
+        internalized, not looked up in the moment.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Fine-tuning vs. prompting</h3>
+      <table>
+        <tr><th>&nbsp;</th><th>Prompting</th><th>Fine-tuning</th></tr>
+        <tr><td>Changes weights?</td><td>No</td><td>Yes</td></tr>
+        <tr><td>Effort</td><td>Instant, no training</td><td>Needs data + a training run</td></tr>
+        <tr><td>Per-request cost</td><td>Long prompts every time</td><td>Short prompts (behavior is baked in)</td></tr>
+        <tr><td>Best for</td><td>Quick tasks, experiments</td><td>Consistent style/format at scale</td></tr>
+      </table>
+      <div class="why">
+        <strong>Rule of thumb:</strong> If a well-crafted prompt already works reliably, you may not
+        need fine-tuning. Reach for fine-tuning when you need <em>consistent</em> behavior across
+        thousands of calls, or a specialized skill prompting can't reach.
+      </div>
+    </div>
+
+    <!-- 2. TYPES -->
+    <h2 class="section" id="types">2. Full Fine-Tuning vs. PEFT (LoRA / QLoRA)</h2>
+    <p class="muted">There are two families: retrain everything, or retrain a tiny efficient add-on.</p>
+
+    <div class="concept">
+      <h3>Full fine-tuning</h3>
+      <p>Every weight in the model is updated during training. This is powerful but
+      <strong>expensive</strong>: you need enough GPU memory to hold and update billions of
+      parameters, and you produce a full-size copy of the model for each task.</p>
+      <div class="why">
+        <strong>Why it's heavy:</strong> A 7-billion-parameter model has 7 billion weights to store,
+        compute gradients for, and save. That's a lot of memory and disk for one specialized model.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Parameter-efficient fine-tuning (PEFT) &mdash; LoRA</h3>
+      <p><strong>PEFT</strong> freezes the original weights and trains only a small number of new
+      parameters. The most popular method is <strong>LoRA</strong> (Low-Rank Adaptation):</p>
+      <ul class="clean">
+        <li><strong>Freeze</strong> the giant base model &mdash; it never changes.</li>
+        <li>Inject small pairs of <strong>low-rank adapter matrices</strong> (call them A and B) next to the frozen layers.</li>
+        <li>Only <strong>A</strong> and <strong>B</strong> are trained &mdash; often less than 1% of the total parameters.</li>
+      </ul>
+      <p>Instead of learning a full weight update matrix &Delta;W (which is huge), LoRA approximates
+      it as the product of two skinny matrices:</p>
+      <div class="formula">&Delta;W &asymp; B &middot; A &nbsp;&nbsp;(A is r&times;k, &nbsp; B is d&times;r, &nbsp; with rank r &Lt; d,k)</div>
+      <p>The final layer output uses the frozen weight <strong>plus</strong> the small learned update:</p>
+      <div class="formula">output = W<sub>frozen</sub> &middot; x &nbsp;+&nbsp; (B &middot; A) &middot; x</div>
+
+      <svg class="diagram" viewBox="0 0 560 240" role="img"
+           aria-label="LoRA: a large frozen base weight matrix stays fixed while two small trainable low-rank adapter matrices A and B are added on and summed into the output.">
+        <!-- frozen base -->
+        <rect x="40" y="60" width="150" height="120" rx="8" fill="#1e293b" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 4"/>
+        <text x="115" y="115" fill="#94a3b8" font-size="14" text-anchor="middle">Frozen base</text>
+        <text x="115" y="135" fill="#94a3b8" font-size="13" text-anchor="middle">W (huge)</text>
+        <text x="115" y="45"  fill="#94a3b8" font-size="11" text-anchor="middle">&#10052; not trained</text>
+        <!-- adapter A -->
+        <rect x="250" y="70" width="40" height="100" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="270" y="125" fill="#a78bfa" font-size="13" text-anchor="middle">A</text>
+        <!-- adapter B -->
+        <rect x="310" y="95" width="70" height="50" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="345" y="125" fill="#38bdf8" font-size="13" text-anchor="middle">B</text>
+        <text x="315" y="55" fill="#a78bfa" font-size="11" text-anchor="middle">small &middot; trainable</text>
+        <line x1="290" y1="120" x2="310" y2="120" stroke="#e2e8f0" stroke-width="2"/>
+        <!-- sum node -->
+        <circle cx="450" cy="120" r="26" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="450" y="126" fill="#4ade80" font-size="20" text-anchor="middle">+</text>
+        <!-- arrows into sum -->
+        <line x1="190" y1="120" x2="424" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#arwF)"/>
+        <line x1="380" y1="120" x2="424" y2="120" stroke="#38bdf8" stroke-width="2" marker-end="url(#arwF)"/>
+        <!-- output -->
+        <line x1="476" y1="120" x2="525" y2="120" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arwF)"/>
+        <text x="500" y="105" fill="#4ade80" font-size="11" text-anchor="middle">output</text>
+        <defs>
+          <marker id="arwF" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+
+      <div class="why">
+        <strong>Why LoRA is great:</strong> You train a tiny adapter (a few megabytes) instead of the
+        whole model. Training is faster, needs far less memory, and you can swap adapters like plugins
+        &mdash; one base model, many specialized behaviors.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>QLoRA &mdash; LoRA on a small GPU</h3>
+      <p><strong>QLoRA</strong> = <strong>Q</strong>uantized <strong>LoRA</strong>. It first
+      <strong>quantizes</strong> the frozen base model (storing weights in 4-bit instead of 16-bit),
+      which shrinks its memory footprint dramatically, then trains LoRA adapters on top.</p>
+      <div class="formula">4-bit frozen base &nbsp;+&nbsp; small trainable LoRA adapters &rarr; fine-tune on one consumer GPU</div>
+      <div class="why">
+        <strong>Why it matters:</strong> QLoRA is how people fine-tune large models on a single modest
+        GPU. Quantization saves memory on the frozen part; LoRA keeps the trainable part tiny. The two
+        tricks together make big-model fine-tuning affordable.
+      </div>
+    </div>
+
+    <!-- 3. DATA -->
+    <h2 class="section" id="data">3. Preparing Your Data</h2>
+    <p class="muted">Fine-tuning quality is mostly a data problem. Good data beats more data.</p>
+
+    <div class="concept">
+      <h3>Instruction / response pairs</h3>
+      <p>The most common format teaches the model "when you see input like <em>this</em>, respond like
+      <em>that</em>." Each training example is a pair (often with an optional system/instruction and
+      an input):</p>
+      <ul class="clean">
+        <li><strong>Instruction</strong> &mdash; what you want done</li>
+        <li><strong>Input</strong> (optional) &mdash; the specific data to act on</li>
+        <li><strong>Output</strong> &mdash; the ideal response you want the model to learn</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3>JSONL format</h3>
+      <p><strong>JSONL</strong> = JSON Lines: one JSON object per line, no commas between lines. It is
+      the standard for fine-tuning datasets because it streams easily.</p>
+      <pre><code>{"messages": [{"role": "system", "content": "You are a terse SQL assistant."}, {"role": "user", "content": "Get all users created today."}, {"role": "assistant", "content": "SELECT * FROM users WHERE created_at >= CURRENT_DATE;"}]}
+{"messages": [{"role": "system", "content": "You are a terse SQL assistant."}, {"role": "user", "content": "Count orders per customer."}, {"role": "assistant", "content": "SELECT customer_id, COUNT(*) FROM orders GROUP BY customer_id;"}]}</code></pre>
+      <p class="muted">An older but common "instruction" style looks like this:</p>
+      <pre><code>{"instruction": "Translate to formal English.", "input": "gimme the report asap", "output": "Please provide the report as soon as possible."}
+{"instruction": "Translate to formal English.", "input": "no clue what happened", "output": "I am uncertain about what occurred."}</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>How much data &mdash; and splitting it</h3>
+      <table>
+        <tr><th>Dataset size</th><th>What to expect</th></tr>
+        <tr><td>50 &ndash; 100 examples</td><td>Can nudge style/format for narrow tasks (with LoRA)</td></tr>
+        <tr><td>500 &ndash; 1,000 examples</td><td>A solid starting point for most behavior tuning</td></tr>
+        <tr><td>10,000+ examples</td><td>Stronger, more reliable skills; needs careful curation</td></tr>
+      </table>
+      <p>Always hold back part of your data for a <strong>validation set</strong> you never train on,
+      so you can measure honest performance:</p>
+      <div class="formula">train &asymp; 90% &nbsp;&middot;&nbsp; validation &asymp; 10%</div>
+      <div class="why">
+        <strong>Quality &gt; quantity:</strong> 300 clean, consistent, correctly-formatted examples
+        beat 3,000 sloppy ones. The model imitates <em>exactly</em> what you show it &mdash; including
+        your mistakes. Clean your data first.
+      </div>
+    </div>
+
+    <!-- 4. TRAINING -->
+    <h2 class="section" id="training">4. The Training Process</h2>
+    <p class="muted">Fine-tuning reuses the same learning loop as any neural network &mdash; just continued from a pretrained start.</p>
+
+    <div class="concept">
+      <h3>The moving parts</h3>
+      <ul class="clean">
+        <li><strong>Loss</strong> &mdash; measures how far the model's output is from your target response. See <a class="back" style="margin:0;" href="loss-functions.html">loss-functions.html</a>.</li>
+        <li><strong>Epochs</strong> &mdash; how many times the model sees the whole dataset. Fine-tuning usually needs few (1&ndash;4).</li>
+        <li><strong>Learning rate</strong> &mdash; how big each weight update is. Fine-tuning uses a <em>small</em> rate so it nudges, not overwrites.</li>
+        <li><strong>Batch size</strong> &mdash; how many examples per update step.</li>
+      </ul>
+      <p>Under the hood it is the same forward pass &rarr; loss &rarr; backpropagation &rarr; weight
+      update cycle used to train any network. For a refresher on gradients, learning rate, and
+      overfitting see <a class="back" style="margin:0;" href="training-optimization.html">training-optimization.html</a>.</p>
+      <div class="formula">w &larr; w &minus; learning_rate &times; gradient</div>
+      <div class="why">
+        <strong>Watch for two failure modes:</strong> <em>Overfitting</em> (the model memorizes your
+        examples and can't generalize &mdash; validation loss rises while training loss falls), and
+        <em>catastrophic forgetting</em> (training so hard on new data that the model loses its
+        original general abilities). Fewer epochs and a small learning rate help avoid both.
+      </div>
+    </div>
+
+    <!-- 5. VS RAG -->
+    <h2 class="section" id="vs-rag">5. Fine-Tuning vs. RAG</h2>
+    <p class="muted">Two different tools for two different problems. They can also be combined.</p>
+
+    <div class="concept">
+      <h3>Quick comparison</h3>
+      <table>
+        <tr><th>&nbsp;</th><th>Fine-tuning</th><th>RAG (retrieval)</th></tr>
+        <tr><td>Changes the model?</td><td>Yes &mdash; updates weights</td><td>No &mdash; adds context at query time</td></tr>
+        <tr><td>Best for</td><td>Behavior, style, format, skill</td><td>Facts, documents, changing knowledge</td></tr>
+        <tr><td>Update knowledge</td><td>Retrain</td><td>Just update the document store</td></tr>
+        <tr><td>Risk</td><td>Overfitting, forgetting</td><td>Retrieval misses, long prompts</td></tr>
+      </table>
+      <div class="why">
+        <strong>Decision rule:</strong> Need to change <em>how</em> the model responds &mdash;
+        behavior, skill, or format? &rarr; <strong>Fine-tune</strong>. Need the model to know
+        <em>facts</em> from your documents that change over time? &rarr; <strong>RAG</strong>. For the
+        full picture on retrieval, see <a class="back" style="margin:0;" href="rag.html">rag.html</a>.
+      </div>
+      <p class="muted">They combine well: fine-tune for the voice and format, use RAG to feed in the
+      up-to-date facts.</p>
+    </div>
+
+    <!-- 6. PRACTICAL -->
+    <h2 class="section" id="practical">6. Practical: Data + Code</h2>
+    <p class="muted">A minimal, realistic example. The training code needs a GPU and libraries, so it is shown as reference.</p>
+
+    <div class="concept">
+      <h3>Example training data (JSONL)</h3>
+      <p>Say we want a support bot that always answers politely in exactly two sentences:</p>
+      <pre><code>{"messages": [{"role": "user", "content": "My order is late."}, {"role": "assistant", "content": "I'm sorry your order is delayed. I've escalated it and you'll get an update within 24 hours."}]}
+{"messages": [{"role": "user", "content": "How do I reset my password?"}, {"role": "assistant", "content": "You can reset it from the login page using the 'Forgot password' link. A reset email will arrive within a few minutes."}]}
+{"messages": [{"role": "user", "content": "Do you ship internationally?"}, {"role": "assistant", "content": "Yes, we ship to most countries worldwide. Shipping times and fees are shown at checkout."}]}</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>LoRA fine-tuning with Hugging Face PEFT</h3>
+      <div class="why">
+        <strong>Reference only:</strong> This snippet requires a <strong>GPU</strong> and the
+        libraries <code>transformers</code>, <code>peft</code>, <code>datasets</code>, and
+        <code>trl</code> installed. It is illustrative &mdash; not meant to be run as-is here.
+      </div>
+      <pre><code># reference-only: needs a GPU + `pip install transformers peft datasets trl`
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import LoraConfig, get_peft_model
+from datasets import load_dataset
+from trl import SFTTrainer, SFTConfig
+
+base_model = "meta-llama/Llama-3.2-1B"          # a small base model
+
+tokenizer = AutoTokenizer.from_pretrained(base_model)
+model = AutoModelForCausalLM.from_pretrained(base_model)
+
+# 1) describe the LoRA adapter (only these params are trained)
+lora_config = LoraConfig(
+    r=8,                    # rank of the adapter matrices (small = efficient)
+    lora_alpha=16,          # scaling factor
+    target_modules=["q_proj", "v_proj"],   # which layers get adapters
+    lora_dropout=0.05,
+    task_type="CAUSAL_LM",
+)
+model = get_peft_model(model, lora_config)
+model.print_trainable_parameters()   # e.g. "trainable: 0.3% of all params"
+
+# 2) load your JSONL dataset
+dataset = load_dataset("json", data_files="support_pairs.jsonl", split="train")
+
+# 3) train (small learning rate, few epochs to avoid overfitting)
+trainer = SFTTrainer(
+    model=model,
+    train_dataset=dataset,
+    args=SFTConfig(
+        output_dir="./lora-support-bot",
+        num_train_epochs=3,
+        per_device_train_batch_size=2,
+        learning_rate=2e-4,
+    ),
+)
+trainer.train()
+
+# 4) save just the tiny adapter (a few MB, not the whole model)
+model.save_pretrained("./lora-support-bot")</code></pre>
+      <p class="muted">For <strong>QLoRA</strong>, you would load the base model in 4-bit (via
+      <code>bitsandbytes</code>) before wrapping it with <code>get_peft_model</code> &mdash; same LoRA
+      code, much less GPU memory.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Running fine-tuned models locally</h3>
+      <p>Once you have a fine-tuned model (often merged and converted to GGUF), you can run it on your
+      own machine &mdash; no GPU cloud required:</p>
+      <ul class="clean">
+        <li><strong>Ollama</strong> &mdash; write a small <code>Modelfile</code> that points at your model and set its behavior, then <code>ollama create</code> and <code>ollama run</code>.</li>
+        <li><strong>llama.cpp</strong> &mdash; run quantized GGUF models efficiently on CPU or Apple Silicon.</li>
+      </ul>
+      <pre><code># reference-only: an Ollama Modelfile
+FROM ./my-finetuned-model.gguf
+SYSTEM "You are a terse, polite support assistant. Answer in two sentences."
+PARAMETER temperature 0.5</code></pre>
+      <p class="muted">Then: <code>ollama create support-bot -f Modelfile</code> and <code>ollama run support-bot</code>.</p>
+    </div>
+
+    <!-- 7. PITFALLS -->
+    <h2 class="section" id="pitfalls">7. Pitfalls to Avoid</h2>
+    <div class="concept">
+      <table>
+        <tr><th>Pitfall</th><th>What happens</th><th>How to avoid</th></tr>
+        <tr>
+          <td>Overfitting</td>
+          <td>Model memorizes training examples; fails on new inputs. Validation loss rises.</td>
+          <td>Fewer epochs, more/varied data, hold out a validation set.</td>
+        </tr>
+        <tr>
+          <td>Catastrophic forgetting</td>
+          <td>Model loses its original general abilities after aggressive tuning.</td>
+          <td>Small learning rate, few epochs, PEFT (frozen base keeps knowledge).</td>
+        </tr>
+        <tr>
+          <td>No evaluation</td>
+          <td>You can't tell if fine-tuning actually helped.</td>
+          <td>Test on a held-out set before/after; compare against the base model.</td>
+        </tr>
+        <tr>
+          <td>Dirty data</td>
+          <td>Model imitates your inconsistencies and errors exactly.</td>
+          <td>Curate for quality and consistent format first.</td>
+        </tr>
+      </table>
+      <div class="why">
+        <strong>Always evaluate.</strong> Keep a small set of realistic test prompts. Run them through
+        the base model and your fine-tuned model, and compare. Without evaluation you're flying blind.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>Fine-tuning</strong> &mdash; continue training to change weights &rarr; new behavior</li>
+        <li><strong>Full vs. PEFT</strong> &mdash; retrain everything, or train tiny LoRA adapters on a frozen base</li>
+        <li><strong>QLoRA</strong> &mdash; quantize the frozen base + LoRA = fine-tune on a small GPU</li>
+        <li><strong>Data</strong> &mdash; clean instruction/response pairs in JSONL; quality &gt; quantity</li>
+        <li><strong>Decision</strong> &mdash; behavior/skill/format &rarr; fine-tune; knowledge &rarr; RAG</li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">8. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://huggingface.co/docs/peft" target="_blank" rel="noopener">Hugging Face PEFT &mdash; official docs (LoRA, QLoRA, and more)</a></li>
+        <li><a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">LoRA: Low-Rank Adaptation of Large Language Models (paper)</a></li>
+        <li><a href="https://arxiv.org/abs/2305.14314" target="_blank" rel="noopener">QLoRA: Efficient Finetuning of Quantized LLMs (paper)</a></li>
+        <li><a href="https://github.com/unslothai/unsloth" target="_blank" rel="noopener">Unsloth &mdash; fast, memory-efficient fine-tuning</a></li>
+        <li><a href="https://github.com/axolotl-ai-cloud/axolotl" target="_blank" rel="noopener">Axolotl &mdash; config-driven fine-tuning toolkit</a></li>
+        <li><a href="https://ollama.com/" target="_blank" rel="noopener">Ollama &mdash; run models locally with a Modelfile</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>
+      <p>Fine-Tuning &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>
