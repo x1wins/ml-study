@@ -580,8 +580,75 @@
       <code>[6, &minus;2]</code>; to reduce <code>f</code> you step along <code>[&minus;6, 2]</code>.</p>
     </div>
 
-    <!-- 8. WHY IT MATTERS IN ML -->
-    <h2 class="section" id="ml">8. Why derivatives matter in machine learning</h2>
+    <!-- 8. DERIVATIVE VS DIFFERENTIAL -->
+    <h2 class="section" id="differential">8. Derivative vs. differential</h2>
+    <p class="muted">Three words that get mixed up &mdash; here's the clean distinction.</p>
+
+    <div class="concept">
+      <h3>Process, result, and small step</h3>
+      <table>
+        <tr><th>Term</th><th>What it is</th><th>Notation</th></tr>
+        <tr><td><strong>Differentiation</strong></td><td>The <em>process</em> / action of finding a derivative</td><td>"differentiate f"</td></tr>
+        <tr><td><strong>Derivative</strong></td><td>The <em>result</em>: a rate of change (slope) at a point</td><td><code>f&prime;(x)</code>, <code>dy/dx</code></td></tr>
+        <tr><td><strong>Differential</strong></td><td>An <em>infinitesimally small change</em> in a variable</td><td><code>dx</code>, <code>dy</code></td></tr>
+      </table>
+      <div class="why">
+        <strong>Key relationship:</strong> the derivative is the <em>rate</em>; a differential is a
+        <em>small step</em> computed from that rate. They are tied together by:
+      </div>
+      <div class="formula">dy = f&prime;(x) &middot; dx</div>
+      <p>The <strong>derivative</strong> <code>f&prime;(x)</code> is a single number (how fast <code>y</code>
+      changes per unit <code>x</code>). A <strong>differential</strong> <code>dy</code> is an actual (tiny)
+      <em>amount</em> &mdash; the approximate change in <code>y</code> caused by a small change
+      <code>dx</code>. Notice that <code>dy/dx</code> (derivative) is literally the ratio of the two
+      differentials &mdash; which is exactly why the chain rule
+      <code>dy/dx = (dy/du)&middot;(du/dx)</code> "cancels" so cleanly.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Worked example: y = x&sup2; at x = 3</h3>
+      <ol style="padding-left:1.25rem; color:var(--muted);">
+        <li>Derivative: <code>f&prime;(x) = 2x</code>, so at <code>x = 3</code> the rate is <code>f&prime;(3) = 6</code>.</li>
+        <li>Differential: for a small step <code>dx</code>, <code>dy = 6 &middot; dx</code>.</li>
+        <li>So nudging <code>x</code> by <code>dx = 0.01</code> changes <code>y</code> by about
+            <code>dy &asymp; 6 &times; 0.01 = 0.06</code>.</li>
+      </ol>
+      <p class="muted">Check: true change = <code>(3.01)&sup2; &minus; 3&sup2; = 9.0601 &minus; 9 = 0.0601</code>
+      &mdash; the differential <code>0.06</code> is the straight-line (tangent) approximation, off only by
+      the tiny <code>0.0001</code> curvature term.</p>
+
+      <svg class="diagram" viewBox="0 0 560 220" role="img"
+           aria-label="A curve with a tangent line at a point; a small horizontal step dx along the tangent produces a vertical rise dy equal to the derivative times dx, approximating the true change on the curve.">
+        <!-- curve y=x^2-ish arc -->
+        <path d="M 40 200 Q 300 200 520 40" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+        <!-- tangent point -->
+        <circle cx="300" cy="150" r="4" fill="#fbbf24"/>
+        <text x="300" y="142" fill="#fbbf24" font-size="11" text-anchor="middle">(x, f(x))</text>
+        <!-- tangent line -->
+        <line x1="200" y1="188" x2="440" y2="92" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5 4"/>
+        <!-- dx horizontal -->
+        <line x1="300" y1="150" x2="400" y2="150" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="350" y="166" fill="#94a3b8" font-size="12" text-anchor="middle">dx</text>
+        <!-- dy vertical (rise along tangent) -->
+        <line x1="400" y1="150" x2="400" y2="110" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="416" y="132" fill="#4ade80" font-size="12">dy = f&prime;(x)&middot;dx</text>
+        <!-- right-angle tick -->
+        <path d="M 390 150 L 390 140 L 400 140" fill="none" stroke="#94a3b8" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <div class="concept">
+      <h3>Why this matters in ML</h3>
+      <p>Gradient descent is a differential idea in disguise: a small weight step <code>dw</code> changes
+      the loss by approximately</p>
+      <div class="formula">dL &asymp; (&part;L/&part;w) &middot; dw = gradient &middot; dw</div>
+      <p class="muted">That's why stepping <em>against</em> the gradient (<code>dw = &minus;lr &middot; gradient</code>)
+      reliably lowers the loss for a small enough step &mdash; see
+      <a href="gradient-descent.html">Gradient Descent</a>.</p>
+    </div>
+
+    <!-- 9. WHY IT MATTERS IN ML -->
+    <h2 class="section" id="ml">9. Why derivatives matter in machine learning</h2>
 
     <div class="concept">
       <h3>Gradient descent</h3>
@@ -610,7 +677,7 @@
     </div>
 
     <!-- 9. CODE -->
-    <h2 class="section" id="code">9. Code: numerical derivative vs. analytic 2x</h2>
+    <h2 class="section" id="code">10. Code: numerical derivative vs. analytic 2x</h2>
     <p class="muted">Estimate a derivative with a tiny finite difference, then compare to the exact answer.</p>
 
     <div class="concept">
@@ -656,7 +723,7 @@ print("max error:", np.max(np.abs(approx - exact)))
     </div>
 
     <!-- RELATED -->
-    <h2 class="section" id="related">10. Related topics</h2>
+    <h2 class="section" id="related">11. Related topics</h2>
     <div class="concept">
       <ul class="clean">
         <li><a href="integration.html">Integration</a> &mdash; the reverse of differentiation (accumulating change)</li>
@@ -668,7 +735,7 @@ print("max error:", np.max(np.abs(approx - exact)))
     </div>
 
     <!-- RESOURCES -->
-    <h2 class="section" id="resources">11. Free Resources</h2>
+    <h2 class="section" id="resources">12. Free Resources</h2>
     <div class="concept resources">
       <ul class="clean">
         <li><a href="https://www.3blue1brown.com/topics/calculus" target="_blank" rel="noopener">3Blue1Brown &mdash; Essence of Calculus (video series)</a></li>
@@ -690,7 +757,7 @@ print("max error:", np.max(np.abs(approx - exact)))
 
   <script>
   (function () {
-    var DATA = [{"q": "What does a derivative measure at a point on a curve?", "options": ["The area under the curve", "The slope of the tangent line (instantaneous rate of change)", "The total distance travelled", "The height of the curve"], "correct": 1, "explain": "The derivative gives the slope of the tangent line, i.e. the instantaneous rate of change at that point."}, {"q": "Using the power rule, what is the derivative of x³?", "options": ["3x²", "x²", "3x", "x⁴/4"], "correct": 0, "explain": "The power rule brings the exponent down and subtracts one: x³ → 3x²."}, {"q": "Which rule is described as 'literally backpropagation' and the most important for ML?", "options": ["The product rule", "The quotient rule", "The chain rule", "The constant rule"], "correct": 2, "explain": "The chain rule differentiates compositions g(h(x)) and is exactly what backpropagation applies layer by layer."}, {"q": "For f(x, y) = x² + y², what is the partial derivative ∂f/∂x?", "options": ["2y", "x² + 2x", "2x", "2x + 2y"], "correct": 2, "explain": "Treating y as a constant, y² drops to 0 and x² differentiates to 2x, so ∂f/∂x = 2x."}, {"q": "What does the gradient ∇f point toward, and how is it used in gradient descent?", "options": ["Toward steepest decrease; step along +∇f", "Toward steepest increase; step along −∇f to reduce loss", "Toward the origin; step along ∇f²", "It points nowhere; it is just a number"], "correct": 1, "explain": "The gradient points in the direction of steepest increase, so moving along −∇f goes downhill toward smaller loss."}, {"q": "Using the chain rule, the derivative of f(x) = (3x + 1)² is:", "options": ["2(3x + 1)", "6(3x + 1)", "3(3x + 1)²", "6x"], "correct": 1, "explain": "Outer 2(3x+1) times inner derivative 3 gives 2(3x+1)·3 = 6(3x + 1)."}];
+    var DATA = [{"q": "What does a derivative measure at a point on a curve?", "options": ["The area under the curve", "The slope of the tangent line (instantaneous rate of change)", "The total distance travelled", "The height of the curve"], "correct": 1, "explain": "The derivative gives the slope of the tangent line, i.e. the instantaneous rate of change at that point."}, {"q": "Using the power rule, what is the derivative of x³?", "options": ["3x²", "x²", "3x", "x⁴/4"], "correct": 0, "explain": "The power rule brings the exponent down and subtracts one: x³ → 3x²."}, {"q": "Which rule is described as 'literally backpropagation' and the most important for ML?", "options": ["The product rule", "The quotient rule", "The chain rule", "The constant rule"], "correct": 2, "explain": "The chain rule differentiates compositions g(h(x)) and is exactly what backpropagation applies layer by layer."}, {"q": "For f(x, y) = x² + y², what is the partial derivative ∂f/∂x?", "options": ["2y", "x² + 2x", "2x", "2x + 2y"], "correct": 2, "explain": "Treating y as a constant, y² drops to 0 and x² differentiates to 2x, so ∂f/∂x = 2x."}, {"q": "What does the gradient ∇f point toward, and how is it used in gradient descent?", "options": ["Toward steepest decrease; step along +∇f", "Toward steepest increase; step along −∇f to reduce loss", "Toward the origin; step along ∇f²", "It points nowhere; it is just a number"], "correct": 1, "explain": "The gradient points in the direction of steepest increase, so moving along −∇f goes downhill toward smaller loss."}, {"q": "Using the chain rule, the derivative of f(x) = (3x + 1)² is:", "options": ["2(3x + 1)", "6(3x + 1)", "3(3x + 1)²", "6x"], "correct": 1, "explain": "Outer 2(3x+1) times inner derivative 3 gives 2(3x+1)·3 = 6(3x + 1)."}, {"q": "How does a differential dy relate to the derivative f\u2032(x)?", "options": ["dy = f\u2032(x) + dx", "dy = f\u2032(x) \u00b7 dx (a small change in y from a small step dx)", "dy = dx / f\u2032(x)", "dy has no relation to the derivative"], "correct": 1, "explain": "The derivative is the rate; the differential dy = f\u2032(x)\u00b7dx is the small change in y for a small step dx."}];
     var host = document.getElementById("quickquiz");
     if (!host || !DATA || !DATA.length) return;
     var total = DATA.length, score = 0, answered = 0;
