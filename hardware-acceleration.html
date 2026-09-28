@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hardware Acceleration: GPUs, HBM &amp; Tensor Cores</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#9889; Hardware Acceleration: GPUs, HBM &amp; Tensor Cores</h1>
+    <p>Why GPUs crush CPUs for ML, how the memory hierarchy shapes real-world speed, and why
+       modern deep learning is a <em>memory-bandwidth</em> game as much as a raw-compute game.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> Neural networks are almost entirely
+      <strong>matrix multiplications</strong> (see <a href="linear-algebra.html">linear-algebra.html</a>).
+      Hardware acceleration is the art of doing millions of these multiplies in parallel &mdash; and,
+      just as importantly, <em>feeding the math units fast enough</em> so they never sit idle.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#why-gpu">Why GPUs beat CPUs for ML</a></li>
+        <li><a href="#memory">The memory hierarchy: HBM, SRAM &amp; registers</a></li>
+        <li><a href="#bound">Memory-bound vs compute-bound (the roofline idea)</a></li>
+        <li><a href="#tensor">Tensor Cores &amp; mixed precision</a></li>
+        <li><a href="#tiling">How matmul maps to hardware (tiling &amp; FlashAttention)</a></li>
+        <li><a href="#precision">Precision &amp; quantization tradeoffs</a></li>
+        <li><a href="#practical">Practical: batch size, utilization &amp; big matmuls</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. WHY GPU -->
+    <h2 class="section" id="why-gpu">1. Why GPUs beat CPUs for ML</h2>
+    <p class="muted">A CPU has a few very fast cores. A GPU has thousands of simpler cores. ML is
+      embarrassingly parallel, so thousands win.</p>
+
+    <div class="concept">
+      <h3>Few fast cores vs many parallel cores</h3>
+      <p>A <strong>CPU</strong> is optimized for <em>latency</em>: run one thread as fast as possible,
+      with big caches and branch prediction. A modern CPU has maybe 8&ndash;64 powerful cores.</p>
+      <p>A <strong>GPU</strong> is optimized for <em>throughput</em>: run thousands of threads at once,
+      each doing a small piece of the same math. A data-center GPU has tens of thousands of ALUs
+      grouped into streaming multiprocessors.</p>
+      <p>Training a neural net means multiplying huge matrices. In a matrix multiply, every output
+      element is an independent dot product &mdash; perfect for splitting across thousands of cores.</p>
+      <div class="formula">C = A &times; B &nbsp;&middot;&nbsp; each C<sub>ij</sub> = &Sigma;<sub>k</sub> A<sub>ik</sub> B<sub>kj</sub> &nbsp;(all independent)</div>
+
+      <svg class="diagram" viewBox="0 0 560 200" role="img"
+           aria-label="Comparison of a CPU with a few large cores versus a GPU with a grid of many small cores.">
+        <text x="130" y="24" fill="#38bdf8" font-size="14" text-anchor="middle">CPU: few fast cores</text>
+        <rect x="40"  y="40" width="80" height="60" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <rect x="140" y="40" width="80" height="60" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <rect x="40"  y="112" width="80" height="60" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <rect x="140" y="112" width="80" height="60" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="430" y="24" fill="#a78bfa" font-size="14" text-anchor="middle">GPU: thousands of small cores</text>
+        <g fill="#1e293b" stroke="#a78bfa" stroke-width="1.5">
+          <rect x="320" y="40"  width="16" height="16" rx="2"/><rect x="342" y="40"  width="16" height="16" rx="2"/>
+          <rect x="364" y="40"  width="16" height="16" rx="2"/><rect x="386" y="40"  width="16" height="16" rx="2"/>
+          <rect x="408" y="40"  width="16" height="16" rx="2"/><rect x="430" y="40"  width="16" height="16" rx="2"/>
+          <rect x="452" y="40"  width="16" height="16" rx="2"/><rect x="474" y="40"  width="16" height="16" rx="2"/>
+          <rect x="496" y="40"  width="16" height="16" rx="2"/><rect x="518" y="40"  width="16" height="16" rx="2"/>
+          <rect x="320" y="62"  width="16" height="16" rx="2"/><rect x="342" y="62"  width="16" height="16" rx="2"/>
+          <rect x="364" y="62"  width="16" height="16" rx="2"/><rect x="386" y="62"  width="16" height="16" rx="2"/>
+          <rect x="408" y="62"  width="16" height="16" rx="2"/><rect x="430" y="62"  width="16" height="16" rx="2"/>
+          <rect x="452" y="62"  width="16" height="16" rx="2"/><rect x="474" y="62"  width="16" height="16" rx="2"/>
+          <rect x="496" y="62"  width="16" height="16" rx="2"/><rect x="518" y="62"  width="16" height="16" rx="2"/>
+          <rect x="320" y="84"  width="16" height="16" rx="2"/><rect x="342" y="84"  width="16" height="16" rx="2"/>
+          <rect x="364" y="84"  width="16" height="16" rx="2"/><rect x="386" y="84"  width="16" height="16" rx="2"/>
+          <rect x="408" y="84"  width="16" height="16" rx="2"/><rect x="430" y="84"  width="16" height="16" rx="2"/>
+          <rect x="452" y="84"  width="16" height="16" rx="2"/><rect x="474" y="84"  width="16" height="16" rx="2"/>
+          <rect x="496" y="84"  width="16" height="16" rx="2"/><rect x="518" y="84"  width="16" height="16" rx="2"/>
+          <rect x="320" y="106" width="16" height="16" rx="2"/><rect x="342" y="106" width="16" height="16" rx="2"/>
+          <rect x="364" y="106" width="16" height="16" rx="2"/><rect x="386" y="106" width="16" height="16" rx="2"/>
+          <rect x="408" y="106" width="16" height="16" rx="2"/><rect x="430" y="106" width="16" height="16" rx="2"/>
+          <rect x="452" y="106" width="16" height="16" rx="2"/><rect x="474" y="106" width="16" height="16" rx="2"/>
+          <rect x="496" y="106" width="16" height="16" rx="2"/><rect x="518" y="106" width="16" height="16" rx="2"/>
+          <rect x="320" y="128" width="16" height="16" rx="2"/><rect x="342" y="128" width="16" height="16" rx="2"/>
+          <rect x="364" y="128" width="16" height="16" rx="2"/><rect x="386" y="128" width="16" height="16" rx="2"/>
+          <rect x="408" y="128" width="16" height="16" rx="2"/><rect x="430" y="128" width="16" height="16" rx="2"/>
+          <rect x="452" y="128" width="16" height="16" rx="2"/><rect x="474" y="128" width="16" height="16" rx="2"/>
+          <rect x="496" y="128" width="16" height="16" rx="2"/><rect x="518" y="128" width="16" height="16" rx="2"/>
+        </g>
+      </svg>
+
+      <div class="why">
+        <strong>Why it matters:</strong> A CPU does the matrix multiply one small chunk at a time. A
+        GPU launches thousands of threads that each compute a piece simultaneously, giving
+        10&times;&ndash;100&times; speedups on the exact workload ML needs. This connects directly to
+        <a href="linear-algebra.html">linear-algebra.html</a>: <strong>matmul is THE operation</strong>.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>See the parallelism (illustrative)</h3>
+      <pre><code># reference: matmul is the core ML op; NumPy already uses optimized BLAS
+import numpy as np
+
+A = np.random.rand(1024, 1024).astype(np.float32)
+B = np.random.rand(1024, 1024).astype(np.float32)
+
+C = A @ B          # one call -> billions of multiply-adds, run in parallel
+print(C.shape)     # (1024, 1024)
+
+# On a GPU (illustrative, needs a CUDA device + PyTorch):
+#   import torch
+#   A = torch.rand(1024, 1024, device="cuda")
+#   B = torch.rand(1024, 1024, device="cuda")
+#   C = A @ B      # dispatched to thousands of GPU cores / Tensor Cores</code></pre>
+      <p class="muted">The Python at the top is <strong>runnable</strong> with NumPy; the GPU block is
+      <strong>illustrative</strong> (needs CUDA hardware).</p>
+    </div>
+
+    <!-- 2. MEMORY HIERARCHY -->
+    <h2 class="section" id="memory">2. The memory hierarchy: HBM, SRAM &amp; registers</h2>
+    <p class="muted">Compute is cheap; moving data is expensive. Where your numbers live decides how
+      fast the math runs.</p>
+
+    <div class="concept">
+      <h3>Fast &amp; tiny vs slow &amp; huge</h3>
+      <p>Every level of memory trades <strong>size</strong> against <strong>bandwidth/latency</strong>.
+      Registers and on-chip SRAM are blazing fast but tiny; HBM is large but far slower; host RAM is
+      huge but slowest to reach across the PCIe/NVLink bus.</p>
+
+      <svg class="diagram" viewBox="0 0 560 300" role="img"
+           aria-label="Memory hierarchy pyramid: registers and SRAM at the top are smallest but fastest, HBM in the middle is larger and slower, host RAM at the bottom is largest and slowest.">
+        <!-- pyramid tiers -->
+        <polygon points="230,20 330,20 300,80 260,80" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="280" y="55" fill="#4ade80" font-size="12" text-anchor="middle">Registers / SRAM</text>
+        <polygon points="260,82 300,82 340,150 220,150" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="280" y="122" fill="#38bdf8" font-size="13" text-anchor="middle">HBM (on-package)</text>
+        <polygon points="220,152 340,152 400,240 160,240" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="280" y="200" fill="#a78bfa" font-size="13" text-anchor="middle">Host RAM (DRAM)</text>
+        <!-- speed arrow (left) -->
+        <line x1="80" y1="240" x2="80" y2="30" stroke="#94a3b8" stroke-width="2" marker-end="url(#arwH)"/>
+        <text x="80" y="262" fill="#94a3b8" font-size="11" text-anchor="middle">faster &uarr;</text>
+        <!-- size arrow (right) -->
+        <line x1="480" y1="30" x2="480" y2="240" stroke="#94a3b8" stroke-width="2" marker-end="url(#arwH)"/>
+        <text x="480" y="262" fill="#94a3b8" font-size="11" text-anchor="middle">bigger &darr;</text>
+        <!-- bandwidth labels -->
+        <text x="360" y="55"  fill="#4ade80" font-size="10">~10&ndash;100 TB/s, KB&ndash;MB</text>
+        <text x="360" y="120" fill="#38bdf8" font-size="10">~1&ndash;8 TB/s, tens of GB</text>
+        <text x="410" y="200" fill="#a78bfa" font-size="10">~0.05&ndash;0.5 TB/s, 100s GB</text>
+        <defs>
+          <marker id="arwH" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+
+      <table>
+        <tr><th>Level</th><th>Rough size</th><th>Rough bandwidth</th><th>Role</th></tr>
+        <tr><td>Registers</td><td>KBs per core</td><td>fastest (on-chip)</td><td>Operands the ALU works on right now</td></tr>
+        <tr><td>SRAM / shared memory (on-chip)</td><td>tens of MB total</td><td>~10&ndash;100 TB/s</td><td>Scratchpad for a tile of data being reused</td></tr>
+        <tr><td>HBM (high-bandwidth memory)</td><td>tens of GB</td><td>~1&ndash;8 TB/s</td><td>The GPU's main memory: weights, activations</td></tr>
+        <tr><td>Host RAM (system DRAM)</td><td>hundreds of GB</td><td>~0.05&ndash;0.5 TB/s over the bus</td><td>Staging area; slow to reach from the GPU</td></tr>
+      </table>
+      <p class="muted">Numbers are order-of-magnitude and vary by generation; the <em>ratios</em> are
+      what matter.</p>
+
+      <div class="why">
+        <strong>Why it matters:</strong> HBM sits <em>on the same package</em> as the GPU die and uses
+        a very wide interface, which is why it delivers terabytes per second &mdash; far more than
+        ordinary DDR system RAM. But it is still ~100&times; slower than on-chip SRAM. Winning at
+        performance means keeping reused data in SRAM/registers and touching HBM as little as possible.
+      </div>
+    </div>
+
+    <!-- 3. BOUND / ROOFLINE -->
+    <h2 class="section" id="bound">3. Memory-bound vs compute-bound (the roofline idea)</h2>
+    <p class="muted">A kernel is limited either by how fast it can compute (FLOPs) or by how fast it can
+      fetch data (bandwidth). Knowing which tells you what to fix.</p>
+
+    <div class="concept">
+      <h3>Arithmetic intensity decides the bottleneck</h3>
+      <p><strong>Arithmetic intensity</strong> is the ratio of math done to bytes moved:</p>
+      <div class="formula">intensity = FLOPs performed &divide; bytes read+written (FLOPs/byte)</div>
+      <ul class="clean">
+        <li><strong>Low intensity</strong> (few FLOPs per byte) &rarr; <strong>memory-bound</strong>: the
+          ALUs starve waiting on data. Examples: element-wise ops, activations, small vector adds.</li>
+        <li><strong>High intensity</strong> (many FLOPs per byte) &rarr; <strong>compute-bound</strong>:
+          the ALUs are the limit. Example: large matrix multiplies that reuse each loaded value many
+          times.</li>
+      </ul>
+
+      <svg class="diagram" viewBox="0 0 560 240" role="img"
+           aria-label="Roofline chart: a sloped line for the memory-bandwidth limit rises then flattens into a horizontal line for the peak-compute limit; low-intensity kernels sit on the slope, high-intensity kernels sit under the flat roof.">
+        <!-- axes -->
+        <line x1="60" y1="200" x2="520" y2="200" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="60" y1="200" x2="60"  y2="30"  stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="290" y="228" fill="#94a3b8" font-size="11" text-anchor="middle">arithmetic intensity (FLOPs/byte) &rarr;</text>
+        <text x="24"  y="120" fill="#94a3b8" font-size="11" text-anchor="middle" transform="rotate(-90 24 120)">attainable FLOP/s &rarr;</text>
+        <!-- roofline: sloped bandwidth limit then flat compute ceiling -->
+        <line x1="60"  y1="200" x2="270" y2="60" stroke="#38bdf8" stroke-width="3"/>
+        <line x1="270" y1="60"  x2="520" y2="60" stroke="#a78bfa" stroke-width="3"/>
+        <text x="150" y="120" fill="#38bdf8" font-size="11" transform="rotate(-34 150 120)">bandwidth limit</text>
+        <text x="380" y="52"  fill="#a78bfa" font-size="11" text-anchor="middle">peak compute limit</text>
+        <!-- regions -->
+        <text x="150" y="185" fill="#38bdf8" font-size="11" text-anchor="middle">memory-bound</text>
+        <text x="400" y="185" fill="#a78bfa" font-size="11" text-anchor="middle">compute-bound</text>
+        <!-- ridge point marker -->
+        <circle cx="270" cy="60" r="4" fill="#fbbf24"/>
+        <text x="270" y="48" fill="#fbbf24" font-size="10" text-anchor="middle">ridge</text>
+      </svg>
+
+      <div class="why">
+        <strong>Why it matters:</strong> If you are <em>memory-bound</em>, buying a chip with more
+        FLOPs won't help &mdash; you need more bandwidth or fewer memory trips (fusion, tiling). If you
+        are <em>compute-bound</em>, faster math units (Tensor Cores) or lower precision help. Modern ML
+        speed is often a <strong>memory-bandwidth game</strong>: many real kernels are memory-bound.
+      </div>
+    </div>
+
+    <!-- 4. TENSOR CORES -->
+    <h2 class="section" id="tensor">4. Tensor Cores &amp; mixed precision</h2>
+    <p class="muted">Dedicated silicon that does a small matrix multiply-accumulate in one shot, at
+      lower precision, for huge throughput.</p>
+
+    <div class="concept">
+      <h3>What a Tensor Core does</h3>
+      <p>A <strong>Tensor Core</strong> is a specialized unit that computes a small
+      <strong>matrix multiply-accumulate</strong> (MMA) in a single operation &mdash; something like
+      <code>D = A &times; B + C</code> on small tiles (e.g. 4&times;4 or 16&times;16) every cycle,
+      instead of doing scalar multiply-adds one at a time.</p>
+      <div class="formula">D = A &times; B &plus; C &nbsp;&middot;&nbsp; one fused matrix multiply-accumulate</div>
+      <p>They typically read inputs in <strong>reduced precision</strong> (FP16, BF16, or FP8) but
+      <strong>accumulate in FP32</strong>. This is <strong>mixed precision</strong>: fast, low-precision
+      multiplies with a high-precision running total to preserve accuracy.</p>
+      <div class="why">
+        <strong>Why it matters:</strong> A Tensor Core can deliver many times the matmul throughput of
+        the general-purpose cores. Since transformers and CNNs are dominated by matmul, Tensor Cores
+        are where most of the real training/inference speed comes from &mdash; but only if your tensors
+        are shaped and typed so they can be used.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Mixed precision in practice (illustrative)</h3>
+      <pre><code># illustrative: PyTorch automatic mixed precision (needs a GPU with Tensor Cores)
+import torch
+
+model  = build_model().cuda()          # your model
+opt    = torch.optim.Adam(model.parameters())
+scaler = torch.cuda.amp.GradScaler()   # keeps small gradients from underflowing
+
+for x, y in loader:
+    x, y = x.cuda(), y.cuda()
+    opt.zero_grad()
+    with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+        pred = model(x)                # matmuls run on Tensor Cores in BF16
+        loss = loss_fn(pred, y)        # accumulation stays in FP32
+    scaler.scale(loss).backward()
+    scaler.step(opt)
+    scaler.update()</code></pre>
+      <p class="muted">Reference only &mdash; it needs CUDA hardware and a defined model. The idea:
+      compute in low precision, keep the master weights/accumulation in FP32.</p>
+    </div>
+
+    <!-- 5. TILING / FLASHATTENTION -->
+    <h2 class="section" id="tiling">5. How matmul maps to hardware (tiling &amp; FlashAttention)</h2>
+    <p class="muted">The trick to fast matmul: load a block once, reuse it many times, and never round-trip
+      to HBM if you can avoid it.</p>
+
+    <div class="concept">
+      <h3>Tiling: reuse data in fast memory</h3>
+      <p>A naive matmul streams rows and columns from HBM repeatedly &mdash; low arithmetic intensity,
+      memory-bound. <strong>Tiling</strong> (blocking) splits the matrices into small tiles that fit in
+      on-chip SRAM/registers, then does <em>all</em> the multiply-adds those tiles allow before moving
+      on. Each value loaded from HBM gets reused many times, pushing the kernel toward compute-bound.</p>
+
+      <svg class="diagram" viewBox="0 0 560 200" role="img"
+           aria-label="Tiled matrix multiply: a tile of A and a tile of B are loaded into fast SRAM, multiplied into a tile of the output C, reusing the loaded data many times.">
+        <!-- A -->
+        <rect x="40" y="50" width="90" height="90" fill="#1e293b" stroke="#334155"/>
+        <rect x="40" y="50" width="45" height="45" fill="none" stroke="#38bdf8" stroke-width="2"/>
+        <text x="85" y="40" fill="#38bdf8" font-size="12" text-anchor="middle">A</text>
+        <!-- times -->
+        <text x="150" y="100" fill="#e2e8f0" font-size="18" text-anchor="middle">&times;</text>
+        <!-- B -->
+        <rect x="175" y="50" width="90" height="90" fill="#1e293b" stroke="#334155"/>
+        <rect x="175" y="50" width="45" height="45" fill="none" stroke="#a78bfa" stroke-width="2"/>
+        <text x="220" y="40" fill="#a78bfa" font-size="12" text-anchor="middle">B</text>
+        <!-- arrow into SRAM -->
+        <line x1="275" y1="95" x2="330" y2="95" stroke="#94a3b8" stroke-width="2" marker-end="url(#arwT)"/>
+        <!-- SRAM box -->
+        <rect x="335" y="55" width="110" height="80" rx="8" fill="#0b1120" stroke="#4ade80" stroke-width="2"/>
+        <text x="390" y="90" fill="#4ade80" font-size="12" text-anchor="middle">on-chip SRAM</text>
+        <text x="390" y="110" fill="#94a3b8" font-size="10" text-anchor="middle">reuse tiles</text>
+        <!-- arrow to C -->
+        <line x1="445" y1="95" x2="490" y2="95" stroke="#94a3b8" stroke-width="2" marker-end="url(#arwT)"/>
+        <rect x="495" y="55" width="45" height="45" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="517" y="118" fill="#fbbf24" font-size="12" text-anchor="middle">C tile</text>
+        <defs>
+          <marker id="arwT" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="concept">
+      <h3>FlashAttention: a bandwidth-aware trick</h3>
+      <p>Attention in transformers computes a big <code>Q &times; K<sup>T</sup></code> score matrix,
+      softmaxes it, then multiplies by <code>V</code>. The naive version writes that giant
+      intermediate matrix to HBM and reads it back &mdash; classic memory-bound behavior.</p>
+      <p><strong>FlashAttention</strong> restructures the computation to process attention in tiles that
+      stay in on-chip SRAM, fusing the softmax so the full score matrix is <em>never</em> materialized
+      in HBM. Same math, far fewer HBM round-trips &rarr; large speedups and less memory use.</p>
+      <div class="why">
+        <strong>Why it matters:</strong> FlashAttention is a headline example of the memory-bandwidth
+        principle: the win comes not from more FLOPs but from <em>avoiding data movement</em>. Learn
+        the attention math it optimizes in <a href="transformers.html">transformers.html</a>.
+      </div>
+    </div>
+
+    <!-- 6. PRECISION / QUANTIZATION -->
+    <h2 class="section" id="precision">6. Precision &amp; quantization tradeoffs</h2>
+    <p class="muted">Fewer bits per number means less memory, less bandwidth, and faster math &mdash; at
+      the cost of range and accuracy.</p>
+
+    <div class="concept">
+      <h3>The common formats</h3>
+      <table>
+        <tr><th>Format</th><th>Bits</th><th>Range vs precision</th><th>Typical use</th></tr>
+        <tr>
+          <td><code>FP32</code></td><td>32</td>
+          <td>Wide range, high precision</td>
+          <td>Baseline / accumulation; "full precision"</td>
+        </tr>
+        <tr>
+          <td><code>FP16</code></td><td>16</td>
+          <td>Good precision, <strong>narrow range</strong> (can overflow)</td>
+          <td>Mixed-precision training/inference (needs loss scaling)</td>
+        </tr>
+        <tr>
+          <td><code>BF16</code></td><td>16</td>
+          <td>Same wide range as FP32, <strong>less precision</strong></td>
+          <td>Training on modern accelerators (robust, no loss scaling)</td>
+        </tr>
+        <tr>
+          <td><code>FP8</code></td><td>8</td>
+          <td>Very small range/precision</td>
+          <td>Large-model training/inference on the newest hardware</td>
+        </tr>
+        <tr>
+          <td><code>INT8</code></td><td>8</td>
+          <td>Integers via a scale factor (quantization)</td>
+          <td>Inference: fast, tiny, needs calibration</td>
+        </tr>
+      </table>
+
+      <div class="why">
+        <strong>FP16 vs BF16:</strong> both are 16-bit, but they split the bits differently. FP16 keeps
+        more mantissa (precision) but a small exponent (range), so it can overflow/underflow &mdash;
+        hence loss scaling. BF16 keeps FP32's exponent (range) with fewer mantissa bits, so it "just
+        works" for training. FP8 pushes this further for the largest models.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Why fewer bits is faster (two reasons)</h3>
+      <ul class="clean">
+        <li><strong>Bandwidth:</strong> an INT8 tensor is 1&frasl;4 the bytes of FP32, so it moves
+          through HBM 4&times; faster &mdash; directly attacking the memory-bound bottleneck.</li>
+        <li><strong>Compute:</strong> Tensor Cores hit much higher throughput at FP16/BF16/FP8/INT8
+          than at FP32, so the math finishes sooner too.</li>
+      </ul>
+      <p><strong>Quantization</strong> (e.g. FP32 &rarr; INT8) maps floats onto integers with a scale:</p>
+      <div class="formula">q = round(x &divide; scale) &nbsp;&middot;&nbsp; x &asymp; q &times; scale</div>
+      <p class="muted">The tradeoff: smaller and faster, but rounding error can hurt accuracy, so INT8
+      inference usually needs calibration or quantization-aware training.</p>
+
+      <pre><code># runnable: a toy symmetric INT8 quantization round-trip with numpy
+import numpy as np
+
+x = np.array([-0.9, -0.1, 0.0, 0.4, 1.2], dtype=np.float32)
+
+scale = np.max(np.abs(x)) / 127.0          # symmetric int8: range [-127, 127]
+q = np.round(x / scale).astype(np.int8)    # quantize to integers
+x_hat = q.astype(np.float32) * scale       # dequantize back to float
+
+print("int8   :", q)
+print("approx :", np.round(x_hat, 3))
+print("max err:", round(float(np.max(np.abs(x - x_hat))), 4))</code></pre>
+    </div>
+
+    <!-- 7. PRACTICAL -->
+    <h2 class="section" id="practical">7. Practical: batch size, utilization &amp; big matmuls</h2>
+    <p class="muted">Getting the theoretical speed in practice is mostly about keeping the hardware busy.</p>
+
+    <div class="concept">
+      <h3>Why big matmuls are efficient</h3>
+      <p>Small matrices have low arithmetic intensity: you pay the fixed cost of loading data but do
+      little math with it (memory-bound, cores idle). Big matmuls reuse each loaded tile many times,
+      so the expensive HBM reads are amortized over lots of compute &mdash; that is when Tensor Cores
+      run near peak.</p>
+      <ul class="clean">
+        <li><strong>Batch size:</strong> processing many samples at once turns lots of tiny
+          matrix&ndash;vector products into one large matrix&ndash;matrix multiply, raising intensity
+          and utilization.</li>
+        <li><strong>Shapes:</strong> dimensions that are multiples of the Tensor Core tile size
+          (often 8 or 16) let the hardware use its fast path instead of padding.</li>
+        <li><strong>Utilization:</strong> the fraction of peak FLOP/s you actually achieve. Low
+          utilization usually means memory-bound kernels, tiny batches, or awkward shapes &mdash; not a
+          slow chip.</li>
+      </ul>
+
+      <svg class="diagram" viewBox="0 0 560 180" role="img"
+           aria-label="Bar chart showing GPU utilization rising as batch size increases from tiny to large.">
+        <line x1="60" y1="150" x2="520" y2="150" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="60" y1="150" x2="60"  y2="20"  stroke="#94a3b8" stroke-width="1.5"/>
+        <rect x="100" y="120" width="60" height="30"  fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <rect x="220" y="85"  width="60" height="65"  fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <rect x="340" y="55"  width="60" height="95"  fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <rect x="440" y="42"  width="60" height="108" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="130" y="168" fill="#94a3b8" font-size="10" text-anchor="middle">batch 1</text>
+        <text x="250" y="168" fill="#94a3b8" font-size="10" text-anchor="middle">batch 8</text>
+        <text x="370" y="168" fill="#94a3b8" font-size="10" text-anchor="middle">batch 64</text>
+        <text x="470" y="168" fill="#94a3b8" font-size="10" text-anchor="middle">batch 256</text>
+        <text x="290" y="14"  fill="#e2e8f0" font-size="11" text-anchor="middle">GPU utilization &uarr; with batch size</text>
+      </svg>
+
+      <div class="why">
+        <strong>Rule of thumb:</strong> if the GPU is barely warm during training/inference, you are
+        likely memory-bound or under-batched. Increase batch size, fuse element-wise ops, use
+        mixed precision, and pick Tensor-Core-friendly shapes before reaching for a bigger GPU. When
+        you serve models in production, these same levers drive throughput and cost &mdash; see
+        <a href="model-serving.html">model-serving.html</a>.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>GPUs</strong> &mdash; thousands of cores for parallel matmul, vs a CPU's few fast cores</li>
+        <li><strong>Memory hierarchy</strong> &mdash; registers/SRAM (fast, tiny) &rarr; HBM (big, fast-ish) &rarr; host RAM (huge, slow)</li>
+        <li><strong>Memory-bound vs compute-bound</strong> &mdash; the roofline: fix bandwidth or fix FLOPs</li>
+        <li><strong>Tensor Cores</strong> &mdash; matrix multiply-accumulate units in mixed precision (FP16/BF16/FP8)</li>
+        <li><strong>Tiling / FlashAttention</strong> &mdash; reuse data in SRAM, avoid HBM round-trips</li>
+        <li><strong>Precision / quantization</strong> &mdash; fewer bits = less bandwidth + faster math, some accuracy risk</li>
+        <li><strong>Big matmuls &amp; batching</strong> &mdash; the way to keep the hardware fully utilized</li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">8. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="linear-algebra.html">Linear Algebra &mdash; why matmul is THE operation (this site)</a></li>
+        <li><a href="transformers.html">Transformers &mdash; the attention math FlashAttention optimizes (this site)</a></li>
+        <li><a href="model-serving.html">Model Serving &mdash; throughput, batching &amp; cost in production (this site)</a></li>
+        <li><a href="https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html" target="_blank" rel="noopener">NVIDIA &mdash; GPU Performance Background (memory vs compute bound)</a></li>
+        <li><a href="https://arxiv.org/abs/2205.14135" target="_blank" rel="noopener">FlashAttention paper (Dao et al.)</a></li>
+        <li><a href="https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html" target="_blank" rel="noopener">NVIDIA &mdash; Mixed Precision Training guide</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    
+    <div class="quizbox">
+      <h2 class="section" style="margin-top:0;" id="quiz">✅ Quick Quiz</h2>
+      <p class="muted">Test yourself on this page. Click an answer for instant feedback.</p>
+      <div id="quickquiz" data-quiz="1"></div>
+    </div>
+
+  <script>
+  (function () {
+    var DATA = [{"q": "Why do GPUs beat CPUs for deep learning?", "options": ["Higher clock speed", "Thousands of cores doing massively parallel matrix math", "More disk", "Better keyboards"], "correct": 1, "explain": "Neural nets are matrix multiplications; GPUs run thousands of these operations in parallel."}, {"q": "Tensor Cores are specialized units for:", "options": ["Sorting", "Matrix multiply-accumulate in mixed precision (FP16/BF16/FP8)", "Networking", "Disk I/O"], "correct": 1, "explain": "Tensor Cores accelerate the fused multiply-add at the heart of matmul, often in reduced precision."}, {"q": "HBM (High-Bandwidth Memory) matters because ML is often:", "options": ["Compute-bound only", "Memory-bandwidth-bound — moving data can bottleneck more than FLOPs", "Disk-bound", "Network-bound"], "correct": 1, "explain": "Feeding the cores fast enough (bandwidth) is frequently the real limit, not raw compute."}, {"q": "Lower precision (FP16/BF16/INT8) is used to:", "options": ["Increase accuracy always", "Speed up compute and cut memory use, trading a little precision", "Slow down training", "Avoid GPUs"], "correct": 1, "explain": "Reduced precision moves/computes more per cycle and uses less memory, usually with minimal accuracy loss."}, {"q": "FlashAttention is fast largely because it:", "options": ["Uses more HBM", "Is bandwidth-aware — keeps data in fast on-chip memory to avoid HBM round-trips", "Skips attention", "Uses the CPU"], "correct": 1, "explain": "It tiles the computation to reuse fast SRAM and minimize slow HBM traffic."}];
+    var host = document.getElementById("quickquiz");
+    if (!host || !DATA || !DATA.length) return;
+    var total = DATA.length, score = 0, answered = 0;
+    var bar = document.createElement("div");
+    bar.className = "quizbar";
+    bar.innerHTML = 'Score: <strong id="qqScore">0</strong> / ' + total;
+    host.appendChild(bar);
+    DATA.forEach(function (item, qi) {
+      var wrap = document.createElement("div");
+      wrap.className = "qq";
+      var qt = document.createElement("div");
+      qt.className = "qt";
+      qt.textContent = (qi + 1) + ". " + item.q;
+      wrap.appendChild(qt);
+      var ul = document.createElement("div");
+      ul.className = "qopts";
+      var locked = false;
+      item.options.forEach(function (opt, oi) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "qopt";
+        b.textContent = opt;
+        b.addEventListener("click", function () {
+          if (locked) return;
+          locked = true;
+          answered++;
+          var btns = ul.querySelectorAll(".qopt");
+          btns.forEach(function (bb, i) {
+            bb.disabled = true;
+            if (i === item.correct) bb.classList.add("correct");
+            if (i === oi && oi !== item.correct) bb.classList.add("wrong");
+          });
+          if (oi === item.correct) { score++; document.getElementById("qqScore").textContent = score; }
+          ex.classList.add("show");
+        });
+        ul.appendChild(b);
+      });
+      wrap.appendChild(ul);
+      var ex = document.createElement("div");
+      ex.className = "qex";
+      ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+      wrap.appendChild(ex);
+      host.appendChild(wrap);
+    });
+  })();
+  </script>
+
+    <footer>
+      <p>Hardware Acceleration &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

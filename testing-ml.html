@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testing ML Code with PyTest</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#129514; Testing ML Code with PyTest</h1>
+    <p>Catch silent bugs before they wreck your results &mdash; test your code, your data, and your
+       model behavior with runnable pytest patterns.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> In normal software a bug usually crashes or throws. In ML a bug
+      often stays <em>silent</em> &mdash; a wrong tensor shape gets broadcast, a <code>NaN</code>
+      quietly spreads, accuracy drifts &mdash; and you only notice when the model is already in
+      production. Tests turn those silent failures into loud, early ones.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#why">Why testing ML is different</a></li>
+        <li><a href="#basics">PyTest basics</a></li>
+        <li><a href="#shapes">Data &amp; tensor shape tests</a></li>
+        <li><a href="#numeric">Numerical tests (allclose, NaNs, gradients)</a></li>
+        <li><a href="#threshold">Validation threshold tests</a></li>
+        <li><a href="#dataquality">Testing data quality</a></li>
+        <li><a href="#invariance">Property &amp; invariance tests</a></li>
+        <li><a href="#next">Where this fits &amp; resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. WHY -->
+    <h2 class="section" id="why">1. Why testing ML is different</h2>
+    <p class="muted">Traditional tests check code. ML systems have three moving parts that can all break independently.</p>
+
+    <div class="concept">
+      <h3>Three things to test, not one</h3>
+      <table>
+        <tr><th>Layer</th><th>What can silently break</th><th>Example test</th></tr>
+        <tr><td>Code</td><td>Wrong shape, off-by-one axis, bad normalization</td><td><code>assert out.shape == (batch, classes)</code></td></tr>
+        <tr><td>Data</td><td>Nulls, out-of-range values, schema drift, leakage</td><td><code>assert df["age"].between(0, 120).all()</code></td></tr>
+        <tr><td>Model behavior</td><td>Accuracy regression, broken invariants, <code>NaN</code> loss</td><td><code>assert acc &gt; 0.8</code></td></tr>
+      </table>
+      <div class="why">
+        <strong>Why it matters:</strong> tests catch silent ML bugs &mdash; wrong shapes, <code>NaN</code>s,
+        exploded gradients &mdash; that don't crash but quietly ruin results. A model that "runs fine"
+        can still be completely wrong. Assertions make wrongness visible.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>The ML test flow</h3>
+      <p>Think of tests as gates the data and model must pass through before you trust an output.</p>
+      <svg class="diagram" viewBox="0 0 560 190" role="img"
+           aria-label="ML test flow: raw data passes a data-quality gate, then a shape test, then a numeric NaN check, then a threshold gate before being trusted.">
+        <defs>
+          <marker id="arw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+        <rect x="16"  y="70" width="90" height="46" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="61"  y="90"  fill="#38bdf8" font-size="12" text-anchor="middle">Data</text>
+        <text x="61"  y="106" fill="#94a3b8" font-size="10" text-anchor="middle">quality</text>
+
+        <rect x="140" y="70" width="90" height="46" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="185" y="90"  fill="#a78bfa" font-size="12" text-anchor="middle">Shape</text>
+        <text x="185" y="106" fill="#94a3b8" font-size="10" text-anchor="middle">== (b, c)</text>
+
+        <rect x="264" y="70" width="90" height="46" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="309" y="90"  fill="#fbbf24" font-size="12" text-anchor="middle">Numeric</text>
+        <text x="309" y="106" fill="#94a3b8" font-size="10" text-anchor="middle">no NaN</text>
+
+        <rect x="388" y="70" width="90" height="46" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+        <text x="433" y="90"  fill="#f87171" font-size="12" text-anchor="middle">Threshold</text>
+        <text x="433" y="106" fill="#94a3b8" font-size="10" text-anchor="middle">acc &gt; 0.8</text>
+
+        <circle cx="524" cy="93" r="22" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="524" y="97" fill="#4ade80" font-size="11" text-anchor="middle">ship</text>
+
+        <line x1="106" y1="93" x2="140" y2="93" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="230" y1="93" x2="264" y2="93" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="354" y1="93" x2="388" y2="93" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="478" y1="93" x2="502" y2="93" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+
+        <text x="280" y="30" fill="#e2e8f0" font-size="13" text-anchor="middle">Each gate is a test &mdash; a failure stops the pipeline</text>
+      </svg>
+    </div>
+
+    <!-- 2. PYTEST BASICS -->
+    <h2 class="section" id="basics">2. PyTest basics</h2>
+    <p class="muted">A tiny amount of pytest syntax covers most ML testing needs.</p>
+
+    <div class="concept">
+      <h3>Anatomy of a test</h3>
+      <p>A pytest test is any function whose name starts with <code>test_</code>, containing an
+      <code>assert</code>. If the assertion is false, the test fails.</p>
+      <pre><code># file: test_math.py   (runnable)
+def add(a, b):
+    return a + b
+
+def test_add_basic():
+    assert add(2, 3) == 5
+
+def test_add_negative():
+    assert add(-1, 1) == 0</code></pre>
+      <p>Run it from the terminal:</p>
+      <pre><code># reference: run all tests, verbose, stop at first failure
+pytest -v -x
+pytest test_math.py::test_add_basic   # run one specific test</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>Fixtures &mdash; reusable setup</h3>
+      <p>A <strong>fixture</strong> builds something once (a model, a dataset, a temp file) and hands it
+      to any test that asks for it by name.</p>
+      <pre><code># runnable
+import numpy as np
+import pytest
+
+@pytest.fixture
+def eval_batch():
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(32, 4))   # 32 samples, 4 features
+    y = rng.integers(0, 3, size=32)
+    return X, y
+
+def test_batch_shape(eval_batch):
+    X, y = eval_batch
+    assert X.shape == (32, 4)
+    assert y.shape == (32,)</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>Parametrize &mdash; one test, many cases</h3>
+      <p><code>@pytest.mark.parametrize</code> runs the same test body across many inputs, so each case
+      reports pass/fail independently.</p>
+      <pre><code># runnable
+import numpy as np
+import pytest
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+@pytest.mark.parametrize("x", [-10.0, -1.0, 0.0, 1.0, 10.0])
+def test_sigmoid_in_range(x):
+    y = sigmoid(x)
+    assert 0.0 &lt; y &lt; 1.0            # sigmoid output is strictly between 0 and 1
+
+def test_sigmoid_midpoint():
+    assert np.isclose(sigmoid(0.0), 0.5)</code></pre>
+      <div class="why">
+        <strong>Why it matters:</strong> parametrize gives you edge-case coverage (very negative, zero,
+        very positive) for free &mdash; exactly where numerical bugs like overflow hide.
+      </div>
+    </div>
+
+    <!-- 3. SHAPE TESTS -->
+    <h2 class="section" id="shapes">3. Data &amp; tensor shape tests</h2>
+    <p class="muted">The #1 silent ML bug is a shape mismatch that broadcasts instead of erroring.</p>
+
+    <div class="concept">
+      <h3>Assert the exact output shape</h3>
+      <p>Every model output should have a known shape: <code>(batch, classes)</code> for a classifier.
+      Pin it down.</p>
+      <pre><code># runnable
+import numpy as np
+
+def linear_head(X, W, b):
+    # X: (batch, features), W: (features, classes), b: (classes,)
+    return X @ W + b
+
+def test_output_shape():
+    batch, features, classes = 8, 5, 3
+    X = np.zeros((batch, features))
+    W = np.zeros((features, classes))
+    b = np.zeros(classes)
+    out = linear_head(X, W, b)
+    assert out.shape == (batch, classes)   # (8, 3)</code></pre>
+      <div class="why">
+        <strong>Why it matters:</strong> numpy broadcasting will happily turn a <code>(8, 3)</code> vs
+        <code>(3,)</code> mismatch into a silent wrong result instead of an error. An explicit shape
+        assert is your seatbelt.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Common shape checks</h3>
+      <ul class="clean">
+        <li><code>assert out.shape == (batch, classes)</code> &mdash; classifier logits</li>
+        <li><code>assert preds.shape == labels.shape</code> &mdash; predictions align with targets</li>
+        <li><code>assert X.ndim == 2</code> &mdash; catch a stray extra dimension early</li>
+        <li><code>assert len(loader) &gt; 0</code> &mdash; the dataset actually loaded</li>
+      </ul>
+    </div>
+
+    <!-- 4. NUMERICAL -->
+    <h2 class="section" id="numeric">4. Numerical tests</h2>
+    <p class="muted">Floating-point math is never exact &mdash; compare with tolerance, and hunt for NaNs.</p>
+
+    <div class="concept">
+      <h3>Compare floats with np.allclose</h3>
+      <p>Never use <code>==</code> on floats. Use <code>np.allclose</code> (or <code>np.isclose</code>)
+      with a tolerance.</p>
+      <pre><code># runnable
+import numpy as np
+
+def test_allclose_not_equals():
+    a = np.array([0.1 + 0.2, 1.0])
+    b = np.array([0.3,        1.0])
+    assert not np.all(a == b)        # 0.1 + 0.2 != 0.3 exactly
+    assert np.allclose(a, b)         # but they are close enough</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>No NaNs, no infinities, finite gradients</h3>
+      <p>A single <code>NaN</code> poisons an entire tensor. Assert finiteness on outputs and gradients.</p>
+      <pre><code># runnable
+import numpy as np
+
+def test_outputs_are_finite():
+    out = np.array([0.2, 0.8, 0.5])
+    assert np.all(np.isfinite(out))          # no NaN, no +/-inf
+    assert not np.isnan(out).any()
+
+def test_gradients_finite():
+    # a fake gradient tensor from a backward pass
+    grad = np.array([[0.01, -0.2], [0.3, 0.05]])
+    assert np.isfinite(grad).all()           # exploded/NaN grads would fail here
+    assert np.abs(grad).max() &lt; 1e3          # sanity bound: not exploding</code></pre>
+      <div class="why">
+        <strong>Why it matters:</strong> a <code>NaN</code> loss won't raise an exception &mdash; training
+        just silently stops learning. A finiteness assert in your test suite (and even in training code)
+        catches it at the source.
+      </div>
+    </div>
+
+    <!-- 5. THRESHOLD -->
+    <h2 class="section" id="threshold">5. Validation threshold tests</h2>
+    <p class="muted">Lock in a minimum quality bar so a regression fails the build, not the customer.</p>
+
+    <div class="concept">
+      <h3>Assert accuracy on a fixed eval set</h3>
+      <p>Pick a small, <strong>fixed</strong> evaluation set and assert the model clears a threshold.
+      A fixed set makes the test deterministic and repeatable.</p>
+      <pre><code># runnable  (uses a trivial rule "model" so it always runs)
+import numpy as np
+
+def predict(X):
+    # toy model: class 1 if feature-0 is positive, else class 0
+    return (X[:, 0] &gt; 0).astype(int)
+
+def accuracy(y_true, y_pred):
+    return float(np.mean(y_true == y_pred))
+
+def test_accuracy_above_threshold():
+    # fixed eval set: feature-0 sign perfectly determines the label
+    X = np.array([[ 1.0, 0.0],
+                  [-1.0, 0.0],
+                  [ 2.0, 9.0],
+                  [-3.0, 1.0],
+                  [ 0.5, 2.0]])
+    y = np.array([1, 0, 1, 0, 1])
+    acc = accuracy(y, predict(X))
+    assert acc &gt; 0.8            # here acc == 1.0, comfortably above the bar</code></pre>
+      <div class="why">
+        <strong>Why it matters:</strong> a threshold test turns "the model got worse" into a red CI
+        build. Set the bar just below your current, trusted score so real regressions fail fast.
+      </div>
+    </div>
+
+    <!-- 6. DATA QUALITY -->
+    <h2 class="section" id="dataquality">6. Testing data quality</h2>
+    <p class="muted">Garbage in, garbage out. Test the data before it ever reaches the model.</p>
+
+    <div class="concept">
+      <h3>Nulls, ranges, and schema</h3>
+      <pre><code># runnable (pure numpy so it runs anywhere)
+import numpy as np
+
+def test_no_nulls():
+    ages = np.array([21.0, 34.0, 45.0, 29.0])
+    assert not np.isnan(ages).any()         # no missing values
+
+def test_values_in_range():
+    ages = np.array([21.0, 34.0, 45.0, 29.0])
+    assert (ages &gt;= 0).all() and (ages &lt;= 120).all()
+
+def test_schema_columns():
+    # expected column order / names for a fixed dataset
+    columns = ["age", "income", "label"]
+    expected = ["age", "income", "label"]
+    assert columns == expected              # schema drift would fail here</code></pre>
+      <div class="why">
+        <strong>Why it matters:</strong> a renamed column or a stray sentinel value like
+        <code>&minus;999</code> for "missing" can silently skew every prediction. Schema and range
+        checks catch upstream data changes before they train a broken model.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>What to check on incoming data</h3>
+      <ul class="clean">
+        <li>No nulls / NaNs in required columns</li>
+        <li>Numeric ranges are physically plausible (age 0 &rarr; 120, probability 0 &rarr; 1)</li>
+        <li>Categorical values are in the expected set (no unseen labels)</li>
+        <li>Row count and column schema match expectations</li>
+        <li>No duplicate rows between train and eval sets (leakage)</li>
+      </ul>
+    </div>
+
+    <!-- 7. INVARIANCE -->
+    <h2 class="section" id="invariance">7. Property &amp; invariance tests</h2>
+    <p class="muted">Instead of exact outputs, assert properties that must <em>always</em> hold.</p>
+
+    <div class="concept">
+      <h3>Softmax always sums to 1</h3>
+      <p>Softmax turns logits into a probability distribution, so each row must sum to
+      <code>1</code> and every value must be in <code>[0, 1]</code>.</p>
+      <pre><code># runnable
+import numpy as np
+
+def softmax(x, axis=-1):
+    x = x - np.max(x, axis=axis, keepdims=True)   # numerical stability
+    e = np.exp(x)
+    return e / e.sum(axis=axis, keepdims=True)
+
+def test_softmax_sums_to_one():
+    logits = np.array([[2.0, 1.0, 0.1],
+                       [0.5, 0.5, 0.5]])
+    probs = softmax(logits, axis=1)
+    row_sums = probs.sum(axis=1)
+    assert np.allclose(row_sums, 1.0)             # every row is a distribution
+    assert (probs &gt;= 0).all() and (probs &lt;= 1).all()</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>Shuffling inputs must not change accuracy</h3>
+      <p>Accuracy is a set-level metric &mdash; reordering the samples (and their matching labels)
+      must give the identical score. If it doesn't, something depends on row order (a bug).</p>
+      <pre><code># runnable
+import numpy as np
+
+def predict(X):
+    return (X[:, 0] &gt; 0).astype(int)
+
+def accuracy(y_true, y_pred):
+    return float(np.mean(y_true == y_pred))
+
+def test_shuffle_invariance():
+    rng = np.random.default_rng(42)
+    X = rng.normal(size=(50, 3))
+    y = (X[:, 0] &gt; 0).astype(int)
+
+    acc_original = accuracy(y, predict(X))
+
+    perm = rng.permutation(len(X))       # shuffle rows AND labels together
+    acc_shuffled = accuracy(y[perm], predict(X[perm]))
+
+    assert np.isclose(acc_original, acc_shuffled)</code></pre>
+      <div class="why">
+        <strong>Why it matters:</strong> invariance tests describe <em>what must be true</em> without
+        pinning an exact number. They survive retraining and catch subtle order-dependence,
+        normalization, and leakage bugs that a single fixed-value assert would miss.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Useful ML invariants to test</h3>
+      <table>
+        <tr><th>Invariant</th><th>Assertion idea</th></tr>
+        <tr><td>Softmax is a distribution</td><td><code>np.allclose(probs.sum(axis=1), 1)</code></td></tr>
+        <tr><td>Sigmoid output in (0, 1)</td><td><code>(0 &lt; y).all() and (y &lt; 1).all()</code></td></tr>
+        <tr><td>Order invariance</td><td>shuffle rows &rarr; same accuracy</td></tr>
+        <tr><td>Determinism with fixed seed</td><td>two runs give identical outputs</td></tr>
+        <tr><td>Scale sanity</td><td>doubling all inputs doesn't produce <code>NaN</code></td></tr>
+      </table>
+    </div>
+
+    <!-- 8. NEXT -->
+    <h2 class="section" id="next">8. Where this fits &amp; resources</h2>
+    <div class="concept">
+      <h3>The testing pyramid for ML</h3>
+      <p>Many fast unit tests (shapes, ranges, invariants) at the base; fewer, slower behavior and
+      threshold tests near the top.</p>
+      <svg class="diagram" viewBox="0 0 560 210" role="img"
+           aria-label="Testing pyramid for ML: a wide base of many fast unit and data tests, a middle band of integration tests, and a narrow top of slow end-to-end threshold tests.">
+        <polygon points="280,20 400,80 160,80" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+        <text x="280" y="58" fill="#f87171" font-size="12" text-anchor="middle">E2E / threshold</text>
+
+        <polygon points="160,84 400,84 460,140 100,140" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="280" y="118" fill="#a78bfa" font-size="12" text-anchor="middle">Integration / behavior</text>
+
+        <polygon points="100,144 460,144 520,200 40,200" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="280" y="178" fill="#38bdf8" font-size="12" text-anchor="middle">Unit: shapes &middot; ranges &middot; invariants</text>
+
+        <text x="280" y="16" fill="#94a3b8" font-size="10" text-anchor="middle">fewer, slower</text>
+      </svg>
+      <div class="why">
+        <strong>Practical order:</strong> write the cheap unit tests first (shapes, NaNs, softmax sums
+        to 1). They run in milliseconds and catch the majority of silent bugs. Save the slow
+        train-and-evaluate threshold tests for CI.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Keep learning</h3>
+      <ul class="clean">
+        <li><a href="project-structure.html">Project Structure</a> &mdash; where <code>tests/</code> lives and how to organize test files</li>
+        <li><a href="cicd-ml.html">CI/CD for ML</a> &mdash; run <code>pytest</code> automatically on every push and block bad merges</li>
+        <li><a href="code-drills.html">Code Drills</a> &mdash; practice writing numpy functions worth testing</li>
+        <li><a href="https://docs.pytest.org/" target="_blank" rel="noopener">pytest documentation</a> &mdash; fixtures, parametrize, markers</li>
+        <li><a href="https://numpy.org/doc/stable/reference/generated/numpy.allclose.html" target="_blank" rel="noopener">numpy.allclose reference</a></li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3>Quick recap</h3>
+      <ul class="clean">
+        <li><strong>Test three layers</strong> &mdash; code, data, and model behavior</li>
+        <li><strong>Shapes</strong> &mdash; <code>assert out.shape == (batch, classes)</code></li>
+        <li><strong>Numerics</strong> &mdash; <code>np.allclose</code>, finite outputs, no <code>NaN</code>s</li>
+        <li><strong>Thresholds</strong> &mdash; <code>assert acc &gt; 0.8</code> on a fixed eval set</li>
+        <li><strong>Data quality</strong> &mdash; nulls, ranges, schema</li>
+        <li><strong>Invariants</strong> &mdash; softmax sums to 1, shuffle doesn't change accuracy</li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    
+    <div class="quizbox">
+      <h2 class="section" style="margin-top:0;" id="quiz">✅ Quick Quiz</h2>
+      <p class="muted">Test yourself on this page. Click an answer for instant feedback.</p>
+      <div id="quickquiz" data-quiz="1"></div>
+    </div>
+
+  <script>
+  (function () {
+    var DATA = [{"q": "Why is testing ML code different from normal software testing?", "options": ["It isn't", "You must test data and model behavior, not just code logic", "ML has no bugs", "Tests slow training"], "correct": 1, "explain": "ML bugs often hide in data and shapes/values, so you test data quality and model behavior too."}, {"q": "A shape test typically asserts:", "options": ["The model is happy", "output.shape == (batch, classes)", "The GPU is warm", "The file exists"], "correct": 1, "explain": "Checking tensor shapes catches a huge class of silent ML bugs early."}, {"q": "Which pytest tool runs the same test over many inputs?", "options": ["@pytest.mark.parametrize", "print()", "time.sleep", "import os"], "correct": 0, "explain": "`parametrize` feeds multiple input/expected pairs into one test function."}, {"q": "A good invariance test for softmax is:", "options": ["It returns negatives", "Its outputs sum to 1", "It equals the input", "It has no gradient"], "correct": 1, "explain": "Softmax must produce a valid probability distribution that sums to 1."}, {"q": "A validation-threshold test might assert:", "options": ["accuracy > 0.8 on a fixed eval set", "the code compiles", "the repo has a README", "the GPU exists"], "correct": 0, "explain": "Threshold tests fail the build if model quality drops below an agreed bar."}];
+    var host = document.getElementById("quickquiz");
+    if (!host || !DATA || !DATA.length) return;
+    var total = DATA.length, score = 0, answered = 0;
+    var bar = document.createElement("div");
+    bar.className = "quizbar";
+    bar.innerHTML = 'Score: <strong id="qqScore">0</strong> / ' + total;
+    host.appendChild(bar);
+    DATA.forEach(function (item, qi) {
+      var wrap = document.createElement("div");
+      wrap.className = "qq";
+      var qt = document.createElement("div");
+      qt.className = "qt";
+      qt.textContent = (qi + 1) + ". " + item.q;
+      wrap.appendChild(qt);
+      var ul = document.createElement("div");
+      ul.className = "qopts";
+      var locked = false;
+      item.options.forEach(function (opt, oi) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "qopt";
+        b.textContent = opt;
+        b.addEventListener("click", function () {
+          if (locked) return;
+          locked = true;
+          answered++;
+          var btns = ul.querySelectorAll(".qopt");
+          btns.forEach(function (bb, i) {
+            bb.disabled = true;
+            if (i === item.correct) bb.classList.add("correct");
+            if (i === oi && oi !== item.correct) bb.classList.add("wrong");
+          });
+          if (oi === item.correct) { score++; document.getElementById("qqScore").textContent = score; }
+          ex.classList.add("show");
+        });
+        ul.appendChild(b);
+      });
+      wrap.appendChild(ul);
+      var ex = document.createElement("div");
+      ex.className = "qex";
+      ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+      wrap.appendChild(ex);
+      host.appendChild(wrap);
+    });
+  })();
+  </script>
+
+    <footer>
+      <p>Testing ML Code &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

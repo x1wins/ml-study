@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ML Project Structure &amp; Templates</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#128193; ML Project Structure &amp; Templates</h1>
+    <p>From notebook chaos to a maintainable, reproducible repo &mdash; a practical layout
+       your team (and future you) can actually work with.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> A model is only useful if someone else can run it, retrain it, and
+      ship it. Good structure separates <em>config</em>, <em>code</em>, and <em>data</em> so
+      experiments are repeatable and code is testable &mdash; the difference between a demo and a product.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#why">Why structure matters</a></li>
+        <li><a href="#layout">The recommended layout</a></li>
+        <li><a href="#folders">Folder-by-folder reference</a></li>
+        <li><a href="#separation">Separation of concerns</a></li>
+        <li><a href="#config">Config-driven experiments</a></li>
+        <li><a href="#packaging">Packaging your project</a></li>
+        <li><a href="#repro">Reproducibility</a></li>
+        <li><a href="#resources">Resources &amp; related pages</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. WHY -->
+    <h2 class="section" id="why">1. Why structure matters</h2>
+    <p class="muted">The most common ML failure mode isn't a bad model &mdash; it's a project nobody else can run.</p>
+
+    <div class="concept">
+      <h3>From notebook chaos to a real repo</h3>
+      <p>Every ML project starts as a single notebook: load data, hack a model, print accuracy. That's
+      fine for exploration. But the moment you need to <strong>retrain</strong>, <strong>hand it off</strong>,
+      or <strong>deploy</strong> it, an untracked notebook full of hard-coded paths and out-of-order cells
+      becomes a liability.</p>
+      <p>A structured repo turns "it worked on my machine last Tuesday" into "clone, install, run" &mdash;
+      every time, for everyone.</p>
+      <table>
+        <tr><th>Notebook chaos</th><th>Maintainable repo</th></tr>
+        <tr><td>Cells run out of order</td><td>Deterministic scripts &amp; entry points</td></tr>
+        <tr><td>Hard-coded paths &amp; magic numbers</td><td>Config files (yaml)</td></tr>
+        <tr><td>Copy-pasted code across notebooks</td><td>Reusable modules in <code>src/</code></td></tr>
+        <tr><td>No tests &mdash; "looks right"</td><td>Unit tests in <code>tests/</code></td></tr>
+        <tr><td>Unpinned deps &rarr; breaks later</td><td>Pinned <code>requirements.txt</code></td></tr>
+      </table>
+      <div class="why">
+        <strong>If it only works in your notebook, it doesn't work.</strong> Reproducibility is a
+        feature, not a chore. A model you can't rerun is a screenshot.
+      </div>
+    </div>
+
+    <!-- 2. LAYOUT -->
+    <h2 class="section" id="layout">2. The recommended layout</h2>
+    <p class="muted">A sensible default that scales from solo experiments to a team codebase.</p>
+
+    <div class="concept">
+      <h3>Directory tree</h3>
+      <pre><code>my-ml-project/
+&#9500;&#9472; data/                  # not tracked in git (see .gitignore)
+&#9474;  &#9500;&#9472; raw/                # original, immutable source data
+&#9474;  &#9492;&#9472; processed/          # cleaned / feature-engineered data
+&#9500;&#9472; notebooks/             # exploration only (not the source of truth)
+&#9474;  &#9492;&#9472; 01_explore.ipynb
+&#9500;&#9472; src/                   # the actual, importable package
+&#9474;  &#9500;&#9472; __init__.py
+&#9474;  &#9500;&#9472; data/               # loading &amp; preprocessing
+&#9474;  &#9474;  &#9492;&#9472; dataset.py
+&#9474;  &#9500;&#9472; models/             # model definitions
+&#9474;  &#9474;  &#9492;&#9472; net.py
+&#9474;  &#9500;&#9472; train.py            # training entry point
+&#9474;  &#9492;&#9472; inference.py        # prediction / serving entry point
+&#9500;&#9472; configs/               # experiment settings (yaml)
+&#9474;  &#9492;&#9472; baseline.yaml
+&#9500;&#9472; tests/                 # unit &amp; integration tests
+&#9474;  &#9492;&#9472; test_dataset.py
+&#9500;&#9472; requirements.txt       # pinned dependencies
+&#9500;&#9472; pyproject.toml         # packaging &amp; tool config
+&#9500;&#9472; README.md              # what it is, how to run it
+&#9500;&#9472; .gitignore             # excludes data/, checkpoints, secrets
+&#9492;&#9472; Dockerfile             # reproducible runtime environment</code></pre>
+      <p class="muted">Reference layout &mdash; adjust names to your framework, but keep the four
+      pillars: <strong>data</strong>, <strong>src</strong>, <strong>configs</strong>, <strong>tests</strong>.</p>
+
+      <svg class="diagram" viewBox="0 0 560 260" role="img"
+           aria-label="Module dependency diagram: configs and data feed into src, src builds models, and tests verify src and models.">
+        <defs>
+          <marker id="arw" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+            <path d="M0,0 L7,3.5 L0,7 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+        <!-- configs -->
+        <rect x="30" y="30" width="130" height="44" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="95" y="57" fill="#a78bfa" font-size="13" text-anchor="middle">configs/ (yaml)</text>
+        <!-- data -->
+        <rect x="30" y="170" width="130" height="44" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="95" y="197" fill="#fbbf24" font-size="13" text-anchor="middle">data/</text>
+        <!-- src -->
+        <rect x="230" y="100" width="110" height="44" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="285" y="127" fill="#38bdf8" font-size="14" text-anchor="middle">src/</text>
+        <!-- models -->
+        <rect x="410" y="30" width="120" height="44" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="470" y="57" fill="#4ade80" font-size="13" text-anchor="middle">models/</text>
+        <!-- tests -->
+        <rect x="410" y="170" width="120" height="44" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+        <text x="470" y="197" fill="#f87171" font-size="13" text-anchor="middle">tests/</text>
+        <!-- arrows into src -->
+        <line x1="160" y1="55"  x2="228" y2="112" stroke="#94a3b8" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="160" y1="190" x2="228" y2="134" stroke="#94a3b8" stroke-width="2" marker-end="url(#arw)"/>
+        <!-- src -> models -->
+        <line x1="340" y1="112" x2="408" y2="60" stroke="#94a3b8" stroke-width="2" marker-end="url(#arw)"/>
+        <!-- tests -> src (verify) -->
+        <line x1="410" y1="188" x2="342" y2="134" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+        <!-- tests -> models (verify) -->
+        <line x1="470" y1="170" x2="470" y2="76" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+        <text x="285" y="245" fill="#94a3b8" font-size="10" text-anchor="middle">configs + data &rarr; src &rarr; models &middot; tests verify</text>
+      </svg>
+    </div>
+
+    <!-- 3. FOLDERS -->
+    <h2 class="section" id="folders">3. Folder-by-folder reference</h2>
+    <div class="concept">
+      <h3>What lives where, and why</h3>
+      <table>
+        <tr><th>Folder / file</th><th>Purpose</th></tr>
+        <tr><td><code>data/raw/</code></td><td>Original, immutable source data. Never edited by code. Git-ignored.</td></tr>
+        <tr><td><code>data/processed/</code></td><td>Cleaned, feature-engineered data produced by <code>src/</code>. Regenerable, so git-ignored.</td></tr>
+        <tr><td><code>notebooks/</code></td><td>Exploration and reporting only. Prototype here, then promote stable code into <code>src/</code>.</td></tr>
+        <tr><td><code>src/data/</code></td><td>Dataset loading and preprocessing logic (importable, testable).</td></tr>
+        <tr><td><code>src/models/</code></td><td>Model architecture definitions, decoupled from training.</td></tr>
+        <tr><td><code>src/train.py</code></td><td>Training entry point: reads a config, builds a model, fits, saves checkpoints.</td></tr>
+        <tr><td><code>src/inference.py</code></td><td>Prediction / serving entry point: loads a trained model and produces outputs.</td></tr>
+        <tr><td><code>configs/</code></td><td>YAML files describing an experiment (paths, hyperparameters, seed). No values hard-coded in code.</td></tr>
+        <tr><td><code>tests/</code></td><td>Unit &amp; integration tests for the code in <code>src/</code>. Your safety net for refactors.</td></tr>
+        <tr><td><code>requirements.txt</code></td><td>Pinned dependency versions so environments are reproducible.</td></tr>
+        <tr><td><code>pyproject.toml</code></td><td>Packaging metadata &amp; tool config (build, linters, formatters).</td></tr>
+        <tr><td><code>README.md</code></td><td>What the project is, how to install, and how to run it.</td></tr>
+        <tr><td><code>.gitignore</code></td><td>Excludes <code>data/</code>, checkpoints, caches, and secrets from version control.</td></tr>
+        <tr><td><code>Dockerfile</code></td><td>Defines a reproducible runtime image for training and serving.</td></tr>
+      </table>
+    </div>
+
+    <!-- 4. SEPARATION -->
+    <h2 class="section" id="separation">4. Separation of concerns</h2>
+    <p class="muted">Three things change for different reasons &mdash; keep them apart: config, code, and data.</p>
+
+    <div class="concept">
+      <h3>The three layers</h3>
+      <ul class="clean">
+        <li><strong>Config</strong> &mdash; what to run: which dataset, which hyperparameters, which seed. Changes often.</li>
+        <li><strong>Code</strong> &mdash; how to run it: the logic in <code>src/</code>. Changes when behavior changes.</li>
+        <li><strong>Data</strong> &mdash; what it runs on: large, external, versioned separately. Never committed to git.</li>
+      </ul>
+      <div class="why">
+        <strong>Why it matters:</strong> when a hyperparameter is buried in a code cell, every experiment
+        is a code edit (and a chance to break something). When it lives in a config file, you change one
+        line, keep a record, and never touch the tested code.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>A minimal <code>.gitignore</code></h3>
+      <pre><code># reference .gitignore for an ML project
+data/                 # raw + processed data live outside git
+*.ckpt                # model checkpoints
+*.pth
+__pycache__/
+.env                  # secrets &amp; credentials &mdash; never commit
+.ipynb_checkpoints/
+.venv/</code></pre>
+      <p class="muted">Track code and configs; keep data, checkpoints, and secrets out.</p>
+    </div>
+
+    <!-- 5. CONFIG -->
+    <h2 class="section" id="config">5. Config-driven experiments</h2>
+    <p class="muted">One config file = one reproducible experiment. Change the file, not the code.</p>
+
+    <div class="concept">
+      <h3>A YAML experiment config</h3>
+      <pre><code># configs/baseline.yaml  (reference)
+seed: 42
+data:
+  path: data/processed/train.csv
+  batch_size: 64
+model:
+  hidden_units: 128
+  dropout: 0.2
+train:
+  epochs: 20
+  learning_rate: 0.001
+  optimizer: adam</code></pre>
+      <p class="muted">To try a new idea, copy this file to <code>configs/bigger.yaml</code>, bump
+      <code>hidden_units</code>, and rerun. Both configs stay in git as a permanent record.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Wiring config into code with <code>argparse</code></h3>
+      <p>The simplest approach: pass a config path on the command line, load the YAML, and use it.
+      For larger projects, <strong>Hydra</strong> adds config composition, overrides, and sweeps &mdash;
+      but the idea is the same: keep settings out of code.</p>
+      <pre><code># src/train.py  (illustrative &mdash; requires pyyaml + your own model code)
+import argparse
+import yaml
+
+def load_config(path):
+    with open(path) as f:
+        return yaml.safe_load(f)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", default="configs/baseline.yaml")
+    args = parser.parse_args()
+
+    cfg = load_config(args.config)
+    print("seed        :", cfg["seed"])
+    print("batch_size  :", cfg["data"]["batch_size"])
+    print("epochs      :", cfg["train"]["epochs"])
+    # build model / dataset from cfg, then train ...
+
+if __name__ == "__main__":
+    main()</code></pre>
+      <pre><code># run different experiments without editing code (reference CLI)
+python -m src.train --config configs/baseline.yaml
+python -m src.train --config configs/bigger.yaml</code></pre>
+      <div class="why">
+        <strong>Hydra idea:</strong> instead of one file, compose configs (<code>data</code> +
+        <code>model</code> + <code>train</code>) and override on the command line, e.g.
+        <code>python -m src.train train.learning_rate=0.01</code>. Great for hyperparameter sweeps.
+      </div>
+    </div>
+
+    <!-- 6. PACKAGING -->
+    <h2 class="section" id="packaging">6. Packaging your project</h2>
+    <p class="muted">Make <code>src/</code> a real, importable package so imports work from anywhere.</p>
+
+    <div class="concept">
+      <h3>Editable install with <code>pyproject.toml</code></h3>
+      <p>A <code>pyproject.toml</code> declares your project as an installable package. Installing it in
+      <strong>editable</strong> mode (<code>pip install -e .</code>) means <code>import src...</code>
+      works from any directory, and your edits take effect immediately &mdash; no <code>sys.path</code> hacks.</p>
+      <pre><code># pyproject.toml  (reference)
+[build-system]
+requires = ["setuptools&gt;=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "my-ml-project"
+version = "0.1.0"
+requires-python = "&gt;=3.10"
+dependencies = [
+  "numpy==1.26.4",
+  "pyyaml==6.0.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]</code></pre>
+      <pre><code># install once, then import from anywhere (reference CLI)
+pip install -e .
+python -c "import src; print('package importable')"</code></pre>
+      <div class="why">
+        <strong>Why <code>-e</code> (editable)?</strong> Without it you'd reinstall after every code
+        change. With it, the installed package points at your working tree, so <code>src/</code> is
+        always up to date while staying a proper, importable module.
+      </div>
+    </div>
+
+    <!-- 7. REPRODUCIBILITY -->
+    <h2 class="section" id="repro">7. Reproducibility</h2>
+    <p class="muted">Same code + same data + same seed + same deps = same result. Every time.</p>
+
+    <div class="concept">
+      <h3>Pin your dependencies</h3>
+      <p>Unpinned dependencies are a time bomb: a library releases a new version, and your code silently
+      breaks or your metrics shift. Pin exact versions so the environment is identical months later.</p>
+      <pre><code># requirements.txt  (reference &mdash; note the exact == pins)
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.5.1
+pyyaml==6.0.1</code></pre>
+      <pre><code># capture the versions you actually used (reference CLI)
+pip freeze &gt; requirements.txt</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>Set every random seed</h3>
+      <p>ML is full of randomness: data shuffling, weight initialization, dropout. Seed all of it so a
+      run is repeatable.</p>
+      <pre><code>import os
+import random
+import numpy as np
+
+def set_seed(seed=42):
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    # torch.manual_seed(seed)              # if using PyTorch
+    # torch.cuda.manual_seed_all(seed)     # for GPU runs
+
+set_seed(42)
+
+# proof it's deterministic: same seed -&gt; same numbers
+a = np.random.rand(3)
+set_seed(42)
+b = np.random.rand(3)
+print("reproducible:", np.allclose(a, b))   # True</code></pre>
+      <div class="why">
+        <strong>Reproducibility checklist:</strong> pinned deps, a fixed seed, config in git, data
+        versioned outside git, and a <code>Dockerfile</code> so the runtime itself is fixed. Miss one
+        and "it worked before" becomes a debugging session.
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">8. Resources &amp; related pages</h2>
+    <div class="concept">
+      <h3>Keep going on this site</h3>
+      <ul class="clean">
+        <li><a href="testing-ml.html">Testing ML code &mdash; how to fill the <code>tests/</code> folder</a></li>
+        <li><a href="code-drills.html">Code drills &mdash; practice the Python patterns behind <code>src/</code></a></li>
+        <li><a href="ml-workflow.html">ML workflow &mdash; how structure fits the end-to-end pipeline</a></li>
+      </ul>
+    </div>
+    <div class="concept resources">
+      <h3>External references</h3>
+      <ul class="clean">
+        <li><a href="https://drivendata.github.io/cookiecutter-data-science/" target="_blank" rel="noopener">Cookiecutter Data Science &mdash; a battle-tested project template</a></li>
+        <li><a href="https://packaging.python.org/en/latest/tutorials/packaging-projects/" target="_blank" rel="noopener">Python Packaging &mdash; pyproject.toml tutorial</a></li>
+        <li><a href="https://hydra.cc/docs/intro/" target="_blank" rel="noopener">Hydra &mdash; config management for complex applications</a></li>
+        <li><a href="https://dvc.org/doc" target="_blank" rel="noopener">DVC &mdash; data &amp; model version control</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    
+    <div class="quizbox">
+      <h2 class="section" style="margin-top:0;" id="quiz">✅ Quick Quiz</h2>
+      <p class="muted">Test yourself on this page. Click an answer for instant feedback.</p>
+      <div id="quickquiz" data-quiz="1"></div>
+    </div>
+
+  <script>
+  (function () {
+    var DATA = [{"q": "Why move from a single notebook to a structured repo?", "options": ["Notebooks are illegal", "Maintainability, reproducibility, testing, and collaboration", "To use more disk", "Notebooks can't run code"], "correct": 1, "explain": "A real project layout makes code testable, reproducible, and workable by a team."}, {"q": "Raw/processed data folders are usually:", "options": ["Committed to git", "Gitignored (kept out of the repo)", "Deleted every run", "Stored in src/"], "correct": 1, "explain": "Large data is typically gitignored (and versioned with DVC/remote storage), not committed."}, {"q": "Keeping settings in configs/ (YAML) instead of hardcoding them supports:", "options": ["Slower code", "Config-driven, reproducible experiments", "Bigger models", "Nothing"], "correct": 1, "explain": "Separating config from code lets you rerun/compare experiments by changing config, not code."}, {"q": "`pip install -e .` with a pyproject.toml is used to:", "options": ["Delete the environment", "Install your project as an editable package (clean imports)", "Train the model", "Deploy to production"], "correct": 1, "explain": "Editable install makes `src/` importable as a package while you keep editing it."}, {"q": "A key reproducibility practice is:", "options": ["Random unpinned dependencies", "Setting seeds and pinning dependency versions", "Never using git", "Deleting configs"], "correct": 1, "explain": "Fixed seeds + pinned deps make runs repeatable across machines and time."}];
+    var host = document.getElementById("quickquiz");
+    if (!host || !DATA || !DATA.length) return;
+    var total = DATA.length, score = 0, answered = 0;
+    var bar = document.createElement("div");
+    bar.className = "quizbar";
+    bar.innerHTML = 'Score: <strong id="qqScore">0</strong> / ' + total;
+    host.appendChild(bar);
+    DATA.forEach(function (item, qi) {
+      var wrap = document.createElement("div");
+      wrap.className = "qq";
+      var qt = document.createElement("div");
+      qt.className = "qt";
+      qt.textContent = (qi + 1) + ". " + item.q;
+      wrap.appendChild(qt);
+      var ul = document.createElement("div");
+      ul.className = "qopts";
+      var locked = false;
+      item.options.forEach(function (opt, oi) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "qopt";
+        b.textContent = opt;
+        b.addEventListener("click", function () {
+          if (locked) return;
+          locked = true;
+          answered++;
+          var btns = ul.querySelectorAll(".qopt");
+          btns.forEach(function (bb, i) {
+            bb.disabled = true;
+            if (i === item.correct) bb.classList.add("correct");
+            if (i === oi && oi !== item.correct) bb.classList.add("wrong");
+          });
+          if (oi === item.correct) { score++; document.getElementById("qqScore").textContent = score; }
+          ex.classList.add("show");
+        });
+        ul.appendChild(b);
+      });
+      wrap.appendChild(ul);
+      var ex = document.createElement("div");
+      ex.className = "qex";
+      ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+      wrap.appendChild(ex);
+      host.appendChild(wrap);
+    });
+  })();
+  </script>
+
+    <footer>
+      <p>ML Project Structure &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>

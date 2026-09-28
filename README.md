@@ -45,6 +45,23 @@ and (where useful) runnable Python code.
 | [Model Registry & Versioning](model-registry.html) | MLflow, DVC, W&B — track params/metrics/artifacts, promote Staging → Production |
 | [Model Serving](model-serving.html) | FastAPI, TorchServe, Triton, vLLM; batching, latency vs throughput, autoscaling |
 | [CI/CD for ML](cicd-ml.html) | GitHub Actions: lint (ruff/black), test, validation gates, automated retraining |
+| [Project Structure](project-structure.html) | Best-practice repo layout: data/ src/ configs/ tests/, packaging, reproducibility |
+| [Testing ML (PyTest)](testing-ml.html) | Shape/numerical tests, validation thresholds, data-quality checks |
+
+## 🔒 Security & Guardrails
+
+| Page | What it is |
+|------|-----------|
+| [Adversarial Defense](security-adversarial.html) | Prompt injection, jailbreaks, data poisoning, input/output guardrails |
+| [Data Privacy in Production](security-privacy.html) | PII anonymization pipelines, differential privacy, scrub-before-embed |
+| [Access Control & Auditing](security-access.html) | Securing LLM endpoints, Zero Trust (PEP/PDP), logging & audit trails |
+
+## 📐 Deep Dives: Hardware & Scale
+
+| Page | What it is |
+|------|-----------|
+| [Hardware Acceleration](hardware-acceleration.html) | GPUs, HBM, tensor cores, memory- vs compute-bound, quantization |
+| [Distributed Training](distributed-training.html) | Data/tensor/pipeline parallelism, ZeRO/FSDP, DeepSpeed, comms cost |
 
 ## 🎯 Test Prep — get interview-ready
 

@@ -147,6 +147,8 @@
     <a href="#learn">Topics</a>
     <a href="#testprep">Test Prep</a>
     <a href="#production">Production</a>
+    <a href="#security">Security</a>
+    <a href="#deepdive">Deep Dives</a>
     <a href="#order">Learning Order</a>
     <a href="#resources">Resources</a>
     <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
@@ -463,6 +465,74 @@
           <li>GitHub Actions pipelines</li>
           <li>Lint (ruff/black), test, gate</li>
           <li>Automated retraining</li>
+        </ul>
+      </a>
+      <a class="card" href="project-structure.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>📁 Project Structure <span class="badge ready">Ready</span></h3>
+        <ul>
+          <li>data/ src/ configs/ tests/</li>
+          <li>Config-driven experiments</li>
+          <li>Packaging &amp; reproducibility</li>
+        </ul>
+      </a>
+      <a class="card" href="testing-ml.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>🧪 Testing ML (PyTest) <span class="badge ready">Ready</span></h3>
+        <ul>
+          <li>Shape &amp; numerical tests</li>
+          <li>Validation thresholds</li>
+          <li>Data-quality checks</li>
+        </ul>
+      </a>
+    </div>
+
+    <!-- SECURITY -->
+    <h2 id="security">🔒 Security &amp; Guardrails</h2>
+    <p style="color: var(--muted); margin-bottom: 1rem;">The adversarial, privacy, and access-control side of shipping AI safely.</p>
+    <div class="grid">
+      <a class="card" href="security-adversarial.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>🛡️ Adversarial Defense <span class="badge ready">Ready</span></h3>
+        <ul>
+          <li>Prompt injection &amp; jailbreaks</li>
+          <li>Data poisoning defenses</li>
+          <li>Input/output guardrails</li>
+        </ul>
+      </a>
+      <a class="card" href="security-privacy.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>🔐 Data Privacy <span class="badge ready">Ready</span></h3>
+        <ul>
+          <li>PII anonymization pipelines</li>
+          <li>Differential privacy</li>
+          <li>Scrub before embedding</li>
+        </ul>
+      </a>
+      <a class="card" href="security-access.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>🔑 Access Control &amp; Auditing <span class="badge ready">Ready</span></h3>
+        <ul>
+          <li>Securing LLM endpoints</li>
+          <li>Zero Trust (PEP/PDP)</li>
+          <li>Logging &amp; audit trails</li>
+        </ul>
+      </a>
+    </div>
+
+    <!-- DEEP DIVES -->
+    <h2 id="deepdive">📐 Deep Dives: Hardware &amp; Scale</h2>
+    <p style="color: var(--muted); margin-bottom: 1rem;">How large models actually run fast and scale across many GPUs.</p>
+    <div class="grid">
+      <a class="card" href="hardware-acceleration.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>⚡ Hardware Acceleration <span class="badge ready">Ready</span></h3>
+        <ul>
+          <li>GPUs, HBM, tensor cores</li>
+          <li>Memory- vs compute-bound</li>
+          <li>Precision &amp; quantization</li>
+        </ul>
+      </a>
+      <a class="card" href="distributed-training.html" style="text-decoration:none; color:inherit; display:block;">
+        <h3>🌐 Distributed Training <span class="badge ready">Ready</span></h3>
+        <ul>
+          <li>Data / tensor / pipeline parallelism</li>
+          <li>ZeRO / FSDP, DeepSpeed</li>
+          <li>Communication cost</li>
         </ul>
       </a>
     </div>
