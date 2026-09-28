@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ask Your Notes — Search the ML Study Site</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  
+    .askbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .askinput { width: 100%; font-size: 1.05rem; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--border); background: var(--code-bg); color: var(--text); font-family: inherit; }
+    .askinput:focus { outline: none; border-color: var(--accent); }
+    .chips { margin: 0.6rem 0 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .chip { background: var(--code-bg); border: 1px solid var(--border); color: var(--accent); border-radius: 999px; padding: 0.25rem 0.7rem; font-size: 0.82rem; cursor: pointer; }
+    .chip:hover { border-color: var(--accent); }
+    .results { margin-top: 1rem; display: grid; gap: 0.6rem; }
+    .hit { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 0 10px 10px 0; padding: 0.7rem 1rem; }
+    .hit a { color: var(--accent); text-decoration: none; font-weight: 700; font-size: 1.02rem; }
+    .hit a:hover { text-decoration: underline; }
+    .hit .snip { color: var(--muted); font-size: 0.9rem; margin-top: 0.2rem; }
+    .hit .score { float: right; color: var(--accent-2); font-size: 0.75rem; }
+    .nohit { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#production">Production</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>🔎 Ask Your Notes</h1>
+    <p>Type a question or keywords and jump straight to the right guide. Runs entirely in your
+       browser &mdash; no server, no sign-up.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="askbox">
+      <input class="askinput" id="q" type="text" autocomplete="off"
+             placeholder="e.g. why does softmax use e?  ·  how does backprop work?  ·  RAG vs fine-tuning" />
+      <div class="chips" id="chips"></div>
+      <div class="results" id="results"></div>
+    </div>
+
+    <p class="muted">This is a lightweight, client-side keyword search over all
+      <strong id="count">0</strong> guides (title, summary, and section headings). It points you to the
+      best-matching pages &mdash; think of it as "ask your notes," not a chatbot.</p>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+    <footer><p>Ask Your Notes &middot; Part of your AI study journey 🚀</p></footer>
+  </div>
+
+  <script>
+  var DOCS = [{"t": "🔄 CI/CD for ML: Automated Pipelines", "u": "cicd-ml.html", "s": "From push to production — how continuous integration, delivery, and training keep ML code, data, and models shippable without the manual toil.", "k": "On this page 1. What is CI/CD? (and how ML differs) The two (or three) letters How ML CI/CD differs from normal software 2. GitHub Actions basics The vocabulary 3. A starter workflow (lint, format, test) .github/workflows/ci.yml (illustrative — runs on GitHub Actions) The flow at a glance 4. Formatting & linting: black and ruff What each one does 5. Continuous training & automated evaluation What can trigger retraining? A tiny evaluation gate in code (reference — runs in your train job) 6. Model & data validation gates What to gate on before deploy 7. A typical ML CI/CD pipeline Stages, start to finish Quick recap 8. Free Resources ✅ Quick Quiz"}, {"t": "🖼️ Convolutional Neural Networks (CNNs)", "u": "cnn.html", "s": "How computers \"see\" — convolution, filters, feature maps, and pooling, explained simply with worked examples and diagrams.", "k": "On this page 1. Why images need CNNs The problem with fully-connected networks on images 2. The Convolution Operation What convolution does, step by step A worked example (numbers you can check by hand) 3. Filters, Kernels & Feature Maps Key vocabulary 4. Stride & Padding Stride Padding Output size formula 5. Pooling Max pooling vs. average pooling 6. Typical CNN Architecture The classic pipeline A tiny 2D convolution in numpy 7. Use Cases Where CNNs shine Quick recap 8. Free Resources ✅ Quick Quiz"}, {"t": "⌨️ Code-From-Scratch Drills", "u": "code-drills.html", "s": "Stop reading, start typing. Eight \"implement it yourself\" NumPy exercises — try each one first, then click to reveal a clean reference solution with its expected output.", "k": "The drills 1. Sigmoid Task 2. Sigmoid derivative Task 3. Softmax (numerically stable) Task 4. Mean squared error Task 5. Binary cross-entropy Task 6. Cosine similarity Task 7. Gradient descent on f(x) = x² Task 8. Two-layer forward pass Task Related pages & resources Study the theory behind each drill"}, {"t": "📈 Derivatives & Differentiation", "u": "derivatives.html", "s": "Slopes, instantaneous rates of change, the rules that make calculus fast, partial derivatives and the gradient — the exact math that powers gradient descent and backpropagation.", "k": "On this page 1. Intuition — slope and instantaneous rate of change Slope, but zoomed all the way in 2. The limit definition From secant to tangent Deriving f(x) = x² by hand 3. The differentiation rules The core rules The power rule, step by step Product rule Quotient rule Chain rule — the most important one for ML Step by step: f(x) = (3x + 1)² A harder example: f(x) = e−x² It extends to any depth (3+ functions) 4. Derivatives of ex and ln(x) The two special functions 5. Higher-order derivatives Differentiate again, and again 6. Partial derivatives & the gradient ∇f Partial derivative: hold the others still The gradient ∇f: all the partials in one vector 7. Worked examples Single variable: f(x) = x² Two variables: f(x, y) = x² + y² 8. Why derivatives matter in machine learning Gradient descent Backpropagation is the chain rule 9. Code: numerical derivative vs. analytic 2x Finite differences with numpy 10. Related topics 11. Free Resources ✅ Quick Quiz"}, {"t": "🌐 Distributed Training: Data, Tensor & Pipeline Parallelism", "u": "distributed-training.html", "s": "When a model or dataset won't fit on one GPU, you split the work across many. Here's how — data, tensor, and pipeline parallelism — and how to pick the right one.", "k": "On this page 1. Why Distribute at All? Two hard limits of one GPU The core question 2. Data Parallelism (the most common) The idea The gradient-averaging idea 3. The Memory Problem What actually eats your GPU memory 4. ZeRO & FSDP — Shard the State The intuition ZeRO-3 / FSDP mental model 5. Tensor Parallelism (Megatron style) The idea 6. Pipeline Parallelism The idea 7. Combining Them (3D Parallelism) Three axes, one job 8. Communication Cost & Hardware The operations that move data Bandwidth tiers (fast → slow) 9. Comparison & How to Choose Strategy comparison A quick decision sketch Where this connects 10. Free Resources ✅ Quick Quiz"}, {"t": "⚖️ Ethics & Safety in AI/ML", "u": "ethics-safety.html", "s": "Bias & fairness, privacy, transparency, accountability, and safety — the human side of building machine learning systems that people can trust.", "k": "On this page 1. The Five Pillars — the big picture Responsible AI rests on five pillars 2. Bias & Fairness Where bias comes from Fairness notions (high level) 3. Data Privacy Core privacy concepts GDPR-style ideas (general, not legal advice) 4. Transparency & Explainability Two related ideas 5. Accountability & Human Oversight What good oversight looks like 6. Safety Concerns Common safety concerns 7. Responsible AI Practices Documentation: model cards & datasheets Testing and process habits 8. Model Collapse & Synthetic Data Training on AI-generated data Quick recap 9. Free Resources ✅ Quick Quiz"}, {"t": "℮ Euler's Number e: The Base of Natural Growth", "u": "euler-number.html", "s": "Where e = 2.71828… comes from, why its own derivative is itself, and why it makes almost every AI formula cleaner — explained simply, with runnable code.", "k": "On this page 1. What is e? A constant, like π 2. Where e comes from — compound interest The 100% interest thought experiment Step by step: compounding twice The compounding table 3. The limit definition e as a limit 4. Why it converges — and never reaches 3 Diminishing extra gains 5. The magic property: its own derivative ex is the only function whose slope equals itself 6. Where e shows up in AI The greatest hits 7. Worked softmax example From raw scores to probabilities Runnable code — compute e and softmax 8. Why e makes AI math clean Two clean derivatives Quick recap 9. Free Resources & Next Steps ✅ Quick Quiz"}, {"t": "📊 Evaluation Metrics: Measuring If Your Model Actually Works", "u": "evaluation-metrics.html", "s": "Why accuracy lies, the confusion matrix, precision & recall, F1, ROC/AUC, and the regression metrics MAE, MSE, RMSE and R² — with worked numbers and runnable code.", "k": "On this page 1. Why Accuracy Alone Is Misleading What accuracy measures The class-imbalance trap 2. The Confusion Matrix The four outcomes Accuracy rewritten from the four counts 3. Precision, Recall & F1 Precision — \"when I say positive, how often am I right?\" Recall — \"of all the real positives, how many did I catch?\" F1 — one number balancing both Worked example (with real numbers) 4. The Precision/Recall Tradeoff & Thresholds The decision threshold 5. ROC Curve & AUC The ROC curve AUC — Area Under the Curve 6. Regression Metrics MAE — Mean Absolute Error MSE — Mean Squared Error RMSE — Root Mean Squared Error R² — Coefficient of Determination 7. Which Metric to Use When Quick decision table 8. Runnable Code Precision, recall & F1 from TP / FP / FN (numpy) Where this fits 9. Free Resources ✅ Quick Quiz"}, {"t": "🎓 Fine-Tuning: Teaching a Model New Behavior", "u": "fine-tuning.html", "s": "Continue training a pretrained model on your own examples to change its weights — and with them its behavior, style, format, and skills.", "k": "On this page 1. What Fine-Tuning Is (and Why) The core idea Fine-tuning vs. prompting 2. Full Fine-Tuning vs. PEFT (LoRA / QLoRA) Full fine-tuning Parameter-efficient fine-tuning (PEFT) — LoRA QLoRA — LoRA on a small GPU 3. Preparing Your Data Instruction / response pairs JSONL format How much data — and splitting it 4. The Training Process The moving parts 5. Fine-Tuning vs. RAG Quick comparison 6. Practical: Data + Code Example training data (JSONL) LoRA fine-tuning with Hugging Face PEFT Running fine-tuned models locally 7. Pitfalls to Avoid Quick recap 8. Free Resources ✅ Quick Quiz"}, {"t": "📉 Gradients & Gradient Descent", "u": "gradient-descent.html", "s": "The single algorithm behind almost all learning: follow the slope downhill to make the loss smaller, one small step at a time.", "k": "On this page 1. Recap: the derivative is a slope Slope in one variable 2. The gradient ∇f — steepest increase A gradient is a vector of partial derivatives Gradient arrows on a bowl 3. The update rule — and why the minus sign The rule Minimize f(x) = x² by gradient descent Two variables: minimize f(x, y) = x² + y² 4. Learning rate: too big vs. too small The Goldilocks problem 5. The loss surface — walking downhill Learning is descending a landscape 6. Batch, Stochastic & Mini-batch Three flavors of gradient descent 7. Local vs. global minima Not all valleys are the deepest 8. Backprop: gradients via the chain rule Where do the gradients come from? Quick recap 9. Free Resources ✅ Quick Quiz"}, {"t": "⚡ Hardware Acceleration: GPUs, HBM & Tensor Cores", "u": "hardware-acceleration.html", "s": "Why GPUs crush CPUs for ML, how the memory hierarchy shapes real-world speed, and why modern deep learning is a memory-bandwidth game as much as a raw-compute game.", "k": "On this page 1. Why GPUs beat CPUs for ML Few fast cores vs many parallel cores See the parallelism (illustrative) 2. The memory hierarchy: HBM, SRAM & registers Fast & tiny vs slow & huge 3. Memory-bound vs compute-bound (the roofline idea) Arithmetic intensity decides the bottleneck 4. Tensor Cores & mixed precision What a Tensor Core does Mixed precision in practice (illustrative) 5. How matmul maps to hardware (tiling & FlashAttention) Tiling: reuse data in fast memory FlashAttention: a bandwidth-aware trick 6. Precision & quantization tradeoffs The common formats Why fewer bits is faster (two reasons) 7. Practical: batch size, utilization & big matmuls Why big matmuls are efficient Quick recap 8. Free Resources ✅ Quick Quiz"}, {"t": "∫ Integration: Adding Up the Infinitely Small", "u": "integration.html", "s": "Antiderivatives, definite integrals, the Fundamental Theorem of Calculus, and area under a curve — explained simply, with the \"why it matters\" and runnable code.", "k": "On this page 1. The Intuition — accumulation & area Adding up infinitely many slivers 2. Process vs. Result — and the inverse of the derivative Two words that are easy to mix up Differentiation ↔ Integration 3. The Indefinite Integral (antiderivative + C) Finding the antiderivative 4. The Definite Integral (area from a to b) A number, not a function 5. The Fundamental Theorem of Calculus Integrating a derivative recovers the original 6. Common Integration Rules The rules you use most 7. Numerical Integration (when there is no neat formula) Riemann sums & the trapezoidal rule Approximate ∫01 x² dx (true value = 1/3) 8. Where Integration Shows Up in ML & Stats Area under a probability density = probability Expected value = integral of x weighted by its probability AUC — the area under the ROC curve Diffusion & continuous-time models (briefly) Quick recap 9. Free Resources ✅ Quick Quiz"}, {"t": "🎓 AI Developer Interview Prep", "u": "interview-prep.html", "s": "Your one-stop hub: a topic readiness checklist plus the most common interview questions with click-to-reveal model answers.", "k": "On this page 1. Practice & Drills Hands-on practice pages 2. Topic Readiness Checklist 🔢 Math 🧩 ML fundamentals 🧠 Deep learning 🤖 LLMs 💻 Coding 🏗️ ML system design 3. Common Interview Q&A Q1. What is gradient descent, and why the minus sign? Q2. What is backpropagation? Q3. Explain the bias-variance tradeoff. Q4. What is overfitting, and how do you prevent it? Q5. Precision vs recall vs F1 — when do you prefer each? Q6. Why does softmax use e (the exponential)? Q7. What is the vanishing gradient problem, and how do LSTMs / ReLU help? Q8. How does self-attention (Q/K/V) work? Q9. RAG vs fine-tuning — when do you use each? Q10. What is cross-entropy loss? Q11. Why split data into train / validation / test? Q12. What is a learning rate, and what happens if it is too high or too low? Q13. What are embeddings? Q14. L1 vs L2 regularization? Q15. What is batch normalization (briefly)? Q16. How do you handle class imbalance?"}, {"t": "🔢 Linear Algebra for AI", "u": "linear-algebra.html", "s": "Vectors, matrices, dot products, norms, and PCA — the most-used math in machine learning, explained with intuition, diagrams, and runnable code.", "k": "On this page 1. Scalars, Vectors, Matrices & Tensors The four building blocks Seeing the shapes Shapes in code 2. Vector Operations & the Dot Product Addition and scaling The dot product 3. Matrix Multiplication The rule Worked example: a 2×2 matrix times a 2×1 vector Why this IS a neural-network layer 4. Transpose, Identity & Inverse Transpose — flip rows and columns Identity — the \"1\" of matrices Inverse — the \"undo\" matrix 5. Norms — Length & Distance L2 norm (Euclidean length) L1 norm (Manhattan distance) 6. Eigenvectors & PCA Eigenvectors & eigenvalues (the intuition) PCA — keep the directions that matter 7. How ML Actually Uses This From linear algebra to real models Quick recap Keep learning 8. Free Resources ✅ Quick Quiz"}, {"t": "📐 Logarithms: The Inverse of Exponentiation", "u": "logarithms.html", "s": "What a log really is, the rules that make them tick, and why machine learning turns products of probabilities into sums of logs — with runnable code.", "k": "On this page 1. What a logarithm is The one idea to remember Exponential and log are mirror images across y = x 2. Common bases: 10, 2, and natural log The three logs you will meet constantly All three on one graph 3. The log rules The four rules that matter Rules in one worked example 4. Why logs are useful Three superpowers Example 1 — multiplication becomes addition Example 2 — compressing a huge range (log scale) Example 3 — rescuing tiny probabilities from underflow Example 4 — log scales you already use in real life Example 5 — log-odds (logits): logs power classification 5. The derivative of ln(x) One of the cleanest results in calculus 6. Where logs appear in ML Log-likelihood: products → sums Cross-entropy / log loss Logits and log scales 7. Runnable code (numpy) Log turns a product into a sum Cross-entropy computed with logs Quick recap 8. Free Resources ✅ Quick Quiz"}, {"t": "🎯 Loss Functions: How a Model Knows It's Wrong", "u": "loss-functions.html", "s": "MSE, MAE, and Cross-Entropy — the single number that drives all learning, explained simply with the \"why it matters\" and runnable code.", "k": "On this page 1. What a Loss Function Is — and why it drives learning The core idea Choosing the right loss for the job 2. Regression Losses: MSE & MAE Mean Squared Error (MSE) Mean Absolute Error (MAE) 3. Classification Losses: Cross-Entropy Binary Cross-Entropy (two classes) Categorical Cross-Entropy (many classes) 4. Why Cross-Entropy Pairs Cleanly with Softmax / Sigmoid The gradient simplifies to prediction − target 5. Comparison Table Which loss for which task? 6. Runnable Code (MSE & Cross-Entropy) MSE and MAE in numpy Cross-entropy in numpy (binary & categorical) 7. Loss → Gradient Descent The loss is the map; gradient descent is the walk 8. Free Resources ✅ Quick Quiz"}, {"t": "📐 Math Foundations for AI/ML", "u": "math-foundations.html", "s": "The core math you need to acknowledge — explained simply, with the \"why it matters\" for machine learning.", "k": "On this page 1. Linear Algebra Scalars, Vectors, Matrices, Tensors Key Operations 2. Calculus Derivatives & Gradients Gradient Descent (the learning loop) The Chain Rule Derivatives → Gradient (the key link) Two-variable descent in code The downhill picture 3. Probability & Statistics Core Statistics Probability Basics 4. Optimization (bonus) 5. How Much Do You Actually Need? 6. Free Resources ✅ Quick Quiz"}, {"t": "📝 Math Practice Problems", "u": "math-practice.html", "s": "Computational, exam-style problems across linear algebra, calculus, logs, probability, evaluation metrics, and softmax — each with a click-to-reveal, step-by-step solution.", "k": "On this page 1. Linear Algebra Problem 1 · Shape of a matrix product Problem 2 · Compute a 2×2 by 2×1 matmul Problem 3 · Dot product of two 3-vectors Problem 4 · L2 norm of [3, 4] Problem 5 · Is W x + b valid? 2. Derivatives Problem 6 · d/dx of x3 Problem 7 · d/dx of (3x + 1)2 (chain rule) Problem 8 · d/dx of e−x2 (chain rule) Problem 9 · d/dx of ln(x) Problem 10 · Partial ∂f/∂x of x2 + y2 3. Integration Problem 11 · Indefinite integral of 2x Problem 12 · Indefinite integral of x2 Problem 13 · Definite integral of x from 0 to 2 Problem 14 · What does the definite integral mean? 4. Logarithms Problem 15 · Evaluate log2(8) Problem 16 · Evaluate ln(e3) Problem 17 · Simplify log(a) + log(b) Problem 18 · Why sum log-probabilities? 5. Probability & Statistics Problem 19 · Mean and standard deviation Problem 20 · P(A and B) for independent events Problem 21 · Bayes: the surprising test result Problem 22 · Expected value of a fair die 6. Evaluation Metrics Problem 23 · Precision, recall, and F1 7. Softmax by Hand Problem 24 · Softmax of [2, 1, 0]"}, {"t": "🔄 The ML Workflow", "u": "ml-workflow.html", "s": "The full machine-learning lifecycle — from defining the problem to deploying, monitoring, and retraining a model in production, one stage at a time.", "k": "On this page 1. The Lifecycle at a Glance The pipeline (with a feedback loop) 2. Define the Problem Turn a business goal into an ML question 3. Collect Data Where data comes from 4. Clean & Prepare Data Missing values Encoding categories Scaling numeric features Feature engineering 5. Split Train / Validation / Test Three buckets, three jobs 6. Choose & Train a Model Start simple, then escalate 7. Evaluate Pick a metric that matches the goal 8. Tune (Hyperparameters & Cross-Validation) Parameters vs. hyperparameters K-fold cross-validation 9. Deploy Two common serving patterns Serialization 10. Monitor & Retrain What to watch for 11. Putting It Together (scikit-learn) Split + preprocessing pipeline + train + evaluate Quick recap 12. Free Resources ✅ Quick Quiz"}, {"t": "🏗️ Infrastructure as Code (IaC) for ML", "u": "mlops-iac.html", "s": "Spin up GPU training environments, storage, and networking from version-controlled files — then tear it all down to stop the bill. Reproducible infra instead of clicking around a console.", "k": "On this page 1. What IaC is & why it matters Clicking in a console vs. writing code The core idea: declarative & idempotent 2. Terraform vs CloudFormation Side by side Three words you must know 3. Spinning up an ML training environment The three pieces Illustrative Terraform: a GPU box + an S3 bucket 4. Managing training clusters (autoscaling & spot) Autoscaling groups Spot / preemptible instances = cheap training 5. The plan / apply / destroy lifecycle The three commands 6. Teardown to save cost Destroy when the job is done Cheap habits that add up Where IaC fits in your ML journey 7. Free Resources ✅ Quick Quiz"}, {"t": "📦 Model Registry & Versioning", "u": "model-registry.html", "s": "Which model, data, and params produced this result? Track experiments, version datasets, and promote models to production — so every result is reproducible.", "k": "On this page 1. The Problem: Reproducibility Why \"it works\" is not enough A model is code + data + params + weights 2. Tracking vs Registry vs Data Versioning The three responsibilities The full pipeline in one diagram 3. MLflow: Tracking & the Model Registry MLflow Tracking The MLflow Model Registry & stages 4. DVC: Data Version Control Git-like versioning for large data How DVC and git split the work 5. Weights & Biases (W&B) Hosted tracking & dashboards 6. Tool Comparison Which tool versions what? 7. Semantic Versioning & Lineage Semantic versioning for models Lineage: the full paper trail Quick recap 8. Free Resources ✅ Quick Quiz"}, {"t": "🚀 Model Serving & Deployment", "u": "model-serving.html", "s": "Turning a trained model into a fast, reliable API — online vs batch vs streaming, FastAPI, TorchServe, Triton, vLLM, and the concepts that decide your latency and cost.", "k": "On this page 1. Training vs Inference Different goals, different hardware profile 2. Ways to Serve: Online, Batch, Streaming Online / real-time API Batch (offline) scoring Streaming 3. A Minimal FastAPI Serving Example Load the model at startup, predict per request How a request flows through a serving stack 4. High-Performance Serving Frameworks TorchServe — PyTorch models NVIDIA Triton Inference Server — multi-framework, GPU-first vLLM — high-throughput LLM serving 5. Key Concepts Latency vs Throughput Dynamic & continuous batching Model quantization for serving Autoscaling & GPU utilization 6. Framework Comparison Which server for which job? 7. Why This Matters for RAG & LLM Apps 8. Free Resources ✅ Quick Quiz"}, {"t": "🧠 Neural Networks: The Four Building Blocks", "u": "neural-networks.html", "s": "Weights, Bias, Activation Functions, and Backpropagation — explained simply, with the \"why it matters\" and runnable code.", "k": "On this page 1. The Neuron — the whole idea in one picture What a single neuron does 2. Weights What is a weight? Weights in code 3. Bias What is a bias? Weights vs. Bias at a glance 4. Activation Functions Why do we need them? The common activation functions Activation functions in code 5. Backpropagation The learning loop The chain rule (the engine of backprop) One neuron learning, from scratch 6. Putting It Together A tiny 2-layer network (forward pass) Quick recap 7. Free Resources ✅ Quick Quiz"}, {"t": "🎲 Probability & Statistics for AI", "u": "probability-statistics.html", "s": "Describe data, model uncertainty, and update beliefs with evidence — the language every machine-learning model speaks, explained simply with runnable code.", "k": "On this page 1. Descriptive Statistics Mean (the average / center) Variance (how spread out?) Standard deviation (spread in original units) Tiny worked example Mean & std in code 2. The Normal / Gaussian Distribution What is a distribution? The bell curve Gaussian PDF in code 3. Probability Basics The three rules you always need Independent events example 4. Conditional Probability P(A|B) Definition 5. Bayes' Theorem The formula Worked example: a medical test Bayes in code 6. Expected Value E[X] Definition Example: a weighted die bet 7. Likelihood & Maximum Likelihood Probability vs. likelihood Why we take the log Log-likelihood in code 8. How ML Uses Probability Everywhere you look Quick recap 9. Free Resources ✅ Quick Quiz"}, {"t": "💻 Programming for ML", "u": "programming.html", "s": "The practical toolkit: Python, NumPy, Pandas, notebooks, and scikit-learn — everything you need to load data, crunch numbers, and train your first model.", "k": "On this page 1. Why Python? What makes Python the ML language 2. Python Essentials for ML Lists and dictionaries Functions Comprehensions 3. NumPy — fast arrays & broadcasting Arrays vs. lists Broadcasting 4. Pandas — wrangling tables The DataFrame Load a CSV, select, and filter Group and aggregate 5. Jupyter & Colab notebooks What is a notebook? 6. Plotting with matplotlib A quick plot 7. End-to-end: data → model The data flow Load → inspect → train (scikit-learn) Quick recap 8. Free Resources ✅ Quick Quiz"}, {"t": "📁 ML Project Structure & Templates", "u": "project-structure.html", "s": "From notebook chaos to a maintainable, reproducible repo — a practical layout your team (and future you) can actually work with.", "k": "On this page 1. Why structure matters From notebook chaos to a real repo 2. The recommended layout Directory tree 3. Folder-by-folder reference What lives where, and why 4. Separation of concerns The three layers A minimal .gitignore 5. Config-driven experiments A YAML experiment config Wiring config into code with argparse 6. Packaging your project Editable install with pyproject.toml 7. Reproducibility Pin your dependencies Set every random seed 8. Resources & related pages Keep going on this site External references ✅ Quick Quiz"}, {"t": "💬 Prompt Engineering", "u": "prompting.html", "s": "The cheapest, fastest way to get better answers from an LLM — before you ever reach for RAG or fine-tuning.", "k": "On this page 1. What is a prompt? 2. Anatomy of a good prompt 3. Zero-shot, One-shot, Few-shot 4. System / User / Assistant roles 5. Chain-of-Thought (think step by step) 6. More techniques 7. Common pitfalls 8. The ladder: Prompting → RAG → Fine-tuning 9. Free Resources ✅ Quick Quiz"}, {"t": "📚 RAG: Retrieval-Augmented Generation", "u": "rag.html", "s": "Give a frozen language model an open book. Retrieve the right facts, paste them into the prompt, and let the model answer with citations — explained simply, with runnable code.", "k": "On this page 1. The Problem RAG Solves Why a plain LLM falls short 2. The RAG Pipeline Phase A — Indexing (build the searchable library) Phase B — Query (answer a question) 3. Embeddings & Cosine Similarity What is an embedding? Cosine similarity — measuring \"same direction\" 4. End-to-End RAG in Python Minimal RAG (sentence-transformers + numpy search) 5. RAG vs Fine-Tuning Side-by-side comparison 6. Chunking & Evaluation Chunking tips Evaluating a RAG system 7. Free Resources ✅ Quick Quiz"}, {"t": "🔁 RNNs & LSTMs: Networks with Memory", "u": "rnn-lstm.html", "s": "How neural networks handle sequences — hidden state, recurrence, the vanishing-gradient problem, and the gates that gave machines long-term memory.", "k": "On this page 1. Sequential Data — why order matters What counts as sequential data? 2. The Hidden State & Recurrence The recurrence idea A tiny hidden-state loop in code 3. Unrolling Through Time One cell, many steps 4. The Vanishing / Exploding Gradient Problem Why long sequences break plain RNNs 5. LSTMs — Gates Fix Long-Term Memory The cell state and the three gates 6. GRUs — the lightweight cousin Same idea, fewer parts 7. Why This Leads to Transformers The remaining limits of recurrence Quick recap 8. Free Resources ✅ Quick Quiz"}, {"t": "🔑 Access Control & Auditing", "u": "security-access.html", "s": "Who is allowed to call your model, what are they allowed to do, and how do you prove what happened — authentication, authorization, zero trust, and tamper-evident logs.", "k": "On this page 1. Securing Model / LLM API Endpoints What makes a model endpoint different 2. Authentication vs Authorization · Keys vs OAuth/JWT AuthN ≠ AuthZ API keys vs OAuth / JWT Verifying a bearer token at the gateway (illustrative) 3. Rate Limiting & Input Size Limits Rate limiting Input size limits 4. The Principle of Least Privilege What least privilege means in practice 5. Zero Trust Architecture: PEP & PDP The core idea PEP and PDP — the two roles 6. Auditing & Logging Log the who / what / when Prompt & response logging for abuse detection Tamper-evident logs 7. Secrets Management Never hardcode keys 8. Controls Cheat Sheet Control → purpose Quick recap 9. Free Resources ✅ Quick Quiz"}, {"t": "🛡️ Adversarial Defense & Model Guardrails", "u": "security-adversarial.html", "s": "How attackers manipulate ML systems and LLMs — and how to defend them with layered guardrails, untrusted-input hygiene, and output validation.", "k": "On this page 1. The Threat Landscape for ML & LLMs Where attacks enter 2. Prompt Injection (Direct & Indirect) Direct vs. indirect injection A concrete indirect-injection example (RAG) Mitigations 3. Jailbreaks Breaking the safety policy, not the prompt 4. Data Poisoning Two flavors Defenses 5. Adversarial Examples on Classifiers Tiny perturbations, big misclassifications 6. Output Guardrails The main output controls 7. Defense-in-Depth Table Attack → Defense 8. Resources & Related Topics On this site External ✅ Quick Quiz"}, {"t": "🔐 Data Privacy in Production", "u": "security-privacy.html", "s": "Detecting PII, anonymizing before embedding, and using differential privacy — so personal data never leaks into your vectors, logs, or model weights.", "k": "On this page 1. Why privacy matters What is PII? Regulations — the high-level idea (not legal advice) 2. Anonymization vs. pseudonymization The key distinction Common techniques 3. The anonymization pipeline Detect → redact/tokenize → embed Practical notes 4. Differential privacy & DP-SGD The intuition A tiny DP example: the noisy count DP-SGD in one paragraph 5. Data minimization & retention Principles 6. PII leakage: embeddings, logs, memorization Three leakage vectors 7. Comparison of techniques 8. Resources & cross-links Related pages in this course External references ✅ Quick Quiz"}, {"t": "🧪 Testing ML Code with PyTest", "u": "testing-ml.html", "s": "Catch silent bugs before they wreck your results — test your code, your data, and your model behavior with runnable pytest patterns.", "k": "On this page 1. Why testing ML is different Three things to test, not one The ML test flow 2. PyTest basics Anatomy of a test Fixtures — reusable setup Parametrize — one test, many cases 3. Data & tensor shape tests Assert the exact output shape Common shape checks 4. Numerical tests Compare floats with np.allclose No NaNs, no infinities, finite gradients 5. Validation threshold tests Assert accuracy on a fixed eval set 6. Testing data quality Nulls, ranges, and schema What to check on incoming data 7. Property & invariance tests Softmax always sums to 1 Shuffling inputs must not change accuracy Useful ML invariants to test 8. Where this fits & resources The testing pyramid for ML Keep learning Quick recap ✅ Quick Quiz"}, {"t": "🔧 Tools & Frameworks", "u": "tools-frameworks.html", "s": "The libraries that turn ideas into working models — scikit-learn, PyTorch, TensorFlow/Keras, Hugging Face, and the everyday data toolkit — and how to choose between them.", "k": "On this page 1. The ML Tool Stack — one picture From raw data to large language models 2. scikit-learn — classic machine learning What it is The fit / predict API 3. PyTorch vs TensorFlow / Keras The shared core ideas PyTorch vs TensorFlow/Keras — which to pick? A tiny PyTorch example (reference only — needs the torch library) 4. Hugging Face — pretrained models made easy The Hugging Face ecosystem A short pipeline() example (reference only — needs the transformers library) 5. Supporting Tools The data & workflow essentials 6. Comparison Table — library → use case Which library for which job? Quick recap 7. Free Resources ✅ Quick Quiz"}, {"t": "🏃 Training & Optimization", "u": "training-optimization.html", "s": "How a network actually learns: the training loop, gradient descent variants, momentum & Adam, learning rates, and the tricks that stop it from memorizing instead of learning.", "k": "On this page 1. The Training Loop — epochs & batches The three words you need The loop, step by step 2. Gradient Descent Variants The one update rule they share 3. Momentum & Adam Momentum — a rolling ball Adam — the popular default 4. Learning Rate & Decay Too high, too low, just right Learning-rate decay (scheduling) 5. Overfitting vs Underfitting Two ways to fail 6. Regularization — fighting overfitting L2 regularization (weight decay) Dropout Early stopping 7. Train / Validation / Test Split The three sets 8. A Full Training Loop in Code Mini-batch gradient descent with L2 & early stopping Quick recap 9. Free Resources ✅ Quick Quiz"}, {"t": "🤖 Transformers & Attention", "u": "transformers.html", "s": "Self-attention, Query/Key/Value, multi-head attention, and positional encoding — the architecture behind every modern LLM, explained simply.", "k": "On this page 1. Why Transformers? (vs RNNs) The two problems transformers solve RNN vs Transformer at a glance 2. Self-Attention: Query, Key, Value The library analogy 3. The Attention Formula Scaled dot-product attention 4. Why Softmax? (Euler's e & probabilities) The softmax function 5. Multi-Head Attention Many perspectives at once 6. Positional Encoding Giving the model a sense of order 7. Encoder/Decoder vs Decoder-Only (LLMs) Three flavors of transformer 8. Self-Attention in numpy Scaled dot-product attention, from scratch 9. Free Resources ✅ Quick Quiz"}, {"t": "📏 Trigonometry: Sine, Cosine & Tangent", "u": "trigonometry.html", "s": "From right triangles to the unit circle — and why transformers use sin and cos to tell the model where each word sits in a sentence.", "k": "On this page 1. Right-triangle definitions (SOH-CAH-TOA) The three ratios 2. The unit circle A point at angle θ is (cosθ, sinθ) 3. Radians vs. degrees One full turn 4. Periodicity & range Sin and cos repeat every 2π 5. The key identity: sin²θ + cos²θ = 1 Pythagoras on the circle tan = sin ÷ cos 6. Where trig appears in ML/AI a) Transformer positional encoding b) Cyclical / seasonal feature encoding c) Rotations & signal processing (Fourier) 7. Code: cyclical encoding & a positional-encoding row Encode an hour as (sin, cos) Compute one transformer positional-encoding row Quick recap 8. Free Resources ✅ Quick Quiz"}];
+  document.getElementById("count").textContent = DOCS.length;
+
+  var STOP = new Set("a an the of to in on for is are and or vs how why what when which do does with your you it its as at be by from this that use used using into".split(" "));
+  function toks(s){ return (s.toLowerCase().match(/[a-z0-9]+/g)||[]).filter(function(w){return w.length>1 && !STOP.has(w);}); }
+
+  // precompute token bags
+  DOCS.forEach(function(d){
+    d._t = toks(d.t); d._s = toks(d.s); d._k = toks(d.k);
+    d._all = {};
+    d._t.forEach(function(w){ d._all[w]=(d._all[w]||0)+3; });   // title weighted high
+    d._k.forEach(function(w){ d._all[w]=(d._all[w]||0)+2; });   // headings
+    d._s.forEach(function(w){ d._all[w]=(d._all[w]||0)+1; });   // summary
+  });
+
+  function search(query){
+    var qs = toks(query);
+    if(!qs.length) return [];
+    var scored = DOCS.map(function(d){
+      var sc=0;
+      qs.forEach(function(w){
+        if(d._all[w]) sc += d._all[w];
+        // partial: word appears inside a title token
+        else if(d.t.toLowerCase().indexOf(w)>=0) sc += 1;
+      });
+      return {d:d, sc:sc};
+    }).filter(function(x){return x.sc>0;});
+    scored.sort(function(a,b){return b.sc-a.sc;});
+    return scored.slice(0,6);
+  }
+
+  var resEl=document.getElementById("results");
+  function render(query){
+    var hits=search(query);
+    if(!query.trim()){ resEl.innerHTML=""; return; }
+    if(!hits.length){ resEl.innerHTML='<p class="nohit">No matches. Try simpler keywords like "gradient", "attention", "privacy".</p>'; return; }
+    resEl.innerHTML = hits.map(function(x){
+      var d=x.d;
+      return '<div class="hit"><span class="score">score '+x.sc+'</span>'+
+             '<a href="'+d.u+'">'+d.t+'</a>'+
+             (d.s?'<div class="snip">'+d.s+'</div>':'')+'</div>';
+    }).join("");
+  }
+
+  var qEl=document.getElementById("q");
+  qEl.addEventListener("input", function(){ render(qEl.value); });
+
+  // example chips
+  var examples=["why does softmax use e","how does backpropagation work","RAG vs fine-tuning",
+                "what is a gradient","prompt injection defense","matrix multiplication","precision and recall"];
+  var chips=document.getElementById("chips");
+  examples.forEach(function(ex){
+    var c=document.createElement("span"); c.className="chip"; c.textContent=ex;
+    c.addEventListener("click",function(){ qEl.value=ex; render(ex); qEl.focus(); });
+    chips.appendChild(c);
+  });
+  qEl.focus();
+  </script>
+</body>
+</html>

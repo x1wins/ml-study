@@ -6,6 +6,8 @@ and (where useful) runnable Python code.
 
 **🌐 Live site:** https://x1wins.github.io/ml-study/
 
+**🔎 [Ask Your Notes](ask.html)** — client-side search across all guides (no server, no sign-up).
+
 ---
 
 ## 📚 Guides
