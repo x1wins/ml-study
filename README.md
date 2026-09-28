@@ -37,6 +37,15 @@ and (where useful) runnable Python code.
 | 14 | [Evaluation Metrics](evaluation-metrics.html) | Accuracy, precision/recall, F1, ROC/AUC, regression metrics |
 | 15 | [Ethics & Safety](ethics-safety.html) | Bias & fairness, privacy, responsible AI |
 
+## 🚀 Production & Engineering (MLOps)
+
+| Page | What it is |
+|------|-----------|
+| [Infrastructure as Code](mlops-iac.html) | Terraform/CloudFormation for ML: GPU clusters, spot instances, plan/apply/destroy |
+| [Model Registry & Versioning](model-registry.html) | MLflow, DVC, W&B — track params/metrics/artifacts, promote Staging → Production |
+| [Model Serving](model-serving.html) | FastAPI, TorchServe, Triton, vLLM; batching, latency vs throughput, autoscaling |
+| [CI/CD for ML](cicd-ml.html) | GitHub Actions: lint (ruff/black), test, validation gates, automated retraining |
+
 ## 🎯 Test Prep — get interview-ready
 
 | Page | What it is |

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Infrastructure as Code (IaC) for ML &mdash; Terraform, GPUs &amp; the plan/apply/destroy lifecycle</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --code-bg: #0b1120;
+      --code-text: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 0 4rem;
+    }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back {
+      display: inline-block;
+      margin: 1.5rem 0 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back:hover { text-decoration: underline; }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .toc h2 { border: none; margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--accent-2); }
+    .toc ol { padding-left: 1.25rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.5rem 0 0.5rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+
+    .concept {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .why {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+    }
+    .why strong { color: var(--accent); }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--code-text); }
+    p code, li code, td code { background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    .formula {
+      background: var(--code-bg);
+      border: 1px dashed var(--accent-2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--text);
+      margin: 0.75rem 0;
+      font-size: 1.05rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.92rem;
+    }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: var(--card); color: var(--accent-2); }
+
+    ul.clean { list-style: none; }
+    ul.clean li { padding: 0.2rem 0; color: var(--muted); }
+    ul.clean li::before { content: "\25B8 "; color: var(--accent); }
+
+    .diagram {
+      display: block;
+      width: 100%;
+      max-width: 560px;
+      margin: 0.75rem auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  
+    /* Shared sticky top navigation */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      align-items: center; padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; padding: 0.2rem 0.1rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  
+    /* Inline Quick Quiz */
+    .quizbox { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .quizbox h2 { border: none; margin: 0 0 0.25rem; }
+    .quizbar { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .quizbar strong { color: var(--accent); }
+    .qq { border-top: 1px solid var(--border); padding: 0.9rem 0 0.2rem; }
+    .qq:first-of-type { border-top: none; }
+    .qq .qt { font-weight: 600; margin-bottom: 0.5rem; }
+    .qopts { list-style: none; display: grid; gap: 0.4rem; padding: 0; }
+    .qopt { display: block; width: 100%; text-align: left; background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.96rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.12s ease, background 0.12s ease; }
+    .qopt:hover:not(:disabled) { border-color: var(--accent); }
+    .qopt:disabled { cursor: default; }
+    .qopt.correct { border-color: #4ade80; background: rgba(74,222,128,0.12); color: #d1fae5; }
+    .qopt.wrong { border-color: #f87171; background: rgba(248,113,113,0.12); color: #fecaca; }
+    .qex { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); border-left: 3px solid var(--accent);
+           padding: 0.3rem 0.7rem; display: none; }
+    .qex.show { display: block; }
+    .qex strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html" style="text-decoration:none;">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>&#127959;&#65039; Infrastructure as Code (IaC) for ML</h1>
+    <p>Spin up GPU training environments, storage, and networking from version-controlled files &mdash;
+       then tear it all down to stop the bill. Reproducible infra instead of clicking around a console.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="why" style="margin-top:1rem;">
+      <strong>Big picture:</strong> IaC means your cloud environment &mdash; the GPU box, the data
+      bucket, the network &mdash; is described in <em>files you commit to git</em>, not steps you
+      remember doing in a web console. Run one command to build it, one command to destroy it. That is
+      how ML teams keep experiments reproducible and cheap.
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#what">What IaC is &amp; why it matters</a></li>
+        <li><a href="#tools">Terraform vs CloudFormation</a></li>
+        <li><a href="#env">Spinning up an ML training environment</a></li>
+        <li><a href="#clusters">Managing training clusters (autoscaling &amp; spot)</a></li>
+        <li><a href="#lifecycle">The plan / apply / destroy lifecycle</a></li>
+        <li><a href="#teardown">Teardown to save cost</a></li>
+        <li><a href="#resources">Resources</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. WHAT -->
+    <h2 class="section" id="what">1. What IaC is &amp; why it matters</h2>
+    <p class="muted">Infrastructure as Code = describing servers, storage, and networks in text files that
+    a tool reads and provisions for you.</p>
+
+    <div class="concept">
+      <h3>Clicking in a console vs. writing code</h3>
+      <p>When you set up a GPU instance by clicking through a cloud console, the result lives only in
+      that account &mdash; nobody can review it, reproduce it, or roll it back. With <strong>IaC</strong>
+      you write a file like <code>main.tf</code> that <em>declares</em> what you want, commit it to git,
+      and the tool makes reality match the file.</p>
+      <table>
+        <tr><th>Aspect</th><th>Clicking in a console</th><th>Infrastructure as Code</th></tr>
+        <tr><td>Reproducible</td><td>No &mdash; manual, error-prone</td><td>Yes &mdash; same files, same result</td></tr>
+        <tr><td>Version-controlled</td><td>No history</td><td>Every change in git, reviewable in a PR</td></tr>
+        <tr><td>Teardown</td><td>Hunt &amp; delete by hand</td><td>One command destroys everything</td></tr>
+        <tr><td>Team sharing</td><td>"How did you set that up?"</td><td>Clone the repo &amp; apply</td></tr>
+      </table>
+      <div class="why">
+        <strong>Why it matters for ML:</strong> a training run is only reproducible if the
+        <em>environment</em> is reproducible too. IaC pins the instance type, region, disk size, and
+        drivers so a teammate (or future you) gets the exact same GPU box.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>The core idea: declarative &amp; idempotent</h3>
+      <p>You describe the <strong>desired end state</strong>, not the steps. Running the same file twice
+      does not create two buckets &mdash; the tool checks what already exists and only changes the
+      difference. That property is called <em>idempotency</em>.</p>
+      <div class="formula">your files (desired state) &minus; current cloud (actual state) &rarr; the changes to apply</div>
+    </div>
+
+    <!-- 2. TOOLS -->
+    <h2 class="section" id="tools">2. Terraform vs CloudFormation</h2>
+    <p class="muted">The two most common IaC tools you will meet. Both are declarative; they differ in
+    scope and how they track state.</p>
+
+    <div class="concept">
+      <h3>Side by side</h3>
+      <table>
+        <tr><th>&nbsp;</th><th>Terraform (HashiCorp)</th><th>CloudFormation (AWS)</th></tr>
+        <tr><td>Cloud support</td><td>Multi-cloud via <strong>providers</strong> (AWS, GCP, Azure&hellip;)</td><td>AWS only</td></tr>
+        <tr><td>Language</td><td>HCL (HashiCorp Configuration Language)</td><td>YAML or JSON templates</td></tr>
+        <tr><td>State</td><td>A <code>terraform.tfstate</code> file you manage (often in S3)</td><td>Managed by AWS behind the scenes</td></tr>
+        <tr><td>Style</td><td>Declarative</td><td>Declarative</td></tr>
+        <tr><td>Ecosystem</td><td>Huge module registry</td><td>Tight AWS integration</td></tr>
+      </table>
+      <div class="why">
+        <strong>Which to learn first?</strong> <strong>Terraform</strong> &mdash; its multi-cloud
+        providers and readable HCL make it the default for ML platform work, and the concepts transfer
+        everywhere.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Three words you must know</h3>
+      <ul class="clean">
+        <li><strong>Declarative</strong> &mdash; you state the goal (&ldquo;one GPU instance&rdquo;), the tool figures out the how</li>
+        <li><strong>Providers</strong> &mdash; plugins that teach Terraform how to talk to AWS, GCP, Azure, etc.</li>
+        <li><strong>State</strong> &mdash; a record of what Terraform has created, so it knows what to change or destroy next time</li>
+      </ul>
+      <pre><code># reference: declare the AWS provider and region (Terraform HCL)
+terraform {
+  required_providers {
+    aws = { source = "hashicorp/aws", version = "~&gt; 5.0" }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+}</code></pre>
+      <p class="muted">Snippet is <strong>reference</strong> only &mdash; it targets a real AWS account and cannot run in this browser.</p>
+    </div>
+
+    <!-- 3. ENVIRONMENT -->
+    <h2 class="section" id="env">3. Spinning up an ML training environment</h2>
+    <p class="muted">A minimal training setup needs three things: a <strong>GPU instance</strong> to
+    train on, a <strong>storage bucket</strong> for data &amp; artifacts, and <strong>networking</strong>
+    to connect them.</p>
+
+    <div class="concept">
+      <h3>The three pieces</h3>
+      <ul class="clean">
+        <li><strong>Compute</strong> &mdash; a GPU instance (e.g. AWS <code>g5</code>/<code>p4d</code>) where training actually runs</li>
+        <li><strong>Storage</strong> &mdash; an S3 bucket holding the dataset going in and the model checkpoints coming out</li>
+        <li><strong>Networking</strong> &mdash; a VPC, subnet, and security group so the instance can reach S3 and you can reach the instance</li>
+      </ul>
+
+      <svg class="diagram" viewBox="0 0 560 260" role="img"
+           aria-label="An ML training environment: a GPU instance inside a VPC subnet reads data from and writes artifacts to an S3 bucket.">
+        <!-- VPC boundary -->
+        <rect x="20" y="30" width="330" height="200" rx="12" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="6 4"/>
+        <text x="30" y="24" fill="#a78bfa" font-size="12">VPC &middot; subnet (networking)</text>
+        <!-- GPU instance -->
+        <rect x="60" y="80" width="150" height="70" rx="10" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="135" y="108" fill="#4ade80" font-size="13" text-anchor="middle">GPU instance</text>
+        <text x="135" y="128" fill="#94a3b8" font-size="11" text-anchor="middle">g5.xlarge</text>
+        <!-- security group note -->
+        <rect x="60" y="170" width="230" height="40" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+        <text x="175" y="194" fill="#38bdf8" font-size="11" text-anchor="middle">security group (allow SSH / egress)</text>
+        <!-- S3 bucket -->
+        <rect x="410" y="90" width="120" height="80" rx="10" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="470" y="120" fill="#fbbf24" font-size="13" text-anchor="middle">S3 bucket</text>
+        <text x="470" y="140" fill="#94a3b8" font-size="10" text-anchor="middle">data &amp; artifacts</text>
+        <!-- arrows compute <-> storage -->
+        <line x1="210" y1="105" x2="410" y2="115" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <text x="300" y="98" fill="#94a3b8" font-size="10" text-anchor="middle">read data</text>
+        <line x1="410" y1="150" x2="210" y2="135" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw)"/>
+        <text x="300" y="165" fill="#94a3b8" font-size="10" text-anchor="middle">write checkpoints</text>
+        <defs>
+          <marker id="arw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="concept">
+      <h3>Illustrative Terraform: a GPU box + an S3 bucket</h3>
+      <p>The snippet below declares one GPU instance and one bucket. It is <strong>illustrative</strong>
+      &mdash; it targets real AWS resources (and real charges) and cannot run in this browser. Names,
+      AMI, and instance type would be filled in for your account/region.</p>
+      <pre><code># illustrative &mdash; Terraform HCL (targets real AWS, do not run as-is)
+
+# GPU compute for training (g5 = NVIDIA A10G)
+resource "aws_instance" "trainer" {
+  ami           = "ami-0abcd1234gpu"   # a deep-learning AMI with drivers
+  instance_type = "g5.xlarge"          # 1 GPU &mdash; adjust to your job
+  subnet_id     = aws_subnet.train.id
+
+  tags = {
+    Project = "ml-study"
+    Purpose = "training"
+    Owner   = "you"
+  }
+}
+
+# Storage for datasets and model artifacts
+resource "aws_s3_bucket" "artifacts" {
+  bucket = "ml-study-artifacts-demo"
+
+  tags = {
+    Project = "ml-study"
+    Purpose = "data-and-artifacts"
+  }
+}</code></pre>
+      <div class="why">
+        <strong>Why tag everything?</strong> Tags like <code>Project</code> and <code>Owner</code> let
+        you find, group, and <em>bill</em> ML resources &mdash; and quickly spot orphaned GPUs someone
+        forgot to destroy.
+      </div>
+    </div>
+
+    <!-- 4. CLUSTERS -->
+    <h2 class="section" id="clusters">4. Managing training clusters (autoscaling &amp; spot)</h2>
+    <p class="muted">One instance is fine for a small job. For bigger or many parallel jobs, you scale
+    to a cluster &mdash; and you make it cheap with spot/preemptible instances.</p>
+
+    <div class="concept">
+      <h3>Autoscaling groups</h3>
+      <p>An <strong>autoscaling group</strong> (ASG) keeps a target number of instances running and can
+      grow or shrink on demand. For training you often set <code>min = 0</code> so the group scales all
+      the way down to <em>zero</em> when idle &mdash; no idle GPUs, no idle bill.</p>
+      <pre><code># illustrative &mdash; Terraform HCL (AWS autoscaling group)
+resource "aws_autoscaling_group" "trainers" {
+  min_size         = 0     # scale to zero when idle (no cost)
+  max_size         = 8     # burst up to 8 GPU nodes
+  desired_capacity = 0
+
+  tag {
+    key                 = "Project"
+    value               = "ml-study"
+    propagate_at_launch = true
+  }
+}</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>Spot / preemptible instances = cheap training</h3>
+      <p>Cloud providers sell spare capacity at a steep discount: AWS calls it <strong>Spot</strong>,
+      GCP calls it <strong>preemptible/Spot</strong>. The catch: the provider can reclaim the machine
+      with a couple minutes&rsquo; notice. That is fine for training if you
+      <strong>checkpoint often</strong> to S3, so a reclaimed job resumes instead of restarting.</p>
+      <table>
+        <tr><th>Instance type</th><th>Price</th><th>Can be reclaimed?</th><th>Good for</th></tr>
+        <tr><td>On-demand</td><td>Full price</td><td>No</td><td>Serving, short critical jobs</td></tr>
+        <tr><td>Spot / preemptible</td><td>Up to ~70&ndash;90% cheaper</td><td>Yes, with short notice</td><td>Fault-tolerant training with checkpoints</td></tr>
+      </table>
+      <div class="why">
+        <strong>Rule of thumb:</strong> train on <strong>spot</strong> + frequent checkpoints, serve on
+        <strong>on-demand</strong>. You get GPU training at a fraction of the cost with little downside.
+      </div>
+    </div>
+
+    <!-- 5. LIFECYCLE -->
+    <h2 class="section" id="lifecycle">5. The plan / apply / destroy lifecycle</h2>
+    <p class="muted">Terraform&rsquo;s workflow is three commands. Learn these and you can drive any
+    infrastructure.</p>
+
+    <div class="concept">
+      <h3>The three commands</h3>
+      <table>
+        <tr><th>Command</th><th>What it does</th></tr>
+        <tr><td><code>terraform plan</code></td><td>Dry run &mdash; shows exactly what will be created, changed, or destroyed. No changes made.</td></tr>
+        <tr><td><code>terraform apply</code></td><td>Makes the cloud match your files. Creates the GPU box, bucket, network.</td></tr>
+        <tr><td><code>terraform destroy</code></td><td>Deletes everything Terraform created. Your bill stops.</td></tr>
+      </table>
+      <pre><code># reference &mdash; CLI (needs a configured cloud account)
+terraform init      # download providers, set up state
+terraform plan      # preview the changes (safe, read-only)
+terraform apply     # build the environment
+# ... run your training job ...
+terraform destroy   # tear it all down when done</code></pre>
+
+      <svg class="diagram" viewBox="0 0 560 210" role="img"
+           aria-label="The IaC lifecycle: config files feed into plan, then apply creates cloud resources, and a destroy arrow removes those resources.">
+        <!-- config -->
+        <rect x="20" y="70" width="110" height="50" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <text x="75" y="92" fill="#a78bfa" font-size="12" text-anchor="middle">config</text>
+        <text x="75" y="108" fill="#94a3b8" font-size="10" text-anchor="middle">main.tf</text>
+        <!-- plan -->
+        <rect x="165" y="70" width="100" height="50" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="215" y="100" fill="#38bdf8" font-size="12" text-anchor="middle">plan</text>
+        <!-- apply -->
+        <rect x="300" y="70" width="100" height="50" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+        <text x="350" y="100" fill="#4ade80" font-size="12" text-anchor="middle">apply</text>
+        <!-- cloud resources -->
+        <rect x="435" y="60" width="105" height="70" rx="10" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+        <text x="487" y="88" fill="#fbbf24" font-size="12" text-anchor="middle">cloud</text>
+        <text x="487" y="106" fill="#94a3b8" font-size="10" text-anchor="middle">GPU + S3</text>
+        <!-- forward arrows -->
+        <line x1="130" y1="95" x2="165" y2="95" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw2)"/>
+        <line x1="265" y1="95" x2="300" y2="95" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw2)"/>
+        <line x1="400" y1="95" x2="435" y2="95" stroke="#e2e8f0" stroke-width="2" marker-end="url(#arw2)"/>
+        <!-- destroy arrow -->
+        <path d="M 487 130 C 487 180, 75 180, 75 120" fill="none" stroke="#f87171" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arwR)"/>
+        <text x="281" y="176" fill="#f87171" font-size="11" text-anchor="middle">destroy (tear down &amp; stop the bill)</text>
+        <defs>
+          <marker id="arw2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#e2e8f0"/>
+          </marker>
+          <marker id="arwR" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#f87171"/>
+          </marker>
+        </defs>
+      </svg>
+      <div class="why">
+        <strong>Always <code>plan</code> before <code>apply</code>.</strong> The plan output is your
+        safety check &mdash; it lists every resource that will be created or destroyed, so you never get
+        a surprise GPU (or lose one you needed).
+      </div>
+    </div>
+
+    <!-- 6. TEARDOWN -->
+    <h2 class="section" id="teardown">6. Teardown to save cost</h2>
+    <p class="muted">The single most important cost habit in ML: destroy what you are not using.</p>
+
+    <div class="concept">
+      <h3>Destroy when the job is done</h3>
+      <p>Because the environment is code, tearing it down is one command &mdash; not a scavenger hunt
+      through the console. Wrap it into your workflow: apply, train, download artifacts, destroy.</p>
+      <pre><code># reference &mdash; CLI
+terraform destroy -auto-approve   # remove the GPU box + network
+# S3 artifacts persist if you keep the bucket &mdash; storage is cheap, GPUs are not</code></pre>
+
+      <div class="why">
+        <strong>Never leave GPUs running.</strong> An idle GPU instance costs the same as a busy one
+        &mdash; and a single large multi-GPU box can burn tens of dollars <em>per hour</em>, day and
+        night, whether or not a job is running. Forgetting one over a weekend is a classic, expensive
+        mistake. Destroy (or scale the ASG to zero) the moment training finishes; keep only the cheap
+        S3 artifacts.
+      </div>
+
+      <h3>Cheap habits that add up</h3>
+      <ul class="clean">
+        <li>Set autoscaling <code>min_size = 0</code> so idle clusters cost nothing</li>
+        <li>Train on <strong>spot/preemptible</strong> instances with frequent S3 checkpoints</li>
+        <li>Tag every resource so you can find and kill orphans by <code>Project</code>/<code>Owner</code></li>
+        <li>Run <code>terraform destroy</code> as the last step of every experiment</li>
+        <li>Keep artifacts in cheap object storage, not on running GPU disks</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3>Where IaC fits in your ML journey</h3>
+      <p>IaC is the plumbing under the whole pipeline. See how the training step it provisions connects
+      to the rest of the flow in <a href="ml-workflow.html">the ML workflow</a>, and how the trained
+      model gets deployed in <a href="model-serving.html">model serving</a>.</p>
+    </div>
+
+    <!-- RESOURCES -->
+    <h2 class="section" id="resources">7. Free Resources</h2>
+    <div class="concept resources">
+      <ul class="clean">
+        <li><a href="https://developer.hashicorp.com/terraform/tutorials" target="_blank" rel="noopener">HashiCorp &mdash; Terraform Tutorials (official, hands-on)</a></li>
+        <li><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs" target="_blank" rel="noopener">Terraform AWS Provider &mdash; resource reference</a></li>
+        <li><a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html" target="_blank" rel="noopener">AWS CloudFormation &mdash; User Guide</a></li>
+        <li><a href="https://aws.amazon.com/ec2/spot/" target="_blank" rel="noopener">AWS EC2 Spot Instances &mdash; cheap training capacity</a></li>
+        <li><a href="https://cloud.google.com/compute/docs/instances/spot" target="_blank" rel="noopener">Google Cloud &mdash; Spot / preemptible VMs</a></li>
+      </ul>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    
+    <div class="quizbox">
+      <h2 class="section" style="margin-top:0;" id="quiz">✅ Quick Quiz</h2>
+      <p class="muted">Test yourself on this page. Click an answer for instant feedback.</p>
+      <div id="quickquiz" data-quiz="1"></div>
+    </div>
+
+  <script>
+  (function () {
+    var DATA = [{"q": "What is the main benefit of Infrastructure as Code (IaC)?", "options": ["Faster GPUs", "Reproducible, version-controlled infrastructure instead of manual console clicks", "Cheaper electricity", "It trains the model for you"], "correct": 1, "explain": "IaC defines infra in code you can version, review, and recreate reliably — no error-prone manual setup."}, {"q": "Terraform and CloudFormation are examples of:", "options": ["Model serving frameworks", "Declarative IaC tools", "Vector databases", "Python linters"], "correct": 1, "explain": "Both declare the desired end-state of cloud resources; the tool figures out how to reach it."}, {"q": "Which instances are cheapest for fault-tolerant ML training?", "options": ["On-demand", "Spot / preemptible instances", "Reserved for 3 years", "Dedicated hosts"], "correct": 1, "explain": "Spot/preemptible instances are far cheaper; training can checkpoint and tolerate interruptions."}, {"q": "In the Terraform lifecycle, which command tears down all resources?", "options": ["terraform plan", "terraform apply", "terraform destroy", "terraform init"], "correct": 2, "explain": "`terraform destroy` removes the managed resources — key for not paying for idle GPUs."}, {"q": "Why 'never leave GPUs running'?", "options": ["They wear out in minutes", "Idle GPU instances cost a lot per hour", "They leak data", "They slow down over time"], "correct": 1, "explain": "GPU instances are expensive by the hour; tear them down (IaC destroy) when training finishes."}];
+    var host = document.getElementById("quickquiz");
+    if (!host || !DATA || !DATA.length) return;
+    var total = DATA.length, score = 0, answered = 0;
+    var bar = document.createElement("div");
+    bar.className = "quizbar";
+    bar.innerHTML = 'Score: <strong id="qqScore">0</strong> / ' + total;
+    host.appendChild(bar);
+    DATA.forEach(function (item, qi) {
+      var wrap = document.createElement("div");
+      wrap.className = "qq";
+      var qt = document.createElement("div");
+      qt.className = "qt";
+      qt.textContent = (qi + 1) + ". " + item.q;
+      wrap.appendChild(qt);
+      var ul = document.createElement("div");
+      ul.className = "qopts";
+      var locked = false;
+      item.options.forEach(function (opt, oi) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "qopt";
+        b.textContent = opt;
+        b.addEventListener("click", function () {
+          if (locked) return;
+          locked = true;
+          answered++;
+          var btns = ul.querySelectorAll(".qopt");
+          btns.forEach(function (bb, i) {
+            bb.disabled = true;
+            if (i === item.correct) bb.classList.add("correct");
+            if (i === oi && oi !== item.correct) bb.classList.add("wrong");
+          });
+          if (oi === item.correct) { score++; document.getElementById("qqScore").textContent = score; }
+          ex.classList.add("show");
+        });
+        ul.appendChild(b);
+      });
+      wrap.appendChild(ul);
+      var ex = document.createElement("div");
+      ex.className = "qex";
+      ex.innerHTML = "<strong>Why:</strong> " + item.explain;
+      wrap.appendChild(ex);
+      host.appendChild(wrap);
+    });
+  })();
+  </script>
+
+    <footer>
+      <p>Infrastructure as Code for ML &middot; Part of your AI study journey &#128640;</p>
+    </footer>
+  </div>
+</body>
+</html>
