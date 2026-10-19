@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RNN vs Transformer — Easy English</title>
+  <meta name="description" content="A simple, picture-based explanation of RNN vs Transformer for human language, in easy English." />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --rnn: #fb923c;
+      --trans: #4ade80;
+      --purple: #a78bfa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.7; padding: 0 0 4rem;
+    }
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; align-items: center;
+      padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; text-decoration: none; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem; text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 640px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back { display: inline-block; margin: 1.5rem 0 0; color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+    .back:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem; font-size: 1.6rem; color: var(--accent);
+      border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; scroll-margin-top: 1rem;
+    }
+    p { margin-bottom: 0.85rem; }
+    .big { font-size: 1.08rem; }
+    .muted { color: var(--muted); }
+    ul { padding-left: 1.3rem; margin-bottom: 0.85rem; }
+    li { margin: 0.2rem 0; }
+
+    .concept {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+    }
+    .concept.rnn   { border-left: 5px solid var(--rnn); }
+    .concept.trans { border-left: 5px solid var(--trans); }
+    .concept.purple{ border-left: 5px solid var(--purple); }
+    .note {
+      background: rgba(56, 189, 248, 0.08); border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0; padding: 0.9rem 1.1rem; margin: 1rem 0;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.95rem; }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: #0b1120; color: var(--accent-2); }
+
+    .center { text-align: center; }
+    figure { margin: 1.25rem 0; text-align: center; }
+    svg { background: #0b1120; border: 1px solid var(--border); border-radius: 10px; max-width: 100%; height: auto; }
+    figcaption { color: var(--muted); font-size: 0.88rem; margin-top: 0.5rem; }
+    footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 3rem; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>🧠 RNN vs Transformer</h1>
+    <p>Two ways a computer can read human language — explained in easy English, with drawings.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <div class="note" style="margin-top:1rem;">
+      <strong>Big picture:</strong> An <strong>RNN</strong> reads a sentence one word at a time and keeps
+      a small memory. A <strong>Transformer</strong> looks at all words at once and lets every word
+      pay <em>attention</em> to every other word. See also:
+      <a href="rnn-lstm.html" style="color:var(--accent);">RNNs &amp; LSTMs</a> and
+      <a href="transformers.html" style="color:var(--accent);">Transformers</a>.
+    </div>
+
+    <!-- ============ RNN ============ -->
+    <h2 class="section">1. RNN — Reads one word at a time 🚶</h2>
+    <div class="concept rnn">
+      <p class="big">An <b>RNN</b> reads a sentence like a person walking down a line of words.
+        It reads <b>one word</b>, remembers a little, then reads the <b>next word</b>.</p>
+      <p>Think of a chain: each word passes a small note (its memory) to the next word.</p>
+
+      <figure>
+        <svg width="760" height="200" viewBox="0 0 760 200">
+          <g font-family="sans-serif" font-size="16" text-anchor="middle">
+            <rect x="20"  y="110" width="90" height="50" rx="8" fill="#7c2d12" stroke="#fb923c"/>
+            <text x="65"  y="142" fill="#ffedd5">The</text>
+            <rect x="150" y="110" width="90" height="50" rx="8" fill="#7c2d12" stroke="#fb923c"/>
+            <text x="195" y="142" fill="#ffedd5">cat</text>
+            <rect x="280" y="110" width="90" height="50" rx="8" fill="#7c2d12" stroke="#fb923c"/>
+            <text x="325" y="142" fill="#ffedd5">sat</text>
+            <rect x="410" y="110" width="90" height="50" rx="8" fill="#7c2d12" stroke="#fb923c"/>
+            <text x="455" y="142" fill="#ffedd5">on</text>
+            <rect x="540" y="110" width="90" height="50" rx="8" fill="#7c2d12" stroke="#fb923c"/>
+            <text x="585" y="142" fill="#ffedd5">the</text>
+            <rect x="670" y="110" width="80" height="50" rx="8" fill="#7c2d12" stroke="#fb923c"/>
+            <text x="710" y="142" fill="#ffedd5">mat</text>
+            <g stroke="#fb923c" stroke-width="3" fill="#fb923c">
+              <line x1="110" y1="135" x2="148" y2="135" marker-end="url(#arrO)"/>
+              <line x1="240" y1="135" x2="278" y2="135" marker-end="url(#arrO)"/>
+              <line x1="370" y1="135" x2="408" y2="135" marker-end="url(#arrO)"/>
+              <line x1="500" y1="135" x2="538" y2="135" marker-end="url(#arrO)"/>
+              <line x1="630" y1="135" x2="668" y2="135" marker-end="url(#arrO)"/>
+            </g>
+            <text x="380" y="40" font-size="18" fill="#fb923c">Memory passes along the chain ➡️</text>
+            <text x="380" y="70" font-size="14" fill="#94a3b8">(far-away words can be forgotten)</text>
+          </g>
+          <defs>
+            <marker id="arrO" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#fb923c"/>
+            </marker>
+          </defs>
+        </svg>
+        <figcaption>RNN: words are read in order, memory flows left ➜ right.</figcaption>
+      </figure>
+
+      <p>👍 <b>Good:</b> simple, reads in natural order.<br/>
+         👎 <b>Problem:</b> slow, and it <b>forgets</b> words that are far away.</p>
+    </div>
+
+    <!-- ============ Transformer ============ -->
+    <h2 class="section">2. Transformer — Looks at all words together 👀</h2>
+    <div class="concept trans">
+      <p class="big">A <b>Transformer</b> does not walk word by word. It puts <b>all words on the table</b>
+        and lets every word <b>look at every other word</b> at the same time. This "looking" is called
+        <b>attention</b>.</p>
+
+      <figure>
+        <svg width="760" height="260" viewBox="0 0 760 260">
+          <g font-family="sans-serif" font-size="16" text-anchor="middle">
+            <rect x="20"  y="30" width="90" height="46" rx="8" fill="#14532d" stroke="#4ade80"/>
+            <text x="65"  y="60" fill="#dcfce7">The</text>
+            <rect x="150" y="30" width="90" height="46" rx="8" fill="#14532d" stroke="#4ade80"/>
+            <text x="195" y="60" fill="#dcfce7">cat</text>
+            <rect x="280" y="30" width="90" height="46" rx="8" fill="#14532d" stroke="#4ade80"/>
+            <text x="325" y="60" fill="#dcfce7">sat</text>
+            <rect x="410" y="30" width="90" height="46" rx="8" fill="#14532d" stroke="#4ade80"/>
+            <text x="455" y="60" fill="#dcfce7">on</text>
+            <rect x="540" y="30" width="90" height="46" rx="8" fill="#14532d" stroke="#4ade80"/>
+            <text x="585" y="60" fill="#dcfce7">the</text>
+            <rect x="670" y="30" width="80" height="46" rx="8" fill="#14532d" stroke="#4ade80"/>
+            <text x="710" y="60" fill="#dcfce7">mat</text>
+            <g stroke="#4ade80" stroke-width="2" opacity="0.6">
+              <line x1="710" y1="200" x2="65"  y2="80"/>
+              <line x1="710" y1="200" x2="195" y2="80"/>
+              <line x1="710" y1="200" x2="325" y2="80"/>
+              <line x1="710" y1="200" x2="455" y2="80"/>
+              <line x1="710" y1="200" x2="585" y2="80"/>
+            </g>
+            <rect x="665" y="200" width="90" height="46" rx="8" fill="#4ade80" stroke="#bbf7d0"/>
+            <text x="710" y="230" fill="#052e16">mat</text>
+            <text x="330" y="170" font-size="18" fill="#4ade80">"mat" can look at ALL words at once 👀</text>
+          </g>
+        </svg>
+        <figcaption>Transformer: every word connects to every other word directly (attention).</figcaption>
+      </figure>
+
+      <p>👍 <b>Good:</b> very fast (reads all at once) and <b>never forgets</b> far-away words.<br/>
+         👎 <b>Cost:</b> needs more computer power for long text.</p>
+    </div>
+
+    <!-- ============ Example ============ -->
+    <h2 class="section">3. A simple example 📝</h2>
+    <div class="note big">
+      <p>"The <b>keys</b> on the table ... <b>are</b> missing."</p>
+      <p>To choose <b>"are"</b> (not "is"), the model must remember the word <b>"keys"</b> from far back.</p>
+      <p>🚶 <b>RNN:</b> may forget "keys" because it is far away.<br/>
+         👀 <b>Transformer:</b> looks straight back at "keys" — easy!</p>
+    </div>
+
+    <!-- ============ Table ============ -->
+    <h2 class="section">4. Quick compare 📊</h2>
+    <table>
+      <tr><th>Thing</th><th>🚶 RNN</th><th>👀 Transformer</th></tr>
+      <tr><td>How it reads</td><td>One word at a time</td><td>All words together</td></tr>
+      <tr><td>Speed</td><td>Slow</td><td>Fast</td></tr>
+      <tr><td>Far-away words</td><td>Easy to forget</td><td>Easy to remember</td></tr>
+      <tr><td>Computer power</td><td>Low</td><td>High</td></tr>
+      <tr><td>Examples</td><td>LSTM, GRU</td><td>GPT, BERT, Claude</td></tr>
+    </table>
+
+    <!-- ============ Winner? ============ -->
+    <h2 class="section">5. Is Transformer the winner? 🏆</h2>
+    <div class="concept trans">
+      <p class="big">For <b>human language</b> (chatbots, translation, writing) — <b>yes!</b> 🎉</p>
+      <p>Every big AI model today is a Transformer:</p>
+      <p class="center big">GPT · Claude · Gemini · Llama · DeepSeek · Qwen</p>
+      <p>Since about <b>2018–2020</b>, almost no one builds a new <i>big</i> language model with RNN.</p>
+    </div>
+
+    <!-- ============ Deprecated? ============ -->
+    <h2 class="section">6. Is RNN dead (deprecated)? ⚰️❌</h2>
+    <div class="concept rnn">
+      <p class="big"><b>No!</b> RNN is <b>not</b> dead. It just lost the spotlight 💡.</p>
+      <p>RNN (and LSTM, GRU) is still:</p>
+      <ul>
+        <li>✅ Fully supported in PyTorch, TensorFlow, Keras</li>
+        <li>✅ Taught in every AI class as a base idea</li>
+        <li>✅ Used in real products — see below 👇</li>
+      </ul>
+    </div>
+
+    <!-- ============ Who uses RNN ============ -->
+    <h2 class="section">7. Who still uses RNN now? 🔧</h2>
+    <div class="concept rnn">
+      <p class="big">RNN is good when data comes as a <b>stream</b>, or the device is <b>small and cheap</b>.</p>
+      <table>
+        <tr><th>Where</th><th>Why RNN still fits</th></tr>
+        <tr><td>⌚ Tiny devices<br/>(watches, sensors)</td><td>RNN is small and light; a Transformer is too heavy</td></tr>
+        <tr><td>🎙️ Live streaming<br/>(audio, typing next word)</td><td>RNN reads "one new item at a time" very naturally</td></tr>
+        <tr><td>📈 Short time-series<br/>(ECG, stock ticks, weather)</td><td>Sequences are short — RNN is cheap and good enough</td></tr>
+        <tr><td>🗣️ Some speech systems</td><td>Low delay (low latency) for real-time results</td></tr>
+        <tr><td>📉 Small data</td><td>Transformers need lots of data; a small RNN can win</td></tr>
+      </table>
+    </div>
+
+    <!-- ============ Comeback ============ -->
+    <h2 class="section">8. A surprise: RNN is coming back! 🔄</h2>
+    <div class="concept purple">
+      <p class="big">Transformers have one weak point: cost grows <b>very fast</b> for long text
+        (every word checks every other word = length × length).</p>
+
+      <figure>
+        <svg width="620" height="200" viewBox="0 0 620 200">
+          <g font-family="sans-serif" font-size="14">
+            <line x1="60" y1="170" x2="580" y2="170" stroke="#64748b" stroke-width="2"/>
+            <line x1="60" y1="170" x2="60"  y2="20"  stroke="#64748b" stroke-width="2"/>
+            <text x="300" y="195" text-anchor="middle" fill="#94a3b8">Length of text ➡️</text>
+            <text x="20" y="95" text-anchor="middle" fill="#94a3b8" transform="rotate(-90 20 95)">Cost ⬆️</text>
+            <polyline points="60,160 580,110" fill="none" stroke="#fb923c" stroke-width="4"/>
+            <text x="498" y="100" fill="#fb923c">RNN (cheap)</text>
+            <path d="M60,168 Q 380,160 540,30" fill="none" stroke="#4ade80" stroke-width="4"/>
+            <text x="415" y="52" fill="#4ade80">Transformer (gets costly)</text>
+          </g>
+        </svg>
+        <figcaption>For very long text, the RNN idea (keep a memory) can be cheaper.</figcaption>
+      </figure>
+
+      <p class="big">So researchers built <b>new RNN-style models</b> — fast like RNN, smart like Transformer:</p>
+      <ul>
+        <li>🐍 <b>Mamba</b> (State Space Models) — streams long text cheaply</li>
+        <li>🦅 <b>RWKV</b> — "an RNN that trains like a Transformer"</li>
+        <li>🔁 <b>xLSTM</b> (2024) — a modern, upgraded LSTM</li>
+      </ul>
+      <p>These are not the old RNNs — but they bring back the key idea:
+         <b>keep a running memory instead of looking at everything at once.</b></p>
+    </div>
+
+    <!-- ============ Summary ============ -->
+    <h2 class="section">9. Remember this one line ⭐</h2>
+    <div class="concept center big">
+      <p>🚶 <b>RNN</b> = read word by word, keep a small memory.</p>
+      <p>👀 <b>Transformer</b> = see all words at once, connect any word to any word.</p>
+      <p style="color:var(--trans);"><b>🏆 For big language models, Transformer is the winner today.</b></p>
+      <p style="color:var(--rnn);"><b>⚰️❌ But RNN is NOT dead — it is a light tool for streams and tiny devices.</b></p>
+      <p style="color:var(--purple);"><b>🔄 And the RNN idea is coming back with Mamba, RWKV, and xLSTM.</b></p>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>Made for easy learning 💙 · part of the ML Study notes</footer>
+  </div>
+</body>
+</html>
