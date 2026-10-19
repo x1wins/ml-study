@@ -283,6 +283,117 @@
       <p style="color:var(--purple);"><b>🔄 And the RNN idea is coming back with Mamba, RWKV, and xLSTM.</b></p>
     </div>
 
+    <!-- ============ Real world: live captions ============ -->
+    <h2 class="section">10. Real world: live captions &amp; interpreting 🎧</h2>
+    <div class="concept">
+      <p class="big">Question: when Zoom or YouTube show <b>live captions</b> or <b>live translation</b>,
+        do they use RNN or Transformer?</p>
+      <p>Short answer: <b>mostly Transformer today</b> — but RNN-style models still survive in one part
+        (streaming speech recognition). To see why, you have to know that "real-time interpreting" is not
+        one model. It is a <b>pipeline</b> of 2–3 steps:</p>
+
+      <figure>
+        <svg width="760" height="210" viewBox="0 0 760 210">
+          <g font-family="sans-serif" font-size="13" text-anchor="middle">
+            <!-- voice -->
+            <circle cx="70" cy="90" r="34" fill="#1e293b" stroke="#38bdf8"/>
+            <text x="70" y="86" fill="#e2e8f0">🎤 your</text>
+            <text x="70" y="102" fill="#e2e8f0">voice</text>
+            <!-- step 1 ASR -->
+            <rect x="170" y="56" width="130" height="68" rx="10" fill="#7c2d12" stroke="#fb923c"/>
+            <text x="235" y="82" fill="#ffedd5" font-size="14">1. Speech→Text</text>
+            <text x="235" y="100" fill="#fdba74" font-size="11">(ASR)</text>
+            <text x="235" y="116" fill="#fdba74" font-size="11">RNN-T / Transformer</text>
+            <!-- step 2 MT -->
+            <rect x="340" y="56" width="130" height="68" rx="10" fill="#14532d" stroke="#4ade80"/>
+            <text x="405" y="82" fill="#dcfce7" font-size="14">2. Translate</text>
+            <text x="405" y="100" fill="#86efac" font-size="11">(MT)</text>
+            <text x="405" y="116" fill="#86efac" font-size="11">Transformer</text>
+            <!-- step 3 TTS -->
+            <rect x="510" y="56" width="130" height="68" rx="10" fill="#3b0764" stroke="#a78bfa"/>
+            <text x="575" y="78" fill="#ede9fe" font-size="14">3. Text→Speech</text>
+            <text x="575" y="96" fill="#c4b5fd" font-size="11">(optional voice)</text>
+            <text x="575" y="112" fill="#c4b5fd" font-size="11">Transformer</text>
+            <!-- output -->
+            <circle cx="710" cy="90" r="30" fill="#1e293b" stroke="#38bdf8"/>
+            <text x="710" y="86" fill="#e2e8f0">📝/🔊</text>
+            <text x="710" y="102" fill="#e2e8f0">out</text>
+            <!-- arrows -->
+            <g stroke="#64748b" stroke-width="2.5" fill="#64748b">
+              <line x1="106" y1="90" x2="166" y2="90" marker-end="url(#arrG)"/>
+              <line x1="302" y1="90" x2="338" y2="90" marker-end="url(#arrG)"/>
+              <line x1="472" y1="90" x2="508" y2="90" marker-end="url(#arrG)"/>
+              <line x1="642" y1="90" x2="678" y2="90" marker-end="url(#arrG)"/>
+            </g>
+            <text x="380" y="170" fill="#94a3b8" font-size="12">Each box used to be RNN/LSTM. Today steps 2 and 3 are Transformer; step 1 is mixed.</text>
+          </g>
+          <defs>
+            <marker id="arrG" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+            </marker>
+          </defs>
+        </svg>
+        <figcaption>Live interpreting is a pipeline: recognize speech → translate → (optionally) speak.</figcaption>
+      </figure>
+
+      <h3 style="color:var(--accent-2); margin-top:1.25rem;">Step 1 — Speech-to-Text (ASR): the one place RNNs survive</h3>
+      <p>Turning sound into words is the step where RNN-style models are still genuinely used in production.
+        A design called the <b>RNN-Transducer (RNN-T)</b> was built specifically for <b>streaming</b>: it can
+        emit words <i>while you are still talking</i>, with very low delay. Google used RNN-T for on-device
+        speech. Because low latency matters so much for live captions, RNN-T stuck around longer here than
+        anywhere else.</p>
+      <p>That said, newer systems lean on Transformer-based speech models — for example
+        <b>Whisper</b> (Transformer) and <b>Conformer</b> (convolution + Transformer), often as a
+        <b>Conformer-Transducer</b> that keeps the streaming transducer idea but swaps the RNN core for a
+        Transformer core. So even here, the direction is toward Transformers.</p>
+
+      <h3 style="color:var(--accent-2);">Step 2 — Translation (MT): fully Transformer</h3>
+      <p>Translating the recognized text into another language is now <b>entirely Transformer territory</b>.
+        Google Translate used stacked LSTMs around 2016 (the "GNMT" system), but switched to Transformers a
+        few years later. Every major translation system today is Transformer-based. This is the clearest
+        "Transformer won" part of the pipeline.</p>
+
+      <h3 style="color:var(--accent-2);">Step 3 — Text-to-Speech (only if you want a spoken voice)</h3>
+      <p>If the output is a spoken voice (true "interpreting," not just captions), the system also needs
+        text-to-speech. This too moved away from RNN-based models (like the older Tacotron) toward
+        <b>Transformer and diffusion</b> models for more natural voices.</p>
+
+      <h3 style="color:var(--accent-2);">But wait — isn't RNN supposed to be better at streaming?</h3>
+      <p>Good instinct. RNNs process one piece at a time, so they feel like a natural fit for live audio.
+        Transformers normally look at a <i>whole</i> sequence at once, which sounds wrong for real-time.
+        The trick: in practice, streaming systems feed the Transformer a <b>short rolling window</b> — a few
+        hundred milliseconds of audio at a time — instead of the whole conversation. This "chunked" approach
+        gives near-real-time output while keeping the Transformer's accuracy. Combined with being more robust
+        to accents and background noise, that is why Transformers took over even this live use case.</p>
+
+      <h3 style="color:var(--accent-2);">So, Zoom and YouTube specifically?</h3>
+      <p class="muted">These companies don't fully publish their production stacks, so this part is
+        <b>informed inference, not confirmed fact</b>:</p>
+      <ul>
+        <li><b>YouTube</b> auto-captions &amp; auto-translate run on Google's modern speech and translation
+          stacks — Transformer-based translation, with Transformer (and likely some RNN-T) streaming speech
+          recognition.</li>
+        <li><b>Zoom</b> live captions and translated captions use modern Transformer-based models (Zoom
+          built up translation capability including the Kites team); live translated captions are a
+          Transformer-era feature.</li>
+      </ul>
+
+      <table>
+        <tr><th>Pipeline stage</th><th>Still RNN?</th><th>What's used today</th></tr>
+        <tr><td>🎤 Speech-to-text (ASR)</td><td>Partly (RNN-T)</td><td>Transformer-based, some RNN-T streaming parts</td></tr>
+        <tr><td>🌍 Translation (MT)</td><td>No</td><td>Transformer</td></tr>
+        <tr><td>🔊 Text-to-speech (TTS)</td><td>No</td><td>Transformer / diffusion</td></tr>
+      </table>
+
+      <div class="note">
+        <strong>Takeaway:</strong> Live interpreting on video platforms is mostly a <b>Transformer</b> job
+        now. The only place RNN-style models still genuinely live is <b>streaming speech recognition
+        (RNN-Transducer)</b>, because it was designed for low-latency, word-by-word output — and even that is
+        slowly becoming Transformer-based. This is a perfect example of the big rule: <i>RNNs survive in
+        streaming, low-latency niches; Transformers own the heavy language work.</i>
+      </div>
+    </div>
+
     <a class="back" href="index.html">&larr; Back to Learning Path</a>
 
     <footer>Made for easy learning 💙 · part of the ML Study notes</footer>
