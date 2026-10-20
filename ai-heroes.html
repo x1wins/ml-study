@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI History &amp; the Godfathers of Deep Learning</title>
+  <meta name="description" content="A short history of AI and the key people behind the deep learning revolution: Hinton, Bengio, LeCun, and Andrew Ng — their core algorithms and their views on AI's future." />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #334155;
+      --hinton: #f472b6;
+      --bengio: #38bdf8;
+      --lecun: #fb923c;
+      --ng: #4ade80;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.7; padding: 0 0 4rem;
+    }
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; align-items: center;
+      padding: 0.6rem 1.5rem;
+    }
+    .topnav .brand { font-weight: 700; color: var(--text); margin-right: auto; text-decoration: none; }
+    .topnav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; white-space: nowrap; }
+    .topnav a:hover { color: var(--accent); }
+    header {
+      background: linear-gradient(135deg, #0e7490, #6d28d9);
+      padding: 3rem 1.5rem; text-align: center;
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    header p { color: #cbd5e1; max-width: 680px; margin: 0 auto; }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .back { display: inline-block; margin: 1.5rem 0 0; color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+    .back:hover { text-decoration: underline; }
+
+    h2.section {
+      margin: 2.5rem 0 1rem; font-size: 1.6rem; color: var(--accent);
+      border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; scroll-margin-top: 1rem;
+    }
+    h3 { margin: 1.25rem 0 0.4rem; color: var(--accent-2); font-size: 1.15rem; }
+    p { margin-bottom: 0.85rem; }
+    .muted { color: var(--muted); }
+    ul { padding-left: 1.3rem; margin-bottom: 0.85rem; }
+    li { margin: 0.25rem 0; }
+    a.inline { color: var(--accent); text-decoration: none; }
+    a.inline:hover { text-decoration: underline; }
+
+    .note {
+      background: rgba(56, 189, 248, 0.08); border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0; padding: 0.9rem 1.1rem; margin: 1rem 0;
+    }
+
+    /* timeline */
+    .timeline { border-left: 3px solid var(--border); margin: 1rem 0 1rem 0.5rem; padding-left: 1.25rem; }
+    .tl { position: relative; margin-bottom: 1rem; }
+    .tl::before {
+      content: ""; position: absolute; left: -1.72rem; top: 0.35rem;
+      width: 12px; height: 12px; border-radius: 50%; background: var(--accent);
+      border: 2px solid var(--bg);
+    }
+    .tl .yr { font-weight: 700; color: var(--accent-2); }
+
+    /* hero cards */
+    .hero {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.1rem;
+      border-left: 5px solid var(--border);
+    }
+    .hero.hinton { border-left-color: var(--hinton); }
+    .hero.bengio { border-left-color: var(--bengio); }
+    .hero.lecun  { border-left-color: var(--lecun); }
+    .hero.ng     { border-left-color: var(--ng); }
+    .hero .who { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+    .hero .who h3 { margin: 0; color: var(--text); font-size: 1.25rem; }
+    .hero .role { font-size: 0.9rem; color: var(--muted); }
+    .hero h4 { margin: 0.8rem 0 0.2rem; font-size: 0.95rem; color: var(--accent); }
+
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.95rem; }
+    th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
+    th { background: #0b1120; color: var(--accent-2); }
+    footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 3rem; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <a class="brand" href="index.html">🤖 ML Study</a>
+    <a href="index.html#learn">Topics</a>
+    <a href="index.html#order">Learning Order</a>
+    <a href="index.html#resources">Resources</a>
+    <a href="https://github.com/x1wins/ml-study" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+  <header>
+    <h1>📜 AI History &amp; the Godfathers of Deep Learning</h1>
+    <p>A short, friendly history of AI — and the key people whose algorithms you already study on this site.</p>
+  </header>
+
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <!-- ============ Short history ============ -->
+    <h2 class="section" id="history">A very short history of AI 🕰️</h2>
+    <p>AI has gone through boom-and-bust cycles. The "deep learning" era we live in now took decades to arrive.</p>
+    <div class="timeline">
+      <div class="tl"><span class="yr">1950</span> — Alan Turing asks "Can machines think?" and proposes the <b>Turing Test</b>.</div>
+      <div class="tl"><span class="yr">1956</span> — The <b>Dartmouth workshop</b> coins the term "Artificial Intelligence." Big optimism begins.</div>
+      <div class="tl"><span class="yr">1958</span> — Rosenblatt's <b>Perceptron</b>: the first trainable artificial neuron.</div>
+      <div class="tl"><span class="yr">1969</span> — Minsky &amp; Papert show the perceptron's limits → first <b>"AI winter"</b> (funding dries up).</div>
+      <div class="tl"><span class="yr">1986</span> — Rumelhart, <b>Hinton</b> &amp; Williams popularize <b>backpropagation</b>, reviving neural nets.</div>
+      <div class="tl"><span class="yr">1989–98</span> — <b>LeCun</b> builds <b>LeNet</b>, an early <b>CNN</b> that reads handwritten digits (used on bank checks).</div>
+      <div class="tl"><span class="yr">1997</span> — Hochreiter &amp; Schmidhuber invent the <b>LSTM</b> (an RNN with long memory).</div>
+      <div class="tl"><span class="yr">2003</span> — <b>Bengio</b> and colleagues publish the <b>neural language model</b> → the seed of <b>word embeddings</b>.</div>
+      <div class="tl"><span class="yr">2011</span> — <b>Andrew Ng</b> co-founds <b>Google Brain</b>; the "Google cat" learns from unlabeled YouTube frames.</div>
+      <div class="tl"><span class="yr">2012</span> — <b>AlexNet</b> (Krizhevsky, Sutskever &amp; <b>Hinton</b>) crushes ImageNet → the modern <b>deep learning boom</b>.</div>
+      <div class="tl"><span class="yr">2017</span> — Google's <b>Transformer</b> ("Attention Is All You Need") replaces RNNs for language.</div>
+      <div class="tl"><span class="yr">2018</span> — Bengio, Hinton &amp; LeCun win the <b>ACM Turing Award</b> ("Nobel Prize of Computing").</div>
+      <div class="tl"><span class="yr">2022→</span> — <b>ChatGPT</b> and modern LLMs bring AI to the mainstream.</div>
+    </div>
+    <p class="muted" style="font-size:0.9rem;">Each bold algorithm above has its own guide on this site — follow the links in the profiles below.</p>
+
+    <!-- ============ The heroes ============ -->
+    <h2 class="section" id="heroes">The people behind it 🧑‍🔬</h2>
+    <p><b>Bengio, Hinton, and LeCun</b> jointly won the <b>2018 Turing Award</b> and are often called the
+      <b>"Godfathers of AI."</b> A popular (unofficial) fourth name is <b>Andrew Ng</b>, for bringing AI to
+      the world through Google Brain and online education. Here is what each is famous for — and what they
+      say about where AI is heading.</p>
+
+    <!-- Hinton -->
+    <div class="hero hinton">
+      <div class="who"><h3>1. Geoffrey Hinton</h3><span class="role">— "The Godfather of Deep Learning"</span></div>
+      <h4>Core work: Backpropagation &amp; AlexNet</h4>
+      <p>Hinton <b>co-popularized backpropagation</b> (Rumelhart, Hinton &amp; Williams, 1986) — the method
+        that lets a network learn by correcting its own errors, layer by layer. In <b>2012</b>, his students
+        Alex Krizhevsky and Ilya Sutskever built <b>AlexNet</b>, a deep CNN that dominated the ImageNet
+        contest and single-handedly kicked off the modern deep learning revolution.</p>
+      <h4>Recent view: existential risk ⚠️</h4>
+      <p>In 2023 he left Google to speak freely about AI danger. He argues AI is advancing faster than he
+        expected and may soon surpass human intelligence. His worry: <b>digital minds can copy and share what
+        they learn instantly</b> — something biological brains cannot — which could let AI eventually
+        out-compete or manipulate humanity.</p>
+      <p class="muted" style="font-size:0.9rem;">On this site: <a class="inline" href="neural-networks.html">Neural Networks (backprop)</a> ·
+        <a class="inline" href="cnn.html">CNNs (AlexNet)</a> · <a class="inline" href="gradient-descent.html">Gradient Descent</a></p>
+    </div>
+
+    <!-- Bengio -->
+    <div class="hero bengio">
+      <div class="who"><h3>2. Yoshua Bengio</h3><span class="role">— pioneer of neural language models</span></div>
+      <h4>Core work: word embeddings &amp; neural language models</h4>
+      <p>Bengio's landmark contribution is the <b>neural probabilistic language model (2003)</b>, which
+        represents words as <b>high-dimensional vectors (word embeddings)</b> so a network can capture meaning
+        and context. This idea is foundational to how modern systems like ChatGPT understand language. His
+        group also advanced <b>attention</b> for machine translation, a direct ancestor of the Transformer.</p>
+      <h4>Recent view: safety &amp; regulation 🛡️</h4>
+      <p>Bengio warns that advanced AI could slip out of human control or be misused (cyberattacks,
+        bio-weapons). He signed the <b>2023 letter calling to pause giant AI experiments</b> and now pushes
+        for strong government regulation and legally binding safety rules before powerful models ship.</p>
+      <p class="muted" style="font-size:0.9rem;">On this site: <a class="inline" href="rnn-lstm.html">RNNs &amp; LSTMs</a> ·
+        <a class="inline" href="transformers.html">Transformers (attention)</a> ·
+        <a class="inline" href="rag.html">Embeddings &amp; RAG</a></p>
+    </div>
+
+    <!-- LeCun -->
+    <div class="hero lecun">
+      <div class="who"><h3>3. Yann LeCun</h3><span class="role">— "The Father of CNNs"</span></div>
+      <h4>Core work: Convolutional Neural Networks (CNN)</h4>
+      <p>LeCun created the <b>CNN</b>, a network specialized for images that learns visual features in local
+        patches. His <b>LeNet</b> read handwritten digits on bank checks in the 1990s. CNNs now power
+        autonomous driving, medical image analysis, and face recognition.</p>
+      <h4>Recent view: optimistic, skeptical of LLMs 🤔</h4>
+      <p>LeCun argues today's <b>LLMs are limited</b> — they mostly predict the next word and lack real
+        understanding, planning, or common sense. He pushes a shift toward <b>"objective-driven" / world-model
+        AI</b> that can observe and plan like humans. He is <b>optimistic</b> and dismisses doomsday
+        scenarios.</p>
+      <p class="muted" style="font-size:0.9rem;">On this site: <a class="inline" href="cnn.html">CNNs</a> ·
+        <a class="inline" href="neural-networks.html">Neural Networks</a> ·
+        <a class="inline" href="rnn-vs-transformer.html">RNN vs Transformer</a></p>
+    </div>
+
+    <!-- Ng -->
+    <div class="hero ng">
+      <div class="who"><h3>4. Andrew Ng</h3><span class="role">— the popular "4th": AI's great teacher</span></div>
+      <h4>Core work: Google Brain &amp; democratizing AI</h4>
+      <p>Ng was the <b>founding lead of Google Brain</b> (the famous "Google cat" result, where a huge network
+        learned to spot cats from unlabeled YouTube frames). He co-founded <b>Coursera</b> and
+        <b>DeepLearning.AI</b>, teaching AI to <b>8M+ learners</b>, and was Chief Scientist at Baidu. More than
+        a single algorithm, his impact is <b>making ML practical and accessible to everyone</b>.</p>
+      <h4>Recent view: practical optimism 🚀</h4>
+      <p>Ng is famously optimistic. He calls fears of AI extinction overblown and compares worrying about it
+        to "worrying about overpopulation on Mars." His focus: <b>applying AI to real problems</b> and
+        building a skilled workforce. <span class="muted">(Note: not an official Turing-trio member — included
+        as the widely cited fourth figure.)</span></p>
+      <p class="muted" style="font-size:0.9rem;">On this site: <a class="inline" href="index.html#order">Learning Order</a> ·
+        <a class="inline" href="ml-workflow.html">ML Workflow</a> · <a class="inline" href="tools-frameworks.html">Tools &amp; Frameworks</a></p>
+    </div>
+
+    <!-- ============ Summary table ============ -->
+    <h2 class="section" id="summary">At a glance 📊</h2>
+    <table>
+      <tr><th>Person</th><th>Famous for</th><th>View on AI's future</th></tr>
+      <tr><td>Geoffrey Hinton</td><td>Backpropagation, AlexNet (2012)</td><td>⚠️ Existential risk — left Google to warn</td></tr>
+      <tr><td>Yoshua Bengio</td><td>Word embeddings, neural LMs</td><td>🛡️ Pro-regulation &amp; safety</td></tr>
+      <tr><td>Yann LeCun</td><td>CNNs (LeNet)</td><td>🤔 Optimistic; LLMs are limited</td></tr>
+      <tr><td>Andrew Ng <span class="muted">(4th, unofficial)</span></td><td>Google Brain, Coursera/DeepLearning.AI</td><td>🚀 Practical optimism</td></tr>
+    </table>
+
+    <div class="note">
+      <strong>Why they disagree:</strong> all four built the field, yet they split on risk — from Hinton's
+      alarm to LeCun's and Ng's optimism, with Bengio in between pushing guardrails. That honest disagreement
+      among the pioneers is itself worth remembering: <b>no one knows for sure where AI goes next.</b>
+    </div>
+
+    <p class="muted" style="font-size:0.85rem;">Sources: ACM 2018 Turing Award announcement; Wikipedia profiles
+      of Hinton, Bengio, LeCun, and Andrew Ng; Stanford HAI. Public quotes paraphrased.</p>
+
+    <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <footer>Made for easy learning 💙 · part of the ML Study notes</footer>
+  </div>
+</body>
+</html>
