@@ -199,6 +199,7 @@
       <h2>On this page</h2>
       <ol>
         <li><a href="#motivation">Why Transformers? (vs RNNs)</a></li>
+        <li><a href="#pipeline">The Input Pipeline: Tokenization &rarr; Embedding &rarr; Encoding</a></li>
         <li><a href="#attention">Self-Attention: Query, Key, Value</a></li>
         <li><a href="#formula">The Attention Formula</a></li>
         <li><a href="#softmax">Why Softmax? (Euler's e &amp; probabilities)</a></li>
@@ -241,6 +242,81 @@
         <tr><td>Word order</td><td>Built in (via recurrence)</td><td>Added via positional encoding</td></tr>
         <tr><td>Core operation</td><td>Hidden-state update</td><td>Self-attention</td></tr>
       </table>
+    </div>
+
+    <!-- 1a. INPUT PIPELINE -->
+    <h2 class="section" id="pipeline">The Input Pipeline: Tokenization &rarr; Embedding &rarr; Encoding</h2>
+    <p class="muted">Before attention can do anything, raw text has to become numbers. Three stages turn a sentence into context-aware vectors.</p>
+
+    <div class="concept">
+      <h3>The whole flow at a glance</h3>
+      <p>Everything upstream of self-attention is a fixed pipeline. Each stage feeds the next:</p>
+      <pre><code>  raw text
+     │  1. TOKENIZATION      split into subword tokens + map to ids
+     ▼
+  token ids            [1037, 4937, 2938, ...]
+     │  2. EMBEDDING         look up a learned vector per id (context-free)
+     ▼
+  token vectors        each id → a d_model-dim vector
+     │  + POSITIONAL ENCODING  add "where am I" so order is kept
+     ▼
+  input vectors        embedding + position, one per token
+     │  3. ENCODING          N layers of self-attention + feed-forward
+     ▼
+  contextual vectors   each token's meaning adjusted by its neighbours</code></pre>
+      <div class="why">
+        <strong>Why it matters:</strong> a network can only do math on numbers. This pipeline is how
+        the words "the cat sat" become vectors that carry meaning <em>and</em> order, ready for attention.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Stage 1 &mdash; Tokenization</h3>
+      <p>Text is split into <strong>tokens</strong> &mdash; usually <em>subwords</em>, not whole words &mdash;
+      and each token is mapped to an integer id from a fixed vocabulary. Subword schemes (BPE, WordPiece,
+      SentencePiece) keep the vocabulary small while still handling any word: rare or unseen words break into
+      known pieces.</p>
+      <ul class="clean">
+        <li><code>"tokenization"</code> &rarr; <code>["token", "##ization"]</code> &rarr; <code>[19204, 3989]</code></li>
+        <li>Common words stay whole; rare words split into reusable pieces.</li>
+        <li>Output: a list of integer ids &mdash; still just numbers pointing into a lookup table.</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3>Stage 2 &mdash; Embedding</h3>
+      <p>Each token id is used to look up a row in the <strong>embedding matrix</strong> &mdash; a big learned
+      table with one vector (size <code>d_model</code>, e.g. 768) per vocabulary entry. This is a pure lookup,
+      so at this point a token's vector is <strong>context-free</strong>: <code>"bank"</code> gets the same
+      vector in "river bank" and "savings bank".</p>
+      <pre><code>id 4937 ("cat")  →  [0.21, -0.47, 0.88, ..., 0.05]   (d_model numbers)
+id 3899 ("dog")  →  [0.19, -0.44, 0.91, ..., 0.03]   (close to "cat")
+id 2482 ("car")  →  [-0.62, 0.30, -0.11, ..., 0.77]  (far away)</code></pre>
+      <p>Similar meanings get vectors that point in similar directions &mdash; this is what makes the numbers
+      <em>meaningful</em> rather than arbitrary.</p>
+      <div class="why">
+        <strong>Positional encoding:</strong> because attention sees the tokens as a set, not a sequence, we
+        <em>add</em> a position signal to each embedding here (sine/cosine, or learned/RoPE). Now "dog bites man"
+        and "man bites dog" are distinguishable. See <a href="#positional">section 6</a>.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Stage 3 &mdash; Encoding</h3>
+      <p>The position-aware embeddings flow through <strong>N encoder layers</strong>. In each layer,
+      <strong>self-attention</strong> lets every token gather information from every other token, followed by a
+      feed-forward network (with residual connections and layer norm). The output is one vector per token &mdash;
+      same count as the input, but now each is <strong>context-aware</strong>.</p>
+      <ul class="clean">
+        <li>Before encoding: <code>"bank"</code> has one fixed embedding.</li>
+        <li>After encoding: <code>"bank"</code> in "river bank" ends up with a <em>different</em> vector than in "savings bank".</li>
+      </ul>
+      <div class="why">
+        <strong>Embedding vs. encoding:</strong> the <em>embedding</em> is the context-free lookup (stage 2);
+        <em>encoding</em> is the processing that turns those lookups into context-aware representations (stage 3).
+        Embeddings are the raw material; encoding is the refinement. The next sections open up exactly what
+        happens inside an encoder layer &mdash; starting with self-attention.
+      </div>
     </div>
 
     <!-- 2. SELF-ATTENTION -->
