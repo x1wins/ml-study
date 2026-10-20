@@ -81,10 +81,18 @@
     .hero.bengio { border-left-color: var(--bengio); }
     .hero.lecun  { border-left-color: var(--lecun); }
     .hero.ng     { border-left-color: var(--ng); }
-    .hero .who { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+    .hero .who { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; }
     .hero .who h3 { margin: 0; color: var(--text); font-size: 1.25rem; }
     .hero .role { font-size: 0.9rem; color: var(--muted); }
     .hero h4 { margin: 0.8rem 0 0.2rem; font-size: 0.95rem; color: var(--accent); }
+    .avatar { flex: 0 0 auto; width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--border); background: #0b1120; }
+    .hero.hinton .avatar { border-color: var(--hinton); }
+    .hero.bengio .avatar { border-color: var(--bengio); }
+    .hero.lecun  .avatar { border-color: var(--lecun); }
+    .hero.ng     .avatar { border-color: var(--ng); }
+    .who-text { display: flex; flex-direction: column; }
+    .avatar-row { display: flex; gap: 0.6rem; justify-content: center; margin: 1rem 0 0.5rem; flex-wrap: wrap; }
+    .avatar-row .avatar { width: 52px; height: 52px; }
 
     table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.95rem; }
     th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; vertical-align: top; }
@@ -107,6 +115,60 @@
 
   <div class="container">
     <a class="back" href="index.html">&larr; Back to Learning Path</a>
+
+    <!-- Stylized portrait sprite (self-contained, no external images) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <!-- Hinton: older, white hair + beard, glasses -->
+      <symbol id="av-hinton" viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="32" fill="#2a1420"/>
+        <circle cx="32" cy="26" r="14" fill="#e8c9a0"/>
+        <path d="M18 24 q14 -16 28 0 q2 -14 -14 -16 q-16 2 -14 16Z" fill="#e5e7eb"/>
+        <path d="M20 30 q12 16 24 0 q0 10 -12 12 q-12 -2 -12 -12Z" fill="#e5e7eb"/>
+        <rect x="22" y="25" width="8" height="6" rx="3" fill="none" stroke="#111827" stroke-width="1.5"/>
+        <rect x="34" y="25" width="8" height="6" rx="3" fill="none" stroke="#111827" stroke-width="1.5"/>
+        <line x1="30" y1="27" x2="34" y2="27" stroke="#111827" stroke-width="1.5"/>
+        <path d="M16 64 q16 -16 32 0Z" fill="#9d174d"/>
+      </symbol>
+      <!-- Bengio: grey hair, no glasses -->
+      <symbol id="av-bengio" viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="32" fill="#0b2a3a"/>
+        <circle cx="32" cy="27" r="14" fill="#e8c9a0"/>
+        <path d="M18 23 q14 -14 28 0 q0 -13 -14 -14 q-14 1 -14 14Z" fill="#cbd5e1"/>
+        <circle cx="27" cy="27" r="1.6" fill="#1f2937"/>
+        <circle cx="37" cy="27" r="1.6" fill="#1f2937"/>
+        <path d="M27 33 q5 4 10 0" fill="none" stroke="#9c6b4a" stroke-width="1.5"/>
+        <path d="M16 64 q16 -15 32 0Z" fill="#0ea5e9"/>
+      </symbol>
+      <!-- LeCun: dark hair, glasses -->
+      <symbol id="av-lecun" viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="32" fill="#2a1a0b"/>
+        <circle cx="32" cy="27" r="14" fill="#e3bd90"/>
+        <path d="M18 24 q14 -15 28 0 q1 -12 -14 -13 q-15 1 -14 13Z" fill="#3f3f46"/>
+        <rect x="22" y="25" width="8" height="6" rx="3" fill="none" stroke="#111827" stroke-width="1.5"/>
+        <rect x="34" y="25" width="8" height="6" rx="3" fill="none" stroke="#111827" stroke-width="1.5"/>
+        <line x1="30" y1="27" x2="34" y2="27" stroke="#111827" stroke-width="1.5"/>
+        <path d="M27 34 q5 3 10 0" fill="none" stroke="#9c6b4a" stroke-width="1.5"/>
+        <path d="M16 64 q16 -15 32 0Z" fill="#ea580c"/>
+      </symbol>
+      <!-- Ng: black hair, younger, no glasses -->
+      <symbol id="av-ng" viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="32" fill="#0b2a1a"/>
+        <circle cx="32" cy="27" r="14" fill="#e8c6a0"/>
+        <path d="M18 25 q14 -16 28 0 q1 -13 -14 -14 q-15 1 -14 14Z" fill="#18181b"/>
+        <circle cx="27" cy="27" r="1.6" fill="#1f2937"/>
+        <circle cx="37" cy="27" r="1.6" fill="#1f2937"/>
+        <path d="M27 33 q5 4 10 0" fill="none" stroke="#9c6b4a" stroke-width="1.5"/>
+        <path d="M16 64 q16 -15 32 0Z" fill="#16a34a"/>
+      </symbol>
+    </svg>
+
+    <div class="avatar-row" aria-hidden="true">
+      <svg class="avatar"><use href="#av-hinton"/></svg>
+      <svg class="avatar"><use href="#av-bengio"/></svg>
+      <svg class="avatar"><use href="#av-lecun"/></svg>
+      <svg class="avatar"><use href="#av-ng"/></svg>
+    </div>
+    <p class="muted" style="text-align:center; font-size:0.82rem; margin-top:0;">Stylized illustrations (not real photos).</p>
 
     <!-- ============ Short history ============ -->
     <h2 class="section" id="history">A very short history of AI 🕰️</h2>
@@ -137,7 +199,7 @@
 
     <!-- Hinton -->
     <div class="hero hinton">
-      <div class="who"><h3>1. Geoffrey Hinton</h3><span class="role">— "The Godfather of Deep Learning"</span></div>
+      <div class="who"><svg class="avatar"><use href="#av-hinton"/></svg><span class="who-text"><h3>1. Geoffrey Hinton</h3><span class="role">— "The Godfather of Deep Learning"</span></span></div>
       <h4>Core work: Backpropagation &amp; AlexNet</h4>
       <p>Hinton <b>co-popularized backpropagation</b> (Rumelhart, Hinton &amp; Williams, 1986) — the method
         that lets a network learn by correcting its own errors, layer by layer. In <b>2012</b>, his students
@@ -154,7 +216,7 @@
 
     <!-- Bengio -->
     <div class="hero bengio">
-      <div class="who"><h3>2. Yoshua Bengio</h3><span class="role">— pioneer of neural language models</span></div>
+      <div class="who"><svg class="avatar"><use href="#av-bengio"/></svg><span class="who-text"><h3>2. Yoshua Bengio</h3><span class="role">— pioneer of neural language models</span></span></div>
       <h4>Core work: word embeddings &amp; neural language models</h4>
       <p>Bengio's landmark contribution is the <b>neural probabilistic language model (2003)</b>, which
         represents words as <b>high-dimensional vectors (word embeddings)</b> so a network can capture meaning
@@ -171,7 +233,7 @@
 
     <!-- LeCun -->
     <div class="hero lecun">
-      <div class="who"><h3>3. Yann LeCun</h3><span class="role">— "The Father of CNNs"</span></div>
+      <div class="who"><svg class="avatar"><use href="#av-lecun"/></svg><span class="who-text"><h3>3. Yann LeCun</h3><span class="role">— "The Father of CNNs"</span></span></div>
       <h4>Core work: Convolutional Neural Networks (CNN)</h4>
       <p>LeCun created the <b>CNN</b>, a network specialized for images that learns visual features in local
         patches. His <b>LeNet</b> read handwritten digits on bank checks in the 1990s. CNNs now power
@@ -188,7 +250,7 @@
 
     <!-- Ng -->
     <div class="hero ng">
-      <div class="who"><h3>4. Andrew Ng</h3><span class="role">— the popular "4th": AI's great teacher</span></div>
+      <div class="who"><svg class="avatar"><use href="#av-ng"/></svg><span class="who-text"><h3>4. Andrew Ng</h3><span class="role">— the popular "4th": AI's great teacher</span></span></div>
       <h4>Core work: Google Brain &amp; democratizing AI</h4>
       <p>Ng was the <b>founding lead of Google Brain</b> (the famous "Google cat" result, where a huge network
         learned to spot cats from unlabeled YouTube frames). He co-founded <b>Coursera</b> and
