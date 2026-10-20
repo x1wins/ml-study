@@ -206,6 +206,7 @@
         <li><a href="#multihead">Multi-Head Attention</a></li>
         <li><a href="#positional">Positional Encoding</a></li>
         <li><a href="#arch">Encoder/Decoder vs Decoder-Only (LLMs)</a></li>
+        <li><a href="#rnn-tf-mamba">RNN vs Transformer vs Mamba</a></li>
         <li><a href="#code">Self-Attention in numpy</a></li>
         <li><a href="#resources">Resources</a></li>
       </ol>
@@ -541,6 +542,66 @@ id 2482 ("car")  →  [-0.62, 0.30, -0.11, ..., 0.77]  (far away)</code></pre>
         and captures long-range meaning, you can pour in more data, more parameters, and more compute
         and keep getting better &mdash; the "scaling laws" that took us from a research paper to
         ChatGPT.
+      </div>
+    </div>
+
+    <!-- 7a. RNN vs TRANSFORMER vs MAMBA -->
+    <h2 class="section" id="rnn-tf-mamba">RNN vs Transformer vs Mamba</h2>
+    <p class="muted">Three ways to process a sequence, each defined by one core idea &mdash; and why the field moved the way it did.</p>
+
+    <div class="concept">
+      <h3>The one-idea summary</h3>
+      <pre><code>RNN / LSTM   sequential + forgetting   read word by word, slowly forget
+Transformer  parallel + global         read all at once, link any two tokens
+Mamba / SSM  linear + stateful         carry a smart running state, cheap on long inputs</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3>RNN / LSTM &mdash; sequential, fading memory</h3>
+      <p>Processes <strong>one token at a time</strong>, carrying a hidden state forward. To reach token 100 it must pass through tokens 1&hellip;99.</p>
+      <ul class="clean">
+        <li><strong>Sequential</strong> &mdash; each step waits for the previous, so it can't parallelize for training.</li>
+        <li><strong>Forgets</strong> &mdash; the hidden state is overwritten each step, so early information fades (vanishing gradients).</li>
+      </ul>
+      <p>Dominant in NLP roughly 2014&ndash;2017; retired from large-scale work because of those two weaknesses.</p>
+    </div>
+
+    <div class="concept">
+      <h3>Transformer &mdash; parallel, global connections</h3>
+      <p>Dropped recurrence for <strong>self-attention</strong>: every token looks at every other token directly and in parallel.</p>
+      <ul class="clean">
+        <li><strong>Parallel</strong> &mdash; all tokens at once, so it trains efficiently on GPUs (the practical reason it scaled into LLMs).</li>
+        <li><strong>Global</strong> &mdash; any two tokens are one attention step apart, so no long-range fading.</li>
+      </ul>
+      <div class="why">
+        <strong>The catch:</strong> self-attention compares every token to every other token, so cost grows <strong>quadratically</strong> with sequence length &mdash; 10&times; longer input is 100&times; more work. That is the opening the challengers aim at.
+      </div>
+    </div>
+
+    <div class="concept">
+      <h3>Mamba / State-Space Models &mdash; linear, stateful (the RNN comeback)</h3>
+      <p>Mamba (2023) is the breakout <strong>state-space model (SSM)</strong>. It revives the RNN idea &mdash; carry a running state, update it token by token &mdash; but fixes the old flaws.</p>
+      <ul class="clean">
+        <li><strong>Linear cost</strong> &mdash; O(N) instead of O(N&sup2;), far cheaper on very long inputs (long docs, audio, genomes).</li>
+        <li><strong>Trains in parallel</strong> &mdash; computed with a parallel scan, so unlike classic RNNs it is GPU-friendly.</li>
+        <li><strong>Selective state</strong> &mdash; the state update is input-dependent (it chooses what to keep or forget), recovering long-range modeling plain RNNs lacked.</li>
+        <li><strong>Fast inference</strong> &mdash; streams one step with a fixed-size state instead of re-attending to a growing context.</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3>Side by side</h3>
+      <table>
+        <tr><th>&nbsp;</th><th>RNN / LSTM</th><th>Transformer</th><th>Mamba / SSM</th></tr>
+        <tr><td>Core idea</td><td>hidden state</td><td>self-attention</td><td>selective state</td></tr>
+        <tr><td>Processing</td><td>sequential</td><td>parallel</td><td>parallel (scan)</td></tr>
+        <tr><td>Cost vs length</td><td>linear</td><td>quadratic O(N&sup2;)</td><td>linear O(N)</td></tr>
+        <tr><td>Long-range memory</td><td>fades</td><td>direct / global</td><td>strong, learned</td></tr>
+        <tr><td>Trains on GPU</td><td>poorly</td><td>excellently</td><td>well</td></tr>
+        <tr><td>Status</td><td>legacy</td><td>dominant (LLMs)</td><td>promising challenger</td></tr>
+      </table>
+      <div class="why">
+        <strong>Honest status:</strong> Transformers still dominate &mdash; nearly all major LLMs are Transformers, with mature tooling and proven scaling. Mamba/SSMs are promising for long-context and streaming, and hybrids (attention + SSM layers) try to get both. Is the RNN dead? No &mdash; Mamba is essentially a modern, fixed RNN proving the recurrent idea still competes.
       </div>
     </div>
 
